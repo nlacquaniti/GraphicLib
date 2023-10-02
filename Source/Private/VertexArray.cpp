@@ -5,46 +5,22 @@
 #include <cassert>
 
 #ifdef OPEN_GL_IMPL
-#include "OpenGLImpl/VertexArrayImpl.h"
-using VertexArrayImpl = GraphicLib::OpenGLImpl::VertexArrayImpl;
+#include "OpenGLImpl/VertexArrayOpsImpl.h"
+using VertexArrayOpsImpl = GraphicLib::OpenGLImpl::VertexArrayOpsImpl;
 #else
 #error "No VertexArrayImpl has been detected."
 #endif
 
 namespace GraphicLib {
-VertexArray* VertexArray::Create(VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer) {
-    _vertexBuffer = vertexBuffer;
-    assert(_vertexBuffer != nullptr);
-    _indexBuffer = indexBuffer;
-    assert(_indexBuffer != nullptr);
-    return new VertexArrayImpl();
+void VertexArrayOps::_initialiseVertexArrayData(unsigned int& id) {
+    VertexArrayOpsImpl::InitialiseVertexArrayData(id);
 }
 
-unsigned int VertexArray::GetID() const {
-    return _getID();
+void VertexArrayOps::_bind(unsigned int id, unsigned int vertexBufferId, unsigned int indexBufferId) {
+    VertexArrayOpsImpl::Bind(id, vertexBufferId, indexBufferId);
 }
 
-VertexBuffer& VertexArray::GetVertexBuffer() {
-    return *_vertexBuffer;
-}
-
-const VertexBuffer& VertexArray::GetVertexBuffer() const {
-    return *_vertexBuffer;
-}
-
-IndexBuffer& VertexArray::GetIndexBuffer() {
-    return *_indexBuffer;
-}
-
-const IndexBuffer& VertexArray::GetIndexBuffer() const {
-    return *_indexBuffer;
-}
-
-void VertexArray::Bind() const {
-    _bind();
-}
-
-void VertexArray::Unbind() const {
-    _unbind();
+void VertexArrayOps::_unbind(unsigned int id, unsigned int vertexBufferId, unsigned int indexBufferId) {
+    VertexArrayOpsImpl::Unbind(id, vertexBufferId, indexBufferId);
 }
 } // namespace GraphicLib

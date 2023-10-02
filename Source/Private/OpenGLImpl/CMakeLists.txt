@@ -1,21 +1,24 @@
 target_sources(${PROJECT_NAME} PRIVATE 
 	ShaderImpl.h
-	ShaderImpl.cpp
-	VertexArrayImpl.h
-	VertexArrayImpl.h
-	VertexArrayImpl.cpp
-	VertexBufferImpl.h
-	VertexBufferImpl.cpp
-	IndexBufferImpl.h
-	IndexBufferImpl.cpp
-	WindowImpl.h
-	WindowImpl.cpp
+	"VertexArrayOpsImpl.h"
+	VertexBufferOpsImpl.h
+	IndexBufferOpsImpl.h
+	
 	OpenGLLogSystem.h
-	OpenGLLogSystem.cpp
 	GLFWLogSystem.h
-	GLFWLogSystem.cpp
 	glad.h
 	glfw.h
+
+	WindowImpl.h
+
+	ShaderImpl.cpp
+	"VertexArrayOpsImpl.cpp"
+	VertexBufferOpsImpl.cpp
+	IndexBufferOpsImpl.cpp
+	
+	WindowImpl.cpp
+	OpenGLLogSystem.cpp
+	GLFWLogSystem.cpp
 )
 
 add_subdirectory(Vendors)

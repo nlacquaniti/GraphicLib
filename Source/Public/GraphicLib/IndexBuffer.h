@@ -1,26 +1,60 @@
 #pragma once
 
 #include "DLL_API.h"
+#include "GraphicLib/Utilities/StackArray.h"
 
 namespace GraphicLib {
-class DLL_API IndexBuffer {
-public:
-    static IndexBuffer* Create();
-    virtual ~IndexBuffer() = default;
-    IndexBuffer(const IndexBuffer& other) = delete;
-    IndexBuffer& operator=(const IndexBuffer& other) = delete;
-    unsigned int GetID() const;
-    void Bind() const;
-    void Unbind() const;
-    void SetData(const unsigned int* const dataArray, unsigned int dataArrayCount);
+template<unsigned int INDICES_COUNT>
+struct IndexBufferData final {
+    IndexBufferData();
+    StackArray<unsigned int, INDICES_COUNT> data{};
+    unsigned int id{};
+};
 
-protected:
-    IndexBuffer() = default;
+class IndexBufferOps final {
+public:
+    template<unsigned int INDICES_COUNT>
+    static void InitialiseIndexBufferData(IndexBufferData<INDICES_COUNT>& indexBufferData);
+
+    template<unsigned int INDICES_COUNT>
+    static void Bind(const IndexBufferData<INDICES_COUNT>& indexBufferData);
+
+    template<unsigned int INDICES_COUNT>
+    static void Unbind(const IndexBufferData<INDICES_COUNT>& indexBufferData);
+
+    template<unsigned int INDICES_COUNT>
+    static void SetData(const IndexBufferData<INDICES_COUNT>& indexBufferData);
 
 private:
-    virtual unsigned int _getID() const = 0;
-    virtual void _bind() const = 0;
-    virtual void _unbind() const = 0;
-    virtual void _setData(const unsigned int* const dataArray, unsigned int dataArrayCount) const = 0;
+    DLL_API static void _initialiseIndexBufferData(unsigned int& id);
+    DLL_API static void _bind(unsigned int id);
+    DLL_API static void _unbind(unsigned int id);
+    DLL_API static void _setData(unsigned int id, const StackArraySpan<unsigned int>& data);
 };
+
+template<unsigned int INDICES_COUNT>
+IndexBufferData<INDICES_COUNT>::IndexBufferData() {
+    IndexBufferOps::InitialiseIndexBufferData(*this);
+}
+
+template<unsigned int INDICES_COUNT>
+void IndexBufferOps::InitialiseIndexBufferData(IndexBufferData<INDICES_COUNT>& indexBufferData) {
+    _initialiseIndexBufferData(IndexBufferData.id)
+}
+
+template<unsigned int INDICES_COUNT>
+void IndexBufferOps::Bind(const IndexBufferData<INDICES_COUNT>& indexBufferData) {
+    _bind(indexBufferData.id);
+}
+
+template<unsigned int INDICES_COUNT>
+void IndexBufferOps::Unbind(const IndexBufferData<INDICES_COUNT>& indexBufferData) {
+    _unbind(indexBufferData.id);
+}
+
+template<unsigned int INDICES_COUNT>
+void IndexBufferOps::SetData(const IndexBufferData<INDICES_COUNT>& indexBufferData) {
+    _setData(MakeStackArraySpan(indexBufferData));
+}
+
 } // namespace GraphicLib

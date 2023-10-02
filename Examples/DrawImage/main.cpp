@@ -1,5 +1,9 @@
 #include <GraphicLib/Logger.h>
+#include <GraphicLib/Utilities/StackArray.h>
 #include <GraphicLib/Window.h>
+#include "GraphicLib/VertexBuffer.h"
+#include "GraphicLib/IndexBuffer.h"
+#include "GraphicLib/VertexArray.h"
 #include <iostream>
 #include <memory>
 
@@ -36,6 +40,12 @@ void Application::Initialise() {
     GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::NOTIFICATION);
     GraphicLib::Logger::SetCallback(LoggerCallback, nullptr);
 
+    struct Vertex {
+        float pos[3];
+    };
+    GraphicLib::VertexBufferData<Vertex, 1, 3> vbd{};
+    GraphicLib::VertexBufferOps::Bind(vbd);
+
     _window.reset(GraphicLib::CreateWindow(800, 600, "Example"));
     _window->SetOnCloseCallback(CloseWindowCallback, this);
     _window->SetOnRenderWindowCallback(RenderWindowCallback, this);
@@ -50,7 +60,6 @@ void Application::Start() {
 }
 
 void Application::Render() {
-
 }
 
 void Application::Stop() {

@@ -1,30 +1,48 @@
 #include "GraphicLib/VertexBuffer.h"
 
+#include "InternalLogger.h"
+
 #ifdef OPEN_GL_IMPL
-#include "OpenGLImpl/VertexBufferImpl.h"
-using VertexBufferImpl = GraphicLib::OpenGLImpl::VertexBufferImpl;
+#include "OpenGLImpl/VertexBufferOpsImpl.h"
+using VertexBufferOpsImpl = GraphicLib::OpenGLImpl::VertexBufferOpsImpl;
 #else
 #error "No VertexBufferImpl has been detected."
 #endif
 
 namespace GraphicLib {
-VertexBuffer* VertexBuffer::Create() {
-    return new VertexBufferImpl();
+void VertexBufferOps::_initialiseVertexBufferData(unsigned int& id) {
+    VertexBufferOpsImpl::InitialiseVertexBufferData(id);
 }
 
-unsigned int VertexBuffer::GetID() const {
-    return _getID();
+void VertexBufferOps::_bind(unsigned int id) {
+    VertexBufferOpsImpl::Bind(id);
 }
 
-void VertexBuffer::Bind() const {
-    _bind();
+void VertexBufferOps::_unbind(unsigned int id) {
+    VertexBufferOpsImpl::Unbind(id);
 }
 
-void VertexBuffer::Unbind() const {
-    _unbind();
-}
+void VertexBufferOps::_setData(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data) {
+    if (attributes.Count() == 0) {
+        InternalLogger::Get().LogInternalError("VertexBufferOps::SetData()", "Empty attributes");
+        return;
+    }
 
-void VertexBuffer::SetData(const float* const vertexDataArray, unsigned int vertexDataArrayCount) const {
-    _setData(vertexDataArray, vertexDataArrayCount);
+    if (attributes.Count() != attributes.Size()) {
+        InternalLogger::Get().LogInternalError("VertexBufferOps::SetData()", "Not all attributes have been set");
+        return;
+    }
+
+    if (data.Count() == 0) {
+        InternalLogger::Get().LogInternalError("VertexBufferOps::SetData()", "Empty data");
+        return;
+    }
+
+    if (data.Count() != data.Size()) {
+        InternalLogger::Get().LogInternalError("VertexBufferOps::SetData()", "Not all data have been set");
+        return;
+    }
+
+    VertexBufferOpsImpl::SetData(id, attributes, data);
 }
 } // namespace GraphicLib

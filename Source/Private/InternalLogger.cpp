@@ -38,6 +38,10 @@ void InternalLogger::LogMessage(const Message& message) {
     }
 }
 
+void InternalLogger::LogInternalError(const char* source, const char* text) {
+    LogMessage({Logger::Severity::HIGH, source, "INTERNAL_ERROR", text});
+}
+
 std::size_t InternalLogger::AttachExternalLogSystem(std::unique_ptr<IExternalLogSystem> externalLogSystem) {
     static std::size_t idCounter{};
     assert(idCounter < std::numeric_limits<std::size_t>::max());

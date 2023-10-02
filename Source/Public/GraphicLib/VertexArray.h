@@ -1,32 +1,58 @@
 #pragma once
 
 #include "DLL_API.h"
+#include "GraphicLib/IndexBuffer.h"
+#include "GraphicLib/VertexBuffer.h"
 
 namespace GraphicLib {
-class VertexBuffer;
-class IndexBuffer;
-class DLL_API VertexArray {
-public:
-    VertexArray* Create(VertexBuffer* vertexBuffer, IndexBuffer* indexBuffer);
-    virtual ~VertexArray() = default;
-    VertexArray(const VertexArray& other) = delete;
-    VertexArray& operator=(const VertexArray& other) = delete;
-    unsigned int GetID() const;
-    const VertexBuffer& GetVertexBuffer() const;
-    VertexBuffer& GetVertexBuffer();
-    const IndexBuffer& GetIndexBuffer() const;
-    IndexBuffer& GetIndexBuffer();
-    void Bind() const;
-    void Unbind() const;
+template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT, unsigned int INDICES_COUNT>
+struct VertexArrayData final {
+    using VertexBufferDataType = VertexBufferData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT>;
+    using IndexBufferDataType = IndexBufferData<INDICES_COUNT>;
+    VertexArrayData(const VertexBufferDataType& inVertexBuffer, const IndexBufferDataType& inIndexBuffer);
+    VertexBufferDataType vertexBufferData{};
+    IndexBufferDataType indexBufferData{};
+    unsigned int id{};
+};
 
-protected:
-    VertexArray() = default;
+class VertexArrayOps final {
+public:
+    template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT, unsigned int INDICES_COUNT>
+    static void InitialiseVertexArrayData(VertexArrayData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT, INDICES_COUNT>& vertexArrayData);
+
+    template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT, unsigned int INDICES_COUNT>
+    static void Bind(const VertexArrayData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT, INDICES_COUNT>& vertexArrayData);
+
+    template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT, unsigned int INDICES_COUNT>
+    static void Unbind(const VertexArrayData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT, INDICES_COUNT>& vertexArrayData);
 
 private:
-    virtual unsigned int _getID() const = 0;
-    virtual void _bind() const = 0;
-    virtual void _unbind() const = 0;
-    VertexBuffer* _vertexBuffer{};
-    IndexBuffer* _indexBuffer{};
+    DLL_API static void _initialiseVertexArrayData(unsigned int& id);
+    DLL_API static void _bind(unsigned int id, unsigned int vertexBufferId, unsigned int indexBufferId);
+    DLL_API static void _unbind(unsigned int id, unsigned int vertexBufferId, unsigned int indexBufferId);
 };
+
+template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT, unsigned int INDICES_COUNT>
+VertexArrayData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT, INDICES_COUNT>::VertexArrayData(
+    const VertexBufferDataType& inVertexBuffer, const IndexBufferDataType& inIndexBuffer)
+    : vertexBufferData(inVertexBuffer)
+    , IndexBufferData(inIndexBuffer) {
+    VertexArrayOps::InitialiseVertexArrayData(*this);
+}
+
+template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT, unsigned int INDICES_COUNT>
+void VertexArrayOps::InitialiseVertexArrayData(VertexArrayData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT, INDICES_COUNT>& vertexArrayData) {
+    _initialiseVertexArrayData(vertexArrayData.id);
+}
+
+template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT, unsigned int INDICES_COUNT>
+void VertexArrayOps::Bind(const VertexArrayData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT, INDICES_COUNT>& vertexArrayData) {
+    _bind(vertexArrayData.id, vertexArrayData.vertexBufferData.id, vertexArrayData.indexBufferData.id);
+}
+
+template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT, unsigned int INDICES_COUNT>
+void VertexArrayOps::Unbind(const VertexArrayData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT, INDICES_COUNT>& vertexArrayData) {
+    _unbind(vertexArrayData.id, vertexArrayData.vertexBufferData.id, vertexArrayData.indexBufferData.id);
+}
+
 } // namespace GraphicLib
