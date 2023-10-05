@@ -16,7 +16,7 @@ void VertexBufferOpsImpl::Unbind(unsigned int) {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBufferOpsImpl::SetData(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data) {
+void VertexBufferOpsImpl::SendDataToGPU(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data) {
     Bind(id);
 
     const auto sizeOfArrayType{sizeof(StackArraySpan<float>::ArrayType)};

@@ -4,10 +4,16 @@
 #include "GraphicLib/Utilities/StackArray.h"
 
 namespace GraphicLib {
+struct IndexBufferDataElement {
+    unsigned int E1{};
+    unsigned int E2{};
+    unsigned int E3{};
+};
+
 template<unsigned int INDICES_COUNT>
 struct IndexBufferData final {
     IndexBufferData();
-    StackArray<unsigned int, INDICES_COUNT> data{};
+    StackArray<IndexBufferDataElement, INDICES_COUNT> data{};
     unsigned int id{};
 };
 
@@ -23,13 +29,16 @@ public:
     static void Unbind(const IndexBufferData<INDICES_COUNT>& indexBufferData);
 
     template<unsigned int INDICES_COUNT>
-    static void SetData(const IndexBufferData<INDICES_COUNT>& indexBufferData);
+    static void AddData(IndexBufferData<INDICES_COUNT>& indexBufferData, const IndexBufferDataElement& data);
+
+    template<unsigned int INDICES_COUNT>
+    static void SendBufferToGPU(const IndexBufferData<INDICES_COUNT>& indexBufferData);
 
 private:
     DLL_API static void _initialiseIndexBufferData(unsigned int& id);
     DLL_API static void _bind(unsigned int id);
     DLL_API static void _unbind(unsigned int id);
-    DLL_API static void _setData(unsigned int id, const StackArraySpan<unsigned int>& data);
+    DLL_API static void _sendBufferToGPU(unsigned int id, const StackArraySpan<IndexBufferDataElement>& data);
 };
 
 template<unsigned int INDICES_COUNT>
@@ -39,7 +48,7 @@ IndexBufferData<INDICES_COUNT>::IndexBufferData() {
 
 template<unsigned int INDICES_COUNT>
 void IndexBufferOps::InitialiseIndexBufferData(IndexBufferData<INDICES_COUNT>& indexBufferData) {
-    _initialiseIndexBufferData(IndexBufferData.id)
+    _initialiseIndexBufferData(indexBufferData.id);
 }
 
 template<unsigned int INDICES_COUNT>
@@ -53,8 +62,13 @@ void IndexBufferOps::Unbind(const IndexBufferData<INDICES_COUNT>& indexBufferDat
 }
 
 template<unsigned int INDICES_COUNT>
-void IndexBufferOps::SetData(const IndexBufferData<INDICES_COUNT>& indexBufferData) {
-    _setData(MakeStackArraySpan(indexBufferData));
+void IndexBufferOps::AddData(IndexBufferData<INDICES_COUNT>& indexBufferData, const IndexBufferDataElement& data) {
+    indexBufferData.data.Add(data);
+}
+
+template<unsigned int INDICES_COUNT>
+void IndexBufferOps::SendBufferToGPU(const IndexBufferData<INDICES_COUNT>& indexBufferData) {
+    _sendBufferToGPU(indexBufferData.id, MakeStackArraySpan(indexBufferData.data));
 }
 
 } // namespace GraphicLib

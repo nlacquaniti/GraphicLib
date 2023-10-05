@@ -16,9 +16,9 @@ void IndexBufferOpsImpl::Unbind(unsigned int) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void IndexBufferOpsImpl::SetData(unsigned int id, const StackArraySpan<unsigned int>& data) {
+void IndexBufferOpsImpl::SendBufferToGPU(unsigned int id, const StackArraySpan<IndexBufferDataElement>& data) {
     Bind(id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.Count() * sizeof(StackArraySpan<unsigned int>::ArrayType), data.Data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.Count() * sizeof(StackArraySpan<IndexBufferDataElement>::ArrayType), data.Data(), GL_STATIC_DRAW);
 }
 } // namespace OpenGLImpl
 } // namespace GraphicLib

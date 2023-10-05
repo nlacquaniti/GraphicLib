@@ -10,7 +10,7 @@ public:
     static void InitialiseVertexBufferData(unsigned int& id);
     static void Bind(unsigned int id);
     static void Unbind(unsigned int id);
-    static void SetData(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data);
+    static void SendDataToGPU(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data);
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

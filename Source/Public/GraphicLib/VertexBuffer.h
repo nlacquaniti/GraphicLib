@@ -27,13 +27,16 @@ public:
     static void AddAttribute(VertexBufferData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT>& vertexBufferData);
 
     template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT>
-    static void SetData(const VertexBufferData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT>& vertexBufferData);
+    static void AddData(VertexBufferData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT>& vertexBufferData, const TVertexData& vertexData);
+
+    template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT>
+    static void SendBufferToGPU(const VertexBufferData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT>& vertexBufferData);
 
 private:
     DLL_API static void _initialiseVertexBufferData(unsigned int& id);
     DLL_API static void _bind(unsigned int id);
     DLL_API static void _unbind(unsigned int id);
-    DLL_API static void _setData(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data);
+    DLL_API static void _sendBufferToGPU(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data);
 };
 
 template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT>
@@ -64,11 +67,16 @@ void VertexBufferOps::AddAttribute(VertexBufferData<TVertexData, ATTRIBUTES_COUN
 }
 
 template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT>
-void VertexBufferOps::SetData(const VertexBufferData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT>& vertexBufferData) {
-    _setData(                                                          //
+void VertexBufferOps::AddData(VertexBufferData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT>& vertexBufferData, const TVertexData& vertexData) {
+    vertexBufferData.data.Add(vertexData);
+}
+
+template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTICES_COUNT>
+void VertexBufferOps::SendBufferToGPU(const VertexBufferData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT>& vertexBufferData) {
+    _sendBufferToGPU(                                                  //
         vertexBufferData.id,                                           //
-        MakeStackArraySpan<unsigned int>(vertexBufferData.attributes), //
-        MakeStackArraySpan<float>(vertexBufferData.data)               //
+        MakeStackArraySpan(vertexBufferData.attributes), //
+        MakeStackArraySpan<float, TVertexData>(vertexBufferData.data)                //
     );
 }
 } // namespace GraphicLib

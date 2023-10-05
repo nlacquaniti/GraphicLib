@@ -14,8 +14,9 @@ public:
     }
     constexpr unsigned int GetSize() const { return ARRAY_SIZE; }
     unsigned int GetCount() const { return _dataAllocated; }
-    const TArrayType* GetData() const { return &_data; }
-    TArrayType* GetData() { return &_data; }
+    bool IsFull() const { return _dataAllocated == ARRAY_SIZE; }
+    const TArrayType* GetData() const { return &_data[0]; }
+    TArrayType* GetData() { return &_data[0]; }
 
 private:
     TArrayType _data[ARRAY_SIZE];
@@ -27,29 +28,35 @@ class StackArraySpan final {
 public:
     using ArrayType = TArrayType;
 
-    StackArraySpan(const TArrayType* data, const unsigned int* dataAllocated, unsigned int dataSize)
+    StackArraySpan(const TArrayType* data, unsigned int dataAllocated, unsigned int dataSize)
         : _data(data)
         , _dataAllocated(dataAllocated)
         , _dataSize(dataSize) {}
 
     const ArrayType& operator[](unsigned int index) const {
         assert(_data != nullptr);
-        assert(index <= *_dataAllocated);
+        assert(index <= _dataAllocated);
         return _data[index];
     }
     const TArrayType* Data() const { return _data; }
-    unsigned int Count() const { return *_dataAllocated; }
+    unsigned int Count() const { return _dataAllocated; }
     unsigned int Size() const { return _dataSize; }
+    bool IsFull() const { return _dataSize != _dataAllocated; }
 
 private:
     const TArrayType* _data{};
-    const unsigned int* _dataAllocated{};
+    const unsigned int _dataAllocated{};
     const unsigned int _dataSize{};
 };
 
+template<typename TArrayType, unsigned int ARRAY_SIZE>
+StackArraySpan<TArrayType> MakeStackArraySpan(const StackArray<TArrayType, ARRAY_SIZE>& stackArray) {
+    return {stackArray.GetData(), stackArray.GetCount(), ARRAY_SIZE};
+}
+
 template<typename TSpanArrayType, typename TArrayType, unsigned int ARRAY_SIZE>
 StackArraySpan<TSpanArrayType> MakeStackArraySpan(const StackArray<TArrayType, ARRAY_SIZE>& stackArray) {
-    return {static_cast<TSpanArrayType>(stackArray.GetData()), &stackArray.GetCount()};
+    return {(const TSpanArrayType*)stackArray.GetData(), stackArray.GetCount(), ARRAY_SIZE};
 }
 
 } // namespace GraphicLib

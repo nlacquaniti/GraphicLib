@@ -22,17 +22,7 @@ void IndexBufferOps::_unbind(unsigned int id) {
     IndexBufferOpsImpl::Unbind(id);
 }
 
-void IndexBufferOps::_setData(unsigned int id, const StackArraySpan<unsigned int>& data) {
-    if (data.Count() == 0) {
-        InternalLogger::Get().LogInternalError("IndexBufferOps::SetData()", "Empty data");
-        return;
-    }
-
-    if (data.Count() != data.Size()) {
-        InternalLogger::Get().LogInternalError("IndexBufferOps::SetData()", "Not all data have been set");
-        return;
-    }
-
-    IndexBufferOpsImpl::SetData(id, data);
+void IndexBufferOps::_sendBufferToGPU(unsigned int id, const StackArraySpan<IndexBufferDataElement>& data) {
+    IndexBufferOpsImpl::SendBufferToGPU(id, data);
 }
 } // namespace GraphicLib

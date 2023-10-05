@@ -36,7 +36,7 @@ template<typename TVertexData, unsigned int ATTRIBUTES_COUNT, unsigned int VERTI
 VertexArrayData<TVertexData, ATTRIBUTES_COUNT, VERTICES_COUNT, INDICES_COUNT>::VertexArrayData(
     const VertexBufferDataType& inVertexBuffer, const IndexBufferDataType& inIndexBuffer)
     : vertexBufferData(inVertexBuffer)
-    , IndexBufferData(inIndexBuffer) {
+    , indexBufferData(inIndexBuffer) {
     VertexArrayOps::InitialiseVertexArrayData(*this);
 }
 

@@ -22,27 +22,7 @@ void VertexBufferOps::_unbind(unsigned int id) {
     VertexBufferOpsImpl::Unbind(id);
 }
 
-void VertexBufferOps::_setData(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data) {
-    if (attributes.Count() == 0) {
-        InternalLogger::Get().LogInternalError("VertexBufferOps::SetData()", "Empty attributes");
-        return;
-    }
-
-    if (attributes.Count() != attributes.Size()) {
-        InternalLogger::Get().LogInternalError("VertexBufferOps::SetData()", "Not all attributes have been set");
-        return;
-    }
-
-    if (data.Count() == 0) {
-        InternalLogger::Get().LogInternalError("VertexBufferOps::SetData()", "Empty data");
-        return;
-    }
-
-    if (data.Count() != data.Size()) {
-        InternalLogger::Get().LogInternalError("VertexBufferOps::SetData()", "Not all data have been set");
-        return;
-    }
-
-    VertexBufferOpsImpl::SetData(id, attributes, data);
+void VertexBufferOps::_sendBufferToGPU(unsigned int id, const StackArraySpan<unsigned int>& attributes, const StackArraySpan<float>& data) {
+    VertexBufferOpsImpl::SendDataToGPU(id, attributes, data);
 }
 } // namespace GraphicLib
