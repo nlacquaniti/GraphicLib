@@ -1,10 +1,24 @@
 #include "GraphicLib/IndexBuffer.h"
+#include "GraphicLib/Utilities/Span.h"
 #include "GraphicLib/VertexArray.h"
 #include "GraphicLib/VertexBuffer.h"
 #include <GraphicLib/Logger.h>
 #include <GraphicLib/Window.h>
 #include <iostream>
 #include <memory>
+
+const char* vertexShaderSource = "#version 330 core\n"
+                                 "layout (location = 0) in vec3 aPos;\n"
+                                 "void main()\n"
+                                 "{\n"
+                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                 "}\0";
+const char* fragmentShaderSource = "#version 330 core\n"
+                                   "out vec4 FragColor;\n"
+                                   "void main()\n"
+                                   "{\n"
+                                   "   FragColor = vec4(1.0f, 0.5f, 0.2f, 1.0f);\n"
+                                   "}\n\0";
 
 class Application {
 public:
@@ -14,7 +28,7 @@ public:
     void Stop();
 
 private:
-    std::unique_ptr<GraphicLib::Window> _window{};
+    GraphicLib::Window _window{};
     bool _shouldUpdate{};
 };
 
@@ -39,38 +53,30 @@ void Application::Initialise() {
     GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::NOTIFICATION);
     GraphicLib::Logger::SetCallback(LoggerCallback, nullptr);
 
-    struct Vertex {
-        float x{};
-        float y{};
-        float z{};
-    };
-
-    _window.reset(GraphicLib::CreateWindow(800, 600, "Example"));
-    _window->SetOnCloseCallback(CloseWindowCallback, this);
-    _window->SetOnRenderWindowCallback(RenderWindowCallback, this);
-    _window->Initialise();
+    _window.SetOnCloseCallback(CloseWindowCallback);
+    _window.SetOnRenderWindowCallback(RenderWindowCallback);
+    if (!_window.Create({800, 600}, "Example", this)) {
+        return;
+    }
     _shouldUpdate = true;
 
-    GraphicLib::VertexBufferData<Vertex, 1, 3> vbd{};
-    GraphicLib::VertexBufferOps::Bind(vbd);
-    GraphicLib::VertexBufferOps::AddAttribute<Vertex>(vbd);
-    GraphicLib::VertexBufferOps::AddData(vbd, {-0.5f, -0.5f, 0.0f});
-    GraphicLib::VertexBufferOps::AddData(vbd, {0.5f, -0.5f, 0.0f});
-    GraphicLib::VertexBufferOps::AddData(vbd, {0.0f, 0.5f, 0.0f});
-    GraphicLib::VertexBufferOps::SendBufferToGPU(vbd);
+    const float vertexData[] = {
+        -0.5f, -0.5f, 0.0f, //
+        0.5f, -0.5f, 0.0f,  //
+        0.0f, 0.5f, 0.0f    //
+    };
+    const int vertexAttributes[] = {3};
+    const GraphicLib::IndexBufferDataElement indices[] = {{0, 1, 3}};
 
-    GraphicLib::IndexBufferData<3> idb{};
-    GraphicLib::IndexBufferOps::Bind(idb);
-    GraphicLib::IndexBufferOps::AddData(idb, {0, 1, 3});
-    GraphicLib::IndexBufferOps::SendBufferToGPU(idb);
-
-    GraphicLib::VertexArrayData vad{vbd, idb};
-    GraphicLib::VertexArrayOps::Bind(vad);
+    GraphicLib::VertexArray vertexArray{};
+    vertexArray.Bind();
+    vertexArray.GetVertexBuffer().Set({vertexData}, {vertexAttributes});
+    vertexArray.GetIndexBuffer().Set({indices});
 }
 
 void Application::Start() {
     while (_shouldUpdate) {
-        _window->Render();
+        _window.Render();
     }
 }
 

@@ -3,33 +3,31 @@
 #include "DLL_API.h"
 
 namespace GraphicLib {
-class DLL_API Window {
-public:
-    using CloseWindowCallback = void (*)(void*);
-    using RenderWindowCallback = void(*)(void*);
-    virtual ~Window() = default;
-    void Initialise();
-    void Render();
-    void Shutdown();
-    void SetOnCloseCallback(CloseWindowCallback closeWindowCallback, void* userData);
-    void SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback, void* userData);
-    unsigned int GetWidth() const;
-    unsigned int GetHeight() const;
-
-protected:
-    Window() = default;
-
-private:
-    Window(const Window&) = delete;
-    Window& operator=(const Window&) = delete;
-    virtual void _initialise() = 0;
-    virtual void _render() = 0;
-    virtual void _shutdown() = 0;
-    virtual void _setOnCloseCallback(CloseWindowCallback closeWindowCallback, void* userData) = 0;
-    virtual void _setOnRenderWindowCallback(RenderWindowCallback renderWindowCallback, void* userData) = 0;
-    virtual unsigned int _getWidth() const = 0;
-    virtual unsigned int _getHeight() const = 0;
+struct DLL_API WindowSize {
+    int Width{};
+    int Height{};
 };
 
-extern "C" DLL_API Window* CreateWindow(unsigned int width, unsigned int height, const char* title);
+class DLL_API Window final {
+public:
+    using CloseWindowCallback = void (*)(void*);
+    using RenderWindowCallback = void (*)(void*);
+
+    Window() = default;
+    Window(const Window& other) = delete;
+    Window(Window&& other) = delete;
+    Window& operator=(const Window& other) = delete;
+    Window& operator=(const Window&& other) = delete;
+    ~Window();
+    bool Create(const WindowSize& size, const char* title, void* userData);
+    void Render();
+    void Shutdown();
+    void SetOnCloseCallback(CloseWindowCallback closeWindowCallback);
+    void SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback);
+    WindowSize GetSize() const;
+
+private:
+    void _clear();
+    void* _userData{};
+};
 } // namespace GraphicLib

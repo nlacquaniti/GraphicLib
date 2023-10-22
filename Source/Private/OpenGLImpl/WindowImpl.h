@@ -1,38 +1,33 @@
 #pragma once
 
-#include "GraphicLib/Window.h"
-
-#include <string>
-
 struct GLFWwindow;
+
 namespace GraphicLib {
 namespace OpenGLImpl {
-class WindowImpl : public Window {
+class WindowImpl final {
 public:
-    WindowImpl(unsigned int width, unsigned int height, const char* title);
-    ~WindowImpl() override;
-    void CallOnCloseWindowCallback();
+    using OnRenderCallback = void (*)(void*);
+    using OnWindowClosedCallback = void(*)(void*);
+
+    static bool Create(int width, int height, const char* title, void* userData);
+    static void Render();
+    static void Shutdown();
+    static void SetRenderCallback(OnRenderCallback onRenderCallback);
+    static void SetWindowClosedCallback(OnWindowClosedCallback onWindowClosedCallback);
+    static void GetSize(int& width, int& height);
 
 private:
-    void _initialise() override;
-    void _render() override;
-    void _shutdown() override;
-    void _setOnCloseCallback(CloseWindowCallback closeWindowCallback, void* userData) override;
-    void _setOnRenderWindowCallback(RenderWindowCallback renderWindowCallback, void* userData) override;
-    unsigned int _getWidth() const override;
-    unsigned int _getHeight() const override;
-    void _clear();
-    const std::string _name;
-    std::size_t _glfwLogSystemId{};
-    std::size_t _openGLLogSystemId{};
-    GLFWwindow* _window{};
-    CloseWindowCallback _closeWindowCallback{};
-    RenderWindowCallback _renderWindowCallback{};
-    void* _closeWindowUserData{};
-    void* _renderWindowUserData{};
-    unsigned int _width{};
-    unsigned int _height{};
-    bool _initialised{};
+    static void _clear();
+    static void _onWindowClosed(GLFWwindow* window);
+    static void _onKeyPressed(GLFWwindow* window, int key, int, int action, int);
+    static void _onSetWindowSize(GLFWwindow* window, int width, int height);
+
+    static void* _userData;
+    static OnWindowClosedCallback _onWindowClosedCallback;
+    static OnRenderCallback _onRenderCallback;
+    static unsigned long long _glfwLogSystemId;
+    static unsigned long long _openGLLogSystemId;
+    static GLFWwindow* _window;
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

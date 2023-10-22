@@ -6,7 +6,8 @@ add_library(${PROJECT_NAME} SHARED
 	Public/${PROJECT_NAME}/VertexArray.h
 	Public/${PROJECT_NAME}/VertexBuffer.h
 	Public/${PROJECT_NAME}/Window.h
-	Public/${PROJECT_NAME}/Utilities/StackArray.h
+	Public/${PROJECT_NAME}/Utilities/Array.h
+	Public/${PROJECT_NAME}/Utilities/Span.h
 
 	Private/IExternalLogSystem.h
 	Private/IExternalLogSystem.cpp

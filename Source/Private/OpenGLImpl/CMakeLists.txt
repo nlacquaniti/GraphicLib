@@ -1,8 +1,8 @@
 target_sources(${PROJECT_NAME} PRIVATE 
 	ShaderImpl.h
-	"VertexArrayOpsImpl.h"
-	VertexBufferOpsImpl.h
-	IndexBufferOpsImpl.h
+	VertexArrayImpl.h
+	VertexBufferImpl.h
+	IndexBufferImpl.h
 	
 	OpenGLLogSystem.h
 	GLFWLogSystem.h
@@ -12,9 +12,9 @@ target_sources(${PROJECT_NAME} PRIVATE
 	WindowImpl.h
 
 	ShaderImpl.cpp
-	"VertexArrayOpsImpl.cpp"
-	VertexBufferOpsImpl.cpp
-	IndexBufferOpsImpl.cpp
+	VertexArrayImpl.cpp
+	VertexBufferImpl.cpp
+	IndexBufferImpl.cpp
 	
 	WindowImpl.cpp
 	OpenGLLogSystem.cpp

@@ -7,109 +7,122 @@
 #include "InternalLogger.h"
 #include "OpenGLImpl/GLFWLogSystem.h"
 #include "OpenGLImpl/OpenGLLogSystem.h"
-#include <cassert>
 #include <limits>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-namespace {
-void WindowCloseCallback(GLFWwindow* window) {
-    auto* windowImpl = static_cast<WindowImpl*>(glfwGetWindowUserPointer(window));
-    assert(windowImpl != nullptr);
-    windowImpl->CallOnCloseWindowCallback();
-}
-void WindowOnKeyPressedCallback(GLFWwindow* window, int key, int, int action, int) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-        WindowCloseCallback(window);
+void* WindowImpl::_userData{};
+WindowImpl::OnWindowClosedCallback WindowImpl::_onWindowClosedCallback{};
+WindowImpl::OnRenderCallback WindowImpl::_onRenderCallback{};
+unsigned long long WindowImpl::_glfwLogSystemId{};
+unsigned long long WindowImpl::_openGLLogSystemId{};
+GLFWwindow* WindowImpl::_window{};
+
+bool WindowImpl::Create(int width, int height, const char* title, void* userData) {
+    if (width < 1 || height < 1) {
+        InternalLogger::Get().LogInternalError("OpenGLImpl::WindowImpl::Create", "Cannot create a window with either width or height with 0 or less value");
+        return false;
     }
-}
-} // namespace
 
-WindowImpl::WindowImpl(unsigned int width, unsigned int height, const char* title)
-    : _name(title)
-    , _width(width)
-    , _height(height) {
-    assert(_width != 0 && _height != 0 && title != nullptr);
-}
+    if (title == nullptr) {
+        InternalLogger::Get().LogInternalError("OpenGLImpl::WindowImpl::Create", "Cannot create a window without a title");
+        return false;
+    }
 
-WindowImpl::~WindowImpl() {
-    _clear();
-}
-
-void WindowImpl::CallOnCloseWindowCallback() {
-    _closeWindowCallback(_closeWindowUserData);
-}
-
-void WindowImpl::_initialise() {
+    _userData = userData;
     _glfwLogSystemId = InternalLogger::Get().AttachExternalLogSystem(std::make_unique<GLFWLogSystem>());
     _openGLLogSystemId = InternalLogger::Get().AttachExternalLogSystem(std::make_unique<OpenGLLogSystem>());
 
-    assert(glfwInit());
-    assert(_width <= std::numeric_limits<int>::max());
-    assert(_height <= std::numeric_limits<int>::max());
-    _window = glfwCreateWindow(static_cast<int>(_width), static_cast<int>(_height), _name.c_str(), nullptr, nullptr);
-    assert(_window != nullptr);
+    if (!glfwInit()) {
+        _clear();
+        return false;
+    }
 
-    glfwSetWindowUserPointer(_window, static_cast<void*>(this));
-    glfwSetWindowCloseCallback(_window, WindowCloseCallback);
-    glfwSetKeyCallback(_window, WindowOnKeyPressedCallback);
+    _window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    if (_window == nullptr) {
+        _clear();
+        return false;
+    }
+
+    glfwSetWindowCloseCallback(_window, _onWindowClosed);
+    glfwSetKeyCallback(_window, _onKeyPressed);
+    glfwSetWindowSizeCallback(_window, _onSetWindowSize);
 
     glfwMakeContextCurrent(_window);
-
     gladLoadGL();
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
-    _initialised = true;
     glfwSwapInterval(1);
+
+    return true;
 }
 
-void WindowImpl::_render() {
-    assert(_initialised);
-
-    if (glfwWindowShouldClose(_window)) {
+void WindowImpl::Render() {
+    if (_window == nullptr) {
+        InternalLogger::Get().LogInternalError("OpenGLImpl::WindowImpl::Render", "GLFWwindow is null");
         return;
     }
 
     int width{};
     int height{};
-    glfwGetFramebufferSize(_window, &width, &height);
-    glViewport(0, 0, width, height);
+
     glClear(GL_COLOR_BUFFER_BIT);
-    _renderWindowCallback(_renderWindowUserData);
+
+    if (_onRenderCallback != nullptr) {
+        _onRenderCallback(_userData);
+    }
+
     glfwSwapBuffers(_window);
     glfwPollEvents();
 }
 
-void WindowImpl::_shutdown() {
+void WindowImpl::Shutdown() {
     _clear();
 }
 
-void WindowImpl::_setOnCloseCallback(CloseWindowCallback closeWindowCallback, void* userData) {
-    _closeWindowCallback = closeWindowCallback;
-    _closeWindowUserData = userData;
+void WindowImpl::SetRenderCallback(OnRenderCallback onRenderCallback) {
+    _onRenderCallback = onRenderCallback;
 }
 
-void WindowImpl::_setOnRenderWindowCallback(RenderWindowCallback renderWindowCallback, void* userData) {
-    _renderWindowCallback = renderWindowCallback;
-    _renderWindowUserData = userData;
+void WindowImpl::SetWindowClosedCallback(OnWindowClosedCallback onWindowClosedCallback) {
+    _onWindowClosedCallback = onWindowClosedCallback;
 }
 
-unsigned int WindowImpl::_getWidth() const {
-    return _width;
-}
-
-unsigned int WindowImpl::_getHeight() const {
-    return _height;
+void WindowImpl::GetSize(int& width, int& height) {
+    glfwGetWindowSize(_window, &width, &height);
 }
 
 void WindowImpl::_clear() {
-    assert(_initialised);
-    glfwDestroyWindow(_window);
-    _window = nullptr;
-    glfwTerminate();
+    if (_window != nullptr) {
+        glfwDestroyWindow(_window);
+        _window = nullptr;
+        glfwTerminate();
+    }
+
+    _userData = nullptr;
     InternalLogger::Get().DetachExternalLogSystem(_glfwLogSystemId);
+    _glfwLogSystemId = {};
     InternalLogger::Get().DetachExternalLogSystem(_openGLLogSystemId);
-    _initialised = false;
+    _openGLLogSystemId = {};
+    _onWindowClosedCallback = nullptr;
+    _onRenderCallback = nullptr;
+}
+
+void WindowImpl::_onWindowClosed(GLFWwindow*) {
+    if (_onWindowClosedCallback != nullptr) {
+        _onWindowClosedCallback(_userData);
+    }
+}
+
+void WindowImpl::_onKeyPressed(GLFWwindow* window, int key, int, int action, int) {
+    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
+        glfwSetWindowShouldClose(window, GLFW_TRUE);
+        _onWindowClosed(window);
+    }
+}
+
+void WindowImpl::_onSetWindowSize(GLFWwindow*, int width, int height) {
+    glViewport(0, 0, width, height);
+    Render();
 }
 } // namespace OpenGLImpl
 } // namespace GraphicLib

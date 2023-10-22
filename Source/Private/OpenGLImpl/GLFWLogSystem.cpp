@@ -7,6 +7,7 @@ namespace GraphicLib {
 namespace OpenGLImpl {
 namespace {
 GLFWLogSystem::IExternalLogSystem::MessageLogCallback g_LogMessageCallback{};
+
 const char* glfwErrorToString(int errorCode) {
     switch (errorCode) {
         case GLFW_NOT_INITIALIZED:
@@ -34,6 +35,7 @@ const char* glfwErrorToString(int errorCode) {
             return "GLFW_UNKNOWN_ERROR";
     }
 }
+
 void glfwErrorCallback(int errorCode, const char* description) {
     InternalLogger::Message message{};
     message.severity = Logger::Severity::HIGH;
@@ -55,6 +57,5 @@ void GLFWLogSystem::_onDetach() {
     g_LogMessageCallback = nullptr;
     glfwSetErrorCallback(nullptr);
 }
-
 } // namespace OpenGLImpl
 } // namespace GraphicLib

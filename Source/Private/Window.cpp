@@ -1,5 +1,6 @@
 #include "GraphicLib/Window.h"
 
+#include <string.h>
 #ifdef OPEN_GL_IMPL
 #include "OpenGLImpl/WindowImpl.h"
 using WindowImpl = GraphicLib::OpenGLImpl::WindowImpl;
@@ -8,36 +9,47 @@ using WindowImpl = GraphicLib::OpenGLImpl::WindowImpl;
 #endif
 
 namespace GraphicLib {
-void Window::Initialise() {
-    _initialise();
+Window::~Window() {
+    _clear();
+}
+
+bool Window::Create(const WindowSize& size, const char* title, void* userData) {
+    static bool _createdCalled{};
+    bool bSuccess{};
+    if (!_createdCalled) {
+        bSuccess = WindowImpl::Create(size.Width, size.Height, title, userData);
+        _userData = userData;
+        _createdCalled = true;
+    }
+
+    return bSuccess;
 }
 
 void Window::Render() {
-    _render();
+    WindowImpl::Render();
 }
 
 void Window::Shutdown() {
-    _shutdown();
+    _clear();
 }
 
-unsigned int Window::GetWidth() const {
-    return _getWidth();
+void Window::SetOnCloseCallback(CloseWindowCallback closeWindowCallback) {
+    WindowImpl::SetWindowClosedCallback(closeWindowCallback);
 }
 
-unsigned int Window::GetHeight() const {
-    return _getHeight();
+void Window::SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback) {
+    WindowImpl::SetRenderCallback(renderWindowCallback);
 }
 
-void Window::SetOnCloseCallback(CloseWindowCallback closeWindowCallback, void* userData) {
-    _setOnCloseCallback(closeWindowCallback, userData);
+WindowSize Window::GetSize() const {
+    WindowSize size;
+    WindowImpl::GetSize(size.Width, size.Height);
+    return size;
 }
 
-void Window::SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback, void* userData) {
-    _setOnRenderWindowCallback(renderWindowCallback, userData);
-}
-
-Window* CreateWindow(unsigned int width, unsigned int height, const char* title) {
-    return new WindowImpl(width, height, title);
+void Window::_clear() {
+    _userData = nullptr;
+    WindowImpl::Shutdown();
 }
 
 } // namespace GraphicLib
