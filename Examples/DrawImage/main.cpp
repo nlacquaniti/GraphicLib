@@ -1,4 +1,5 @@
 #include "GraphicLib/IndexBuffer.h"
+#include "GraphicLib/Shader.h"
 #include "GraphicLib/Utilities/Span.h"
 #include "GraphicLib/VertexArray.h"
 #include "GraphicLib/VertexBuffer.h"
@@ -29,14 +30,17 @@ public:
 
 private:
     GraphicLib::Window _window{};
+    GraphicLib::Shader _shader{};
+    GraphicLib::VertexArray _triangleVA{};
     bool _shouldUpdate{};
 };
 
 namespace {
 void LoggerCallback(const GraphicLib::Logger::Message& message) {
-    std::cout << "Source [" << message.source << "]\n";
-    std::cout << "Type [" << message.type << "]\n";
-    std::cout << "Message [" << message.text << "]" << std::endl;
+    std::cout << "Log from GraphicLib:\n";
+    std::cout << "Source: " << message.source << "\n";
+    std::cout << "Type: " << message.type << "\n";
+    std::cout << "Message: " << message.text << "" << std::endl;
 }
 void CloseWindowCallback(void* userData) {
     auto* application = static_cast<Application*>(userData);
@@ -60,18 +64,30 @@ void Application::Initialise() {
     }
     _shouldUpdate = true;
 
-    const float vertexData[] = {
-        -0.5f, -0.5f, 0.0f, //
+    const float vertices[] = {
+        0.0f, 0.5f, 0.0f,   //
         0.5f, -0.5f, 0.0f,  //
-        0.0f, 0.5f, 0.0f    //
+        -0.5f, -0.5f, 0.0f, //
+        // 0.5f, 0.5f, 0.0f,   // top right
+        // 0.5f, -0.5f, 0.0f,  // bottom right
+        //-0.5f, -0.5f, 0.0f, // bottom left
+        //-0.5f, 0.5f, 0.0f   // top left
     };
     const int vertexAttributes[] = {3};
-    const GraphicLib::IndexBufferDataElement indices[] = {{0, 1, 3}};
 
-    GraphicLib::VertexArray vertexArray{};
-    vertexArray.Bind();
-    vertexArray.GetVertexBuffer().Set({vertexData}, {vertexAttributes});
-    vertexArray.GetIndexBuffer().Set({indices});
+    const GraphicLib::IndexBufferDataElement indices[] = {
+        // note that we start from 0!
+        //{0, 1, 3}, // first triangle
+        //{1, 2, 3}, // second triangle
+        {0, 1, 2},
+    };
+
+    _triangleVA.Initialise();
+    _triangleVA.Bind();
+    _triangleVA.GetVertexBuffer().Set({vertices}, {vertexAttributes});
+    _triangleVA.GetIndexBuffer().Set({indices});
+
+    _shader.Load(vertexShaderSource, fragmentShaderSource);
 }
 
 void Application::Start() {
@@ -81,6 +97,8 @@ void Application::Start() {
 }
 
 void Application::Render() {
+    _shader.Bind();
+    _triangleVA.Draw();
 }
 
 void Application::Stop() {

@@ -12,8 +12,10 @@ using VertexArrayImpl = GraphicLib::OpenGLImpl::VertexArrayImpl;
 #endif
 
 namespace GraphicLib {
-VertexArray::VertexArray() {
+void VertexArray::Initialise() {
     VertexArrayImpl::Initialise(_id);
+    _vertexBuffer.Initialise();
+    _indexBuffer.Initialise();
 }
 
 void VertexArray::Bind() {
@@ -26,6 +28,11 @@ void VertexArray::Unbind() {
     VertexArrayImpl::Unbind(_id);
     _vertexBuffer.Unbind();
     _indexBuffer.Unbind();
+}
+
+void VertexArray::Draw() {
+    Bind();
+    VertexArrayImpl::Draw(_id, _indexBuffer.Get().Size() * 3);
 }
 
 const VertexBuffer& VertexArray::GetVertexBuffer() const {

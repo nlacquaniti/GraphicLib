@@ -5,7 +5,7 @@
 namespace GraphicLib {
 namespace OpenGLImpl {
 void VertexArrayImpl::Initialise(unsigned int& id) {
-    glGenBuffers(1, &id);
+    glGenVertexArrays(1, &id);
 }
 
 void VertexArrayImpl::Bind(unsigned int id) {
@@ -15,5 +15,10 @@ void VertexArrayImpl::Bind(unsigned int id) {
 void VertexArrayImpl::Unbind(unsigned int) {
     glBindVertexArray(0);
 }
+
+void VertexArrayImpl::Draw(unsigned int, unsigned int trianglesCount) {
+    glDrawElements(GL_TRIANGLES, trianglesCount, GL_UNSIGNED_INT, nullptr);
+}
+
 } // namespace OpenGLImpl
 } // namespace GraphicLib

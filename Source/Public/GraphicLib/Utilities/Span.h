@@ -7,12 +7,12 @@ public:
     template<unsigned int SIZE>
     Span(TSpanType (&arr)[SIZE]) noexcept
         : _data(arr)
-        , _size(SIZE - 1) {}
+        , _size(SIZE) {}
 
     template<unsigned int SIZE>
     Span(const TSpanType (&arr)[SIZE]) noexcept
         : _data(arr)
-        , _size(SIZE - 1) {}
+        , _size(SIZE) {}
 
     Span(const TSpanType* arr, unsigned int size) noexcept
         : _data(arr)

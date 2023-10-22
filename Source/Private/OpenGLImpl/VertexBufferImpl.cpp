@@ -21,10 +21,15 @@ void VertexBufferImpl::Set(unsigned int id, const Span<float>& data, const Span<
 
     glBufferData(GL_ARRAY_BUFFER, data.SizeBytes(), data.Data(), GL_STATIC_DRAW);
 
+    unsigned int numberOfAttributes{};
+    for (unsigned int i{}; i < attributes.Size(); ++i) {
+        numberOfAttributes += attributes[i];
+    }
+
     int attributesSum{};
     for (unsigned int i{}; i < attributes.Size(); ++i) {
         const int attribute{attributes[i]};
-        glVertexAttribPointer(i, attribute, GL_FLOAT, GL_FALSE, sizeof(float), reinterpret_cast<void*>(static_cast<unsigned int>(attributesSum) * sizeof(float)));
+        glVertexAttribPointer(i, attribute, GL_FLOAT, GL_FALSE, numberOfAttributes * sizeof(float), reinterpret_cast<void*>(static_cast<unsigned int>(attributesSum) * sizeof(float)));
         glEnableVertexAttribArray(i);
         attributesSum += attribute;
     }

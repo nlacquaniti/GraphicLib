@@ -10,7 +10,7 @@ using IndexBufferImpl = GraphicLib::OpenGLImpl::IndexBufferImpl;
 #endif
 
 namespace GraphicLib {
-IndexBuffer::IndexBuffer() {
+void IndexBuffer::Initialise() {
     IndexBufferImpl::Initialise(_id);
 }
 
@@ -26,4 +26,9 @@ void IndexBuffer::Set(const Span<IndexBufferDataElement>& indices) {
     _indices.SetData(indices);
     IndexBufferImpl::Set(_id, indices);
 }
+
+Span<IndexBufferDataElement> IndexBuffer::Get() const {
+    return {_indices.Data(), _indices.Size()};
+}
+
 } // namespace GraphicLib

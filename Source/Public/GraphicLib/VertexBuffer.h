@@ -7,7 +7,7 @@
 namespace GraphicLib {
 class DLL_API VertexBuffer final {
 public:
-    VertexBuffer();
+    void Initialise();
     void Bind();
     void Unbind();
     void Set(const Span<float>& vertexData, const Span<int>& vertexAttributes);

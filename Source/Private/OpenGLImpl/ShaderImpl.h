@@ -4,14 +4,14 @@
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-class ShaderImpl final : public Shader {
-private:
-    bool _load(const char* vertexShared, const char* fragmentShader) override;
-    void _bind() override;
-    void _unbind() override;
-    unsigned int _getID() const override;
-    void _setUniformValue(const char* name, int value) const override;
-    unsigned int _id{};
+class ShaderImpl final {
+public:
+    static bool Load(unsigned int& id, const char* vertexShared, const char* fragmentShader);
+    static void Bind(unsigned int id);
+    static void Unbind(unsigned int id);
+    static void SetUniformValue(unsigned int id, const char* name, bool value);
+    static void SetUniformValue(unsigned int id, const char* name, int value);
+    static void SetUniformValue(unsigned int id, const char* name, float value);
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

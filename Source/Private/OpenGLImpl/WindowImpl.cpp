@@ -31,7 +31,6 @@ bool WindowImpl::Create(int width, int height, const char* title, void* userData
 
     _userData = userData;
     _glfwLogSystemId = InternalLogger::Get().AttachExternalLogSystem(std::make_unique<GLFWLogSystem>());
-    _openGLLogSystemId = InternalLogger::Get().AttachExternalLogSystem(std::make_unique<OpenGLLogSystem>());
 
     if (!glfwInit()) {
         _clear();
@@ -50,6 +49,7 @@ bool WindowImpl::Create(int width, int height, const char* title, void* userData
 
     glfwMakeContextCurrent(_window);
     gladLoadGL();
+    _openGLLogSystemId = InternalLogger::Get().AttachExternalLogSystem(std::make_unique<OpenGLLogSystem>());
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glfwSwapInterval(1);
 

@@ -7,7 +7,12 @@ namespace OpenGLImpl {
 namespace {
 static bool _compileShader(unsigned int shaderID, unsigned int compilationType) {
     int success{};
-    glGetShaderiv(shaderID, compilationType, &success);
+    if (compilationType == GL_COMPILE_STATUS) {
+        glGetShaderiv(shaderID, compilationType, &success);
+    } else if (compilationType == GL_LINK_STATUS) {
+        glGetProgramiv(shaderID, compilationType, &success);
+    }
+
     if (!success) {
         return false;
     }
@@ -15,7 +20,7 @@ static bool _compileShader(unsigned int shaderID, unsigned int compilationType) 
 }
 } // namespace
 
-bool ShaderImpl::_load(const char* vertexShared, const char* fragmentShader) {
+bool ShaderImpl::Load(unsigned int& id, const char* vertexShared, const char* fragmentShader) {
     unsigned int vertex, fragment;
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -34,11 +39,11 @@ bool ShaderImpl::_load(const char* vertexShared, const char* fragmentShader) {
     }
 
     // shader Program
-    _id = glCreateProgram();
-    glAttachShader(_id, vertex);
-    glAttachShader(_id, fragment);
-    glLinkProgram(_id);
-    if (!_compileShader(_id, GL_LINK_STATUS)) {
+    id = glCreateProgram();
+    glAttachShader(id, vertex);
+    glAttachShader(id, fragment);
+    glLinkProgram(id);
+    if (!_compileShader(id, GL_LINK_STATUS)) {
         return false;
     }
 
@@ -49,20 +54,25 @@ bool ShaderImpl::_load(const char* vertexShared, const char* fragmentShader) {
     return true;
 }
 
-void ShaderImpl::_bind() {
-    glUseProgram(_id);
+void ShaderImpl::Bind(unsigned int id) {
+    glUseProgram(id);
 }
 
-void ShaderImpl::_unbind() {
+void ShaderImpl::Unbind(unsigned int) {
     glUseProgram(0);
 }
 
-unsigned int ShaderImpl::_getID() const {
-    return _id;
+void ShaderImpl::SetUniformValue(unsigned int id, const char* name, bool value) {
+    glUniform1i(glGetUniformLocation(id, name), static_cast<int>(value));
 }
 
-void ShaderImpl::_setUniformValue(const char* name, int value) const {
-    glUniform1i(glGetUniformLocation(_id, name), value);
+void ShaderImpl::SetUniformValue(unsigned int id, const char* name, int value) {
+    glUniform1i(glGetUniformLocation(id, name), value);
 }
+
+void ShaderImpl::SetUniformValue(unsigned int id, const char* name, float value) {
+    glUniform1f(glGetUniformLocation(id, name), value);
+}
+
 } // namespace OpenGLImpl
 } // namespace GraphicLib

@@ -13,10 +13,11 @@ struct IndexBufferDataElement {
 
 class DLL_API IndexBuffer final {
 public:
-    IndexBuffer();
+    void Initialise();
     void Bind();
     void Unbind();
     void Set(const Span<IndexBufferDataElement>& indices);
+    Span<IndexBufferDataElement> Get() const;
 
 private:
     Array<IndexBufferDataElement> _indices{};

@@ -46,6 +46,7 @@ std::size_t InternalLogger::AttachExternalLogSystem(std::unique_ptr<IExternalLog
     static std::size_t idCounter{};
     assert(idCounter < std::numeric_limits<std::size_t>::max());
     externalLogSystem->_setMessageLogCallback([](const Message& message) { InternalLogger::Get().LogMessage(message); });
+    externalLogSystem->OnAttach();
     _externalLogSystems.emplace(std::make_pair(idCounter, std::move(externalLogSystem)));
     return idCounter++;
 }
@@ -53,6 +54,7 @@ std::size_t InternalLogger::AttachExternalLogSystem(std::unique_ptr<IExternalLog
 void InternalLogger::DetachExternalLogSystem(std::size_t id) {
     const auto elementPos = _externalLogSystems.find(id);
     assert(elementPos != _externalLogSystems.cend());
+    elementPos->second->OnDetach();
     _externalLogSystems.erase(elementPos);
 }
 } // namespace GraphicLib

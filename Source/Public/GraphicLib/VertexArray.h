@@ -7,9 +7,10 @@
 namespace GraphicLib {
 class DLL_API VertexArray final {
 public:
-    VertexArray();
+    void Initialise();
     void Bind();
     void Unbind();
+    void Draw();
     const VertexBuffer& GetVertexBuffer() const;
     VertexBuffer& GetVertexBuffer();
     const IndexBuffer& GetIndexBuffer() const;

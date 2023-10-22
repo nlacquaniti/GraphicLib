@@ -8,27 +8,27 @@ using ShaderImpl = GraphicLib::OpenGLImpl::ShaderImpl;
 #endif
 
 namespace GraphicLib {
-Shader* Shader::Create() {
-    return new ShaderImpl();
-}
-
 bool Shader::Load(const char* vertexShared, const char* fragmentShader) {
-    return _load(vertexShared, fragmentShader);
+    return ShaderImpl::Load(_id, vertexShared, fragmentShader);
 }
 
 void Shader::Bind() {
-    _bind();
+    ShaderImpl::Bind(_id);
 }
 
 void Shader::Unbind() {
-    _unbind();
+    ShaderImpl::Unbind(_id);
 }
 
-unsigned int Shader::GetID() const {
-    return _getID();
+void Shader::SetUniformValue(const char* name, bool value) const {
+    ShaderImpl::SetUniformValue(_id, name, value);
 }
 
 void Shader::SetUniformValue(const char* name, int value) const {
-    _setUniformValue(name, value);
+    ShaderImpl::SetUniformValue(_id, name, value);
+}
+
+void Shader::SetUniformValue(const char* name, float value) const {
+    ShaderImpl::SetUniformValue(_id, name, value);
 }
 } // namespace GraphicLib

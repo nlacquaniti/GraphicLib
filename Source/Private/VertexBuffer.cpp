@@ -10,7 +10,7 @@ using VertexBufferImpl = GraphicLib::OpenGLImpl::VertexBufferImpl;
 #endif
 
 namespace GraphicLib {
-VertexBuffer::VertexBuffer() {
+void VertexBuffer::Initialise() {
     VertexBufferImpl::Initialise(_id);
 }
 
