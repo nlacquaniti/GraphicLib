@@ -2,7 +2,10 @@
 
 #include "GraphicLib/IndexBuffer.h"
 #include "GraphicLib/VertexBuffer.h"
+#include "InternalLogger.h"
 #include <cassert>
+#include <limits>
+#include <algorithm>
 
 #ifdef OPEN_GL_IMPL
 #include "OpenGLImpl/VertexArrayImpl.h"
@@ -31,8 +34,12 @@ void VertexArray::Unbind() {
 }
 
 void VertexArray::Draw() {
-    Bind();
-    VertexArrayImpl::Draw(_id, _indexBuffer.Get().Size() * 3);
+    const auto trianglesCount = _indexBuffer.Get().Size() * 3;
+    if (trianglesCount > std::numeric_limits<int>::max()) {
+        InternalLogger::Get().LogInternalError("VertexArray::Draw", "Triangles count exceeded the max number");
+        return;
+    }
+    VertexArrayImpl::Draw(_id, static_cast<int>(trianglesCount));
 }
 
 const VertexBuffer& VertexArray::GetVertexBuffer() const {

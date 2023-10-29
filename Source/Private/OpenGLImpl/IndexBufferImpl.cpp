@@ -18,7 +18,7 @@ void IndexBufferImpl::Unbind(unsigned int) {
 
 void IndexBufferImpl::Set(unsigned int id, const Span<IndexBufferDataElement>& data) {
     Bind(id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, data.SizeBytes(), data.Data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<long long>(data.SizeBytes()), data.Data(), GL_STATIC_DRAW);
 }
 } // namespace OpenGLImpl
 } // namespace GraphicLib

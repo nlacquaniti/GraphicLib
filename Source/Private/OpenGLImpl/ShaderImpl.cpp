@@ -1,6 +1,8 @@
 #include "OpenGLImpl/ShaderImpl.h"
 
+#include "InternalLogger.h"
 #include "OpenGLImpl/glad.h"
+#include <vector>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
@@ -12,11 +14,15 @@ static bool _compileShader(unsigned int shaderID, unsigned int compilationType) 
     } else if (compilationType == GL_LINK_STATUS) {
         glGetProgramiv(shaderID, compilationType, &success);
     }
-
     if (!success) {
-        return false;
+        int infoLogLength{};
+        glGetShaderiv(shaderID, GL_INFO_LOG_LENGTH, &infoLogLength);
+        std::vector<char> logText{};
+        logText.reserve(static_cast<size_t>(infoLogLength));
+        glGetShaderInfoLog(shaderID, infoLogLength, &infoLogLength, logText.data());
+        InternalLogger::Get().LogInternalError("ShaderImpl::Load", logText.data());
     }
-    return true;
+    return success;
 }
 } // namespace
 
@@ -27,6 +33,7 @@ bool ShaderImpl::Load(unsigned int& id, const char* vertexShared, const char* fr
     glShaderSource(vertex, 1, &vertexShared, nullptr);
     glCompileShader(vertex);
     if (!_compileShader(vertex, GL_COMPILE_STATUS)) {
+        glDeleteShader(vertex);
         return false;
     }
 
@@ -44,6 +51,8 @@ bool ShaderImpl::Load(unsigned int& id, const char* vertexShared, const char* fr
     glAttachShader(id, fragment);
     glLinkProgram(id);
     if (!_compileShader(id, GL_LINK_STATUS)) {
+        glDeleteShader(vertex);
+        glDeleteShader(fragment);
         return false;
     }
 
@@ -63,14 +72,17 @@ void ShaderImpl::Unbind(unsigned int) {
 }
 
 void ShaderImpl::SetUniformValue(unsigned int id, const char* name, bool value) {
+    Bind(id);
     glUniform1i(glGetUniformLocation(id, name), static_cast<int>(value));
 }
 
 void ShaderImpl::SetUniformValue(unsigned int id, const char* name, int value) {
+    Bind(id);
     glUniform1i(glGetUniformLocation(id, name), value);
 }
 
 void ShaderImpl::SetUniformValue(unsigned int id, const char* name, float value) {
+    Bind(id);
     glUniform1f(glGetUniformLocation(id, name), value);
 }
 

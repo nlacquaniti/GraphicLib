@@ -3,13 +3,12 @@ target_sources(${PROJECT_NAME} PRIVATE
 	VertexArrayImpl.h
 	VertexBufferImpl.h
 	IndexBufferImpl.h
-	
 	OpenGLLogSystem.h
 	GLFWLogSystem.h
 	glad.h
 	glfw.h
-
 	WindowImpl.h
+	TextureImpl.h
 
 	ShaderImpl.cpp
 	VertexArrayImpl.cpp
@@ -19,6 +18,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	WindowImpl.cpp
 	OpenGLLogSystem.cpp
 	GLFWLogSystem.cpp
+	TextureImpl.cpp
 )
 
 add_subdirectory(Vendors)

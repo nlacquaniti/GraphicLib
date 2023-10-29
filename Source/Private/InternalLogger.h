@@ -19,6 +19,7 @@ public:
     void SetCallback(Logger::MessageCallback callback, const void* userData);
     void SetSeverity(Logger::Severity severity);
     void LogMessage(const Message& message);
+    void LogInternalNotification(const char* source, const char* text);
     void LogInternalError(const char* source, const char* text);
     std::size_t AttachExternalLogSystem(std::unique_ptr<IExternalLogSystem> externalLogSystem);
     void DetachExternalLogSystem(std::size_t id);

@@ -6,8 +6,10 @@ add_library(${PROJECT_NAME} SHARED
 	Public/${PROJECT_NAME}/VertexArray.h
 	Public/${PROJECT_NAME}/VertexBuffer.h
 	Public/${PROJECT_NAME}/Window.h
+	Public/${PROJECT_NAME}/Texture.h
 	Public/${PROJECT_NAME}/Utilities/Array.h
 	Public/${PROJECT_NAME}/Utilities/Span.h
+	Public/${PROJECT_NAME}/Utilities/TextureUtils.h
 
 	Private/IExternalLogSystem.h
 	Private/IExternalLogSystem.cpp
@@ -19,6 +21,11 @@ add_library(${PROJECT_NAME} SHARED
 	Private/InternalLogger.h
 	Private/InternalLogger.cpp
 	Private/Window.cpp
+	Private/Texture.cpp
+	Private/StbImage.h
+	Private/Utilities/TextureUtils.cpp
+
+	Private/Vendor/stb/stb_image.h
 )
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
@@ -26,6 +33,7 @@ target_include_directories(${PROJECT_NAME} PUBLIC
 )
 target_include_directories(${PROJECT_NAME} PRIVATE 
 	Private
+	Private/Vendor
 )
 
 target_compile_definitions(${PROJECT_NAME} PRIVATE DLL_EXPORT)

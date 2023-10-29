@@ -38,6 +38,10 @@ void InternalLogger::LogMessage(const Message& message) {
     }
 }
 
+void InternalLogger::LogInternalNotification(const char* source, const char* text) {
+    LogMessage({ Logger::Severity::NOTIFICATION, source, "INTERNAL_NOTIFICATION", text });
+}
+
 void InternalLogger::LogInternalError(const char* source, const char* text) {
     LogMessage({Logger::Severity::HIGH, source, "INTERNAL_ERROR", text});
 }

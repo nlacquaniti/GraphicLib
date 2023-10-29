@@ -16,8 +16,8 @@ public:
     }
 
     // Element Access
-    TArrayType& operator[](unsigned int pos) { return _data[pos]; }
-    const TArrayType& operator[](unsigned int pos) const { return _data[pos]; }
+    TArrayType& operator[](unsigned long long pos) { return _data[pos]; }
+    const TArrayType& operator[](unsigned long long pos) const { return _data[pos]; }
 
     TArrayType& Front() { return *_data; }
     const TArrayType& Front() const { return *_data; }
@@ -30,7 +30,7 @@ public:
 
     // Capacity
     bool IsEmpty() const noexcept { return _size == 0; }
-    unsigned int Size() const noexcept { return _size; }
+    unsigned long long Size() const noexcept { return _size; }
 
     // Modifiers
     void SetData(const Span<TArrayType>& data) {
@@ -53,7 +53,6 @@ public:
 
 private:
     TArrayType* _data{};
-    unsigned int _size{};
+    unsigned long long _size{};
 };
-
 } // namespace GraphicLib

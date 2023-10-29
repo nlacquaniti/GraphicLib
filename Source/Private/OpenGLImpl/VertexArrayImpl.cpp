@@ -16,7 +16,7 @@ void VertexArrayImpl::Unbind(unsigned int) {
     glBindVertexArray(0);
 }
 
-void VertexArrayImpl::Draw(unsigned int, unsigned int trianglesCount) {
+void VertexArrayImpl::Draw(unsigned int, int trianglesCount) {
     glDrawElements(GL_TRIANGLES, trianglesCount, GL_UNSIGNED_INT, nullptr);
 }
 

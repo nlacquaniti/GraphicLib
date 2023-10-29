@@ -62,9 +62,6 @@ void WindowImpl::Render() {
         return;
     }
 
-    int width{};
-    int height{};
-
     glClear(GL_COLOR_BUFFER_BIT);
 
     if (_onRenderCallback != nullptr) {
