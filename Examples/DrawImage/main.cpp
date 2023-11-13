@@ -6,16 +6,19 @@
 #include "GraphicLib/VertexBuffer.h"
 #include <GraphicLib/Logger.h>
 #include <GraphicLib/Window.h>
+#include <glm/glm.hpp>
+#include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <memory>
 
 const char* vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
                                  "layout (location = 1) in vec2 aTexCoord;\n"
+                                 "uniform mat4 uMVP;\n"
                                  "out vec2 texCoord;\n"
                                  "void main()\n"
                                  "{\n"
-                                 "   gl_Position = vec4(aPos.x, aPos.y, aPos.z, 1.0);\n"
+                                 "   gl_Position = uMVP * vec4(aPos, 1.0);\n"
                                  "   texCoord = aTexCoord;\n"
                                  "}\0";
 const char* fragmentShaderSource = "#version 330 core\n"
@@ -99,7 +102,7 @@ void Application::Initialise() {
 
     _shader.Load(vertexShaderSource, fragmentShaderSource);
     _shader.Bind();
-    _shader.SetUniformValue("uTexture", 0);
+    _shader.SetUniformIntValue("uTexture", 0);
 }
 
 void Application::Start() {
@@ -111,6 +114,8 @@ void Application::Start() {
 void Application::Render() {
     _textureTest.Draw(0);
     _shader.Bind();
+    glm::mat4 MVP(1.0f);
+    _shader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
     _triangleVA.Draw();
 }
 

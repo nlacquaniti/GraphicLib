@@ -2,6 +2,10 @@ add_executable(DrawImageExample
 	main.cpp
 )
 
+target_include_directories(DrawImageExample PRIVATE 
+	../Vendors/glm
+)
+
 target_link_libraries(DrawImageExample PRIVATE ${PROJECT_NAME})
 
 add_custom_command(

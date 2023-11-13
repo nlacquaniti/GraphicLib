@@ -71,19 +71,24 @@ void ShaderImpl::Unbind(unsigned int) {
     glUseProgram(0);
 }
 
-void ShaderImpl::SetUniformValue(unsigned int id, const char* name, bool value) {
+void ShaderImpl::SetUniformBoolValue(unsigned int id, const char* name, bool value) {
     Bind(id);
     glUniform1i(glGetUniformLocation(id, name), static_cast<int>(value));
 }
 
-void ShaderImpl::SetUniformValue(unsigned int id, const char* name, int value) {
+void ShaderImpl::SetUniformIntValue(unsigned int id, const char* name, int value) {
     Bind(id);
     glUniform1i(glGetUniformLocation(id, name), value);
 }
 
-void ShaderImpl::SetUniformValue(unsigned int id, const char* name, float value) {
+void ShaderImpl::SetUniformFloatValue(unsigned int id, const char* name, float value) {
     Bind(id);
     glUniform1f(glGetUniformLocation(id, name), value);
+}
+
+void ShaderImpl::SetUniformMat4Value(unsigned int id, const char* name, const float* value) {
+    Bind(id);
+    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_FALSE, value);
 }
 
 } // namespace OpenGLImpl

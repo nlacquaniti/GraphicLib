@@ -20,15 +20,19 @@ void Shader::Unbind() {
     ShaderImpl::Unbind(_id);
 }
 
-void Shader::SetUniformValue(const char* name, bool value) const {
-    ShaderImpl::SetUniformValue(_id, name, value);
+void Shader::SetUniformBoolValue(const char* name, bool value) const {
+    ShaderImpl::SetUniformIntValue(_id, name, value);
 }
 
-void Shader::SetUniformValue(const char* name, int value) const {
-    ShaderImpl::SetUniformValue(_id, name, value);
+void Shader::SetUniformIntValue(const char* name, int value) const {
+    ShaderImpl::SetUniformIntValue(_id, name, value);
 }
 
-void Shader::SetUniformValue(const char* name, float value) const {
-    ShaderImpl::SetUniformValue(_id, name, value);
+void Shader::SetUniformFloatValue(const char* name, float value) const {
+    ShaderImpl::SetUniformFloatValue(_id, name, value);
+}
+
+void Shader::SetUniformMat4Value(const char* name, float* value) const {
+    ShaderImpl::SetUniformMat4Value(_id, name, value);
 }
 } // namespace GraphicLib

@@ -8,9 +8,10 @@ public:
     bool Load(const char* vertexShared, const char* fragmentShader);
     void Bind();
     void Unbind();
-    void SetUniformValue(const char* name, bool value) const;
-    void SetUniformValue(const char* name, int value) const;
-    void SetUniformValue(const char* name, float value) const;
+    void SetUniformBoolValue(const char* name, bool value) const;
+    void SetUniformIntValue(const char* name, int value) const;
+    void SetUniformFloatValue(const char* name, float value) const;
+    void SetUniformMat4Value(const char* name, float* value) const;
 private:
     unsigned int _id{};
 };
