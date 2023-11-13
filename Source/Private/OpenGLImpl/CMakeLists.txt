@@ -4,10 +4,7 @@ target_sources(${PROJECT_NAME} PRIVATE
 	VertexBufferImpl.h
 	IndexBufferImpl.h
 	OpenGLLogSystem.h
-	GLFWLogSystem.h
 	glad.h
-	glfw.h
-	WindowImpl.h
 	TextureImpl.h
 
 	ShaderImpl.cpp
@@ -15,20 +12,16 @@ target_sources(${PROJECT_NAME} PRIVATE
 	VertexBufferImpl.cpp
 	IndexBufferImpl.cpp
 	
-	WindowImpl.cpp
 	OpenGLLogSystem.cpp
-	GLFWLogSystem.cpp
 	TextureImpl.cpp
+
+	Vendors/glad/include/glad/glad.h
+	Vendors/glad/include/KHR/khrplatform.h
+	Vendors/glad/src/glad.c
 )
 
-add_subdirectory(Vendors)
+target_include_directories(${PROJECT_NAME} PRIVATE 
+	Vendors/glad/include/
+)
 
-target_compile_definitions(${PROJECT_NAME} PRIVATE OPEN_GL_IMPL)
-
-# GLAD library
-add_dependencies(${PROJECT_NAME} glad)
-target_link_libraries(${PROJECT_NAME} PRIVATE glad)
-
-# GLFW Library
-add_dependencies(${PROJECT_NAME} glfw)
-target_link_libraries(${PROJECT_NAME} PRIVATE glfw)
+target_compile_definitions(${PROJECT_NAME} PRIVATE OPENGL_IMPL)

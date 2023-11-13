@@ -1,14 +1,12 @@
-#include "GraphicLib/Window.h"
+#include "Window.h"
 
-#include <string.h>
-#ifdef OPEN_GL_IMPL
+#ifdef OPENGL_IMPL
 #include "OpenGLImpl/WindowImpl.h"
-using WindowImpl = GraphicLib::OpenGLImpl::WindowImpl;
 #else
 #error "No WindowImpl has been detected."
 #endif
 
-namespace GraphicLib {
+
 Window::~Window() {
     _clear();
 }
@@ -41,6 +39,10 @@ void Window::SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback
     WindowImpl::SetRenderCallback(renderWindowCallback);
 }
 
+void Window::SetLogCallback(LogCallback logCallback) {
+    WindowImpl::SetLogCallback(logCallback);
+}
+
 WindowSize Window::GetSize() const {
     WindowSize size;
     WindowImpl::GetSize(size.Width, size.Height);
@@ -51,5 +53,3 @@ void Window::_clear() {
     _userData = nullptr;
     WindowImpl::Shutdown();
 }
-
-} // namespace GraphicLib

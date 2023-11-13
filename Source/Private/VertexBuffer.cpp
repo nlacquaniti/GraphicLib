@@ -2,7 +2,7 @@
 
 #include "InternalLogger.h"
 
-#ifdef OPEN_GL_IMPL
+#ifdef OPENGL_IMPL
 #include "OpenGLImpl/VertexBufferImpl.h"
 using VertexBufferImpl = GraphicLib::OpenGLImpl::VertexBufferImpl;
 #else

@@ -7,7 +7,7 @@
 #include <limits>
 #include <algorithm>
 
-#ifdef OPEN_GL_IMPL
+#ifdef OPENGL_IMPL
 #include "OpenGLImpl/VertexArrayImpl.h"
 using VertexArrayImpl = GraphicLib::OpenGLImpl::VertexArrayImpl;
 #else

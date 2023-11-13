@@ -1,17 +1,15 @@
 #pragma once
 
-#include "DLL_API.h"
-
-namespace GraphicLib {
-struct DLL_API WindowSize {
+struct WindowSize {
     int Width{};
     int Height{};
 };
 
-class DLL_API Window final {
+class Window final {
 public:
     using CloseWindowCallback = void (*)(void*);
     using RenderWindowCallback = void (*)(void*);
+    using LogCallback = void(*)(const char*);
 
     Window() = default;
     Window(const Window& other) = delete;
@@ -24,10 +22,10 @@ public:
     void Shutdown();
     void SetOnCloseCallback(CloseWindowCallback closeWindowCallback);
     void SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback);
+    void SetLogCallback(LogCallback logCallback);
     WindowSize GetSize() const;
 
 private:
     void _clear();
     void* _userData{};
 };
-} // namespace GraphicLib

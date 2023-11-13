@@ -6,7 +6,7 @@
 #include <filesystem>
 #include <sstream>
 
-#ifdef OPEN_GL_IMPL
+#ifdef OPENGL_IMPL
 #include "OpenGLImpl/TextureImpl.h"
 using TextureImpl = GraphicLib::OpenGLImpl::TextureImpl;
 #else

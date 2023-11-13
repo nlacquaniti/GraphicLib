@@ -1,6 +1,6 @@
 #include "GraphicLib/Shader.h"
 
-#ifdef OPEN_GL_IMPL
+#ifdef OPENGL_IMPL
 #include "OpenGLImpl/ShaderImpl.h"
 using ShaderImpl = GraphicLib::OpenGLImpl::ShaderImpl;
 #else

@@ -1,36 +1,27 @@
-#include "OpenGLImpl/WindowImpl.h"
+#include "WindowImpl.h"
 
-#include "OpenGLImpl/glad.h"
+#include "glad.h"
 #define GLFW_INCLUDE_NONE
-#include "OpenGLImpl/glfw.h"
+#include "glfw.h"
 
-#include "InternalLogger.h"
-#include "OpenGLImpl/GLFWLogSystem.h"
-#include "OpenGLImpl/OpenGLLogSystem.h"
-#include <limits>
-
-namespace GraphicLib {
-namespace OpenGLImpl {
 void* WindowImpl::_userData{};
 WindowImpl::OnWindowClosedCallback WindowImpl::_onWindowClosedCallback{};
 WindowImpl::OnRenderCallback WindowImpl::_onRenderCallback{};
-unsigned long long WindowImpl::_glfwLogSystemId{};
-unsigned long long WindowImpl::_openGLLogSystemId{};
+WindowImpl::OnWindowLogCallback WindowImpl::_onWindowLogCallback{};
 GLFWwindow* WindowImpl::_window{};
 
 bool WindowImpl::Create(int width, int height, const char* title, void* userData) {
     if (width < 1 || height < 1) {
-        InternalLogger::Get().LogInternalError("OpenGLImpl::WindowImpl::Create", "Cannot create a window with either width or height with 0 or less value");
+        _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window with either width or height with 0 or less value");
         return false;
     }
 
     if (title == nullptr) {
-        InternalLogger::Get().LogInternalError("OpenGLImpl::WindowImpl::Create", "Cannot create a window without a title");
+        _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window without a title");
         return false;
     }
 
     _userData = userData;
-    _glfwLogSystemId = InternalLogger::Get().AttachExternalLogSystem(std::make_unique<GLFWLogSystem>());
 
     if (!glfwInit()) {
         _clear();
@@ -49,7 +40,6 @@ bool WindowImpl::Create(int width, int height, const char* title, void* userData
 
     glfwMakeContextCurrent(_window);
     gladLoadGL();
-    _openGLLogSystemId = InternalLogger::Get().AttachExternalLogSystem(std::make_unique<OpenGLLogSystem>());
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
     glfwSwapInterval(1);
 
@@ -58,7 +48,7 @@ bool WindowImpl::Create(int width, int height, const char* title, void* userData
 
 void WindowImpl::Render() {
     if (_window == nullptr) {
-        InternalLogger::Get().LogInternalError("OpenGLImpl::WindowImpl::Render", "GLFWwindow is null");
+        _invokeLogCallback("OpenGLImpl::WindowImpl::Render: GLFWwindow is null");
         return;
     }
 
@@ -84,6 +74,10 @@ void WindowImpl::SetWindowClosedCallback(OnWindowClosedCallback onWindowClosedCa
     _onWindowClosedCallback = onWindowClosedCallback;
 }
 
+void WindowImpl::SetLogCallback(OnWindowLogCallback onWindowLogCallback) {
+    _onWindowLogCallback = onWindowLogCallback;
+}
+
 void WindowImpl::GetSize(int& width, int& height) {
     glfwGetWindowSize(_window, &width, &height);
 }
@@ -96,12 +90,9 @@ void WindowImpl::_clear() {
     }
 
     _userData = nullptr;
-    InternalLogger::Get().DetachExternalLogSystem(_glfwLogSystemId);
-    _glfwLogSystemId = {};
-    InternalLogger::Get().DetachExternalLogSystem(_openGLLogSystemId);
-    _openGLLogSystemId = {};
     _onWindowClosedCallback = nullptr;
     _onRenderCallback = nullptr;
+    _onWindowLogCallback = nullptr;
 }
 
 void WindowImpl::_onWindowClosed(GLFWwindow*) {
@@ -121,5 +112,9 @@ void WindowImpl::_onSetWindowSize(GLFWwindow*, int width, int height) {
     glViewport(0, 0, width, height);
     Render();
 }
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+
+void WindowImpl::_invokeLogCallback(const char* message) {
+    if (_onWindowLogCallback != nullptr) {
+        _onWindowLogCallback(message);
+    }
+}

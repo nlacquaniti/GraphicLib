@@ -1,13 +1,14 @@
-#include "GraphicLib/IndexBuffer.h"
-#include "GraphicLib/Shader.h"
-#include "GraphicLib/Texture.h"
-#include "GraphicLib/Utilities/Span.h"
-#include "GraphicLib/VertexArray.h"
-#include "GraphicLib/VertexBuffer.h"
+#include "Window.h"
+#include <GraphicLib/IndexBuffer.h>
+#include <GraphicLib/Shader.h>
+#include <GraphicLib/Texture.h>
+#include <GraphicLib/Utilities/Span.h>
+#include <GraphicLib/VertexArray.h>
+#include <GraphicLib/VertexBuffer.h>
 #include <GraphicLib/Logger.h>
-#include <GraphicLib/Window.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+#include <imgui/imgui.h>
 #include <iostream>
 #include <memory>
 
@@ -38,7 +39,7 @@ public:
     void Stop();
 
 private:
-    GraphicLib::Window _window{};
+    Window _window{};
     GraphicLib::Shader _shader{};
     GraphicLib::VertexArray _triangleVA{};
     GraphicLib::Texture _textureTest{};
@@ -71,6 +72,19 @@ void Application::Initialise() {
     if (!_window.Create({800, 600}, "Example", this)) {
         return;
     }
+
+    // Setup Dear ImGui context
+    IMGUI_CHECKVERSION();
+    ImGui::CreateContext();
+    ImGuiIO& io = ImGui::GetIO();
+    (void)io;
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
+    io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
+    io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
+    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
+    // io.ConfigViewportsNoAutoMerge = true;
+    // io.ConfigViewportsNoTaskBarIcon = true;
+
     _shouldUpdate = true;
 
     const float vertices[] = {

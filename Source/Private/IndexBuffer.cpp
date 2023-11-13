@@ -2,7 +2,7 @@
 
 #include "InternalLogger.h"
 
-#ifdef OPEN_GL_IMPL
+#ifdef OPENGL_IMPL
 #include "OpenGLImpl/IndexBufferImpl.h"
 using IndexBufferImpl = GraphicLib::OpenGLImpl::IndexBufferImpl;
 #else
