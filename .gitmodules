@@ -1,0 +1,9 @@
+[submodule "Examples/Vendors/glm"]
+	path = Examples/Vendors/glm
+	url = https://github.com/g-truc/glm.git
+[submodule "Examples/Vendors/glfw"]
+	path = Examples/Vendors/glfw
+	url = https://github.com/glfw/glfw.git
+[submodule "Examples/Vendors/imgui"]
+	path = Examples/Vendors/imgui
+	url = https://github.com/ocornut/imgui.git
