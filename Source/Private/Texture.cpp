@@ -46,7 +46,7 @@ void Texture::Set(const char* texturePath, TextureType type, const Span<TextureP
     if (!std::filesystem::exists(filePath)) {
         std::stringstream logText;
         logText << "File \"" << texturePath << "\" doesn't exist";
-        InternalLogger::Get().LogInternalError("Texture::SetData", logText.str().c_str());
+        LOG_INTERNAL_ERROR(logText.str().c_str());
         return;
     }
 
@@ -54,7 +54,7 @@ void Texture::Set(const char* texturePath, TextureType type, const Span<TextureP
     if (_pixelData == nullptr) {
         std::stringstream logText;
         logText << "Can't read pixel data for \"" << texturePath << "\"";
-        InternalLogger::Get().LogInternalError("Texture::SetData", logText.str().c_str());
+        LOG_INTERNAL_ERROR(logText.str().c_str());
         return;
     }
     _data.PixelData.SetData(_pixelData, sizeof(unsigned char) * static_cast<unsigned long long>(_data.Width * _data.Height * static_cast<int>(_data.Channel)));

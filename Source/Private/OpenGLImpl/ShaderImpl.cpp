@@ -20,7 +20,7 @@ static bool _compileShader(unsigned int shaderID, unsigned int compilationType) 
         std::vector<char> logText{};
         logText.reserve(static_cast<size_t>(infoLogLength));
         glGetShaderInfoLog(shaderID, infoLogLength, &infoLogLength, logText.data());
-        InternalLogger::Get().LogInternalError("ShaderImpl::Load", logText.data());
+        LOG_INTERNAL_ERROR(logText.data());
     }
     return success;
 }

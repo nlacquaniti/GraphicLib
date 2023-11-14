@@ -30,7 +30,6 @@ void InternalLogger::LogMessage(const Message& message) {
         Logger::Message debuggerMessage{
             _severity,
             message.source,
-            message.type,
             message.text,
             _userData,
         };
@@ -39,11 +38,11 @@ void InternalLogger::LogMessage(const Message& message) {
 }
 
 void InternalLogger::LogInternalNotification(const char* source, const char* text) {
-    LogMessage({ Logger::Severity::NOTIFICATION, source, "INTERNAL_NOTIFICATION", text });
+    LogMessage({Logger::Severity::NOTIFICATION, source, text});
 }
 
 void InternalLogger::LogInternalError(const char* source, const char* text) {
-    LogMessage({Logger::Severity::HIGH, source, "INTERNAL_ERROR", text});
+    LogMessage({Logger::Severity::HIGH, source, text});
 }
 
 std::size_t InternalLogger::AttachExternalLogSystem(std::unique_ptr<IExternalLogSystem> externalLogSystem) {

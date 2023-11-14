@@ -3,19 +3,19 @@
 #include "GraphicLib/IndexBuffer.h"
 #include "GraphicLib/VertexBuffer.h"
 #include "InternalLogger.h"
-#include <cassert>
 #include <limits>
-#include <algorithm>
 
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/VertexArrayImpl.h"
 using VertexArrayImpl = GraphicLib::OpenGLImpl::VertexArrayImpl;
+using GraphicAPI = GraphicLib::OpenGLImpl::API;
 #else
 #error "No VertexArrayImpl has been detected."
 #endif
 
 namespace GraphicLib {
 void VertexArray::Initialise() {
+    GraphicAPI::Get().VertexArray().Initialise()
     VertexArrayImpl::Initialise(_id);
     _vertexBuffer.Initialise();
     _indexBuffer.Initialise();
@@ -36,7 +36,7 @@ void VertexArray::Unbind() {
 void VertexArray::Draw() {
     const auto trianglesCount = _indexBuffer.Get().Size() * 3;
     if (trianglesCount > std::numeric_limits<int>::max()) {
-        InternalLogger::Get().LogInternalError("VertexArray::Draw", "Triangles count exceeded the max number");
+       LOG_INTERNAL_ERROR("Triangles count exceeded the max number");
         return;
     }
     VertexArrayImpl::Draw(_id, static_cast<int>(trianglesCount));

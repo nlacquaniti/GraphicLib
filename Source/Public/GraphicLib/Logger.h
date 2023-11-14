@@ -15,7 +15,6 @@ public:
     struct Message {
         Severity severity{};
         const char* source{};
-        const char* type{};
         const char* text{};
         const void* userData{};
     };

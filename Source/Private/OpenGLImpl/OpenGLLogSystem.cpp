@@ -77,7 +77,6 @@ void OpenGLLogSystem::_onAttach() {
             InternalLogger::Message debugMessage{};
             debugMessage.severity = OpenGLSeverityToInternal(severity);
             debugMessage.source = DebugSourceToString(source);
-            debugMessage.type = DebugTypeToString(type);
             debugMessage.text = message;
 
             logSystem->GetMessageLogCallback()(debugMessage);

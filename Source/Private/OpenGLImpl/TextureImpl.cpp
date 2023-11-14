@@ -21,7 +21,7 @@ bool ConvertTextureType(TextureType type, unsigned int& outType) {
     }
     std::stringstream errorText;
     errorText << "TextureType " << TextureUtils::TextureTypeToString(type);
-    InternalLogger::Get().LogInternalError("TextureImpl::ConvertTextureType", errorText.str().c_str());
+    LOG_INTERNAL_ERROR(errorText.str().c_str());
     return false;
 }
 
@@ -44,7 +44,7 @@ bool ConvertTextureParamName(TextureParamName paramName, unsigned int& outParamN
     }
     std::stringstream errorText;
     errorText << "TextureParamName " << TextureUtils::TextureParamNameToString(paramName);
-    InternalLogger::Get().LogInternalError("TextureImpl::ConvertTextureParamName", errorText.str().c_str());
+    LOG_INTERNAL_ERROR(errorText.str().c_str());
     return false;
 }
 
@@ -76,7 +76,7 @@ bool ConvertTextureParamValue(TextureParamValue paramValue, int& outParamValue) 
     }
     std::stringstream errorText;
     errorText << "TextureParamValue " << TextureUtils::TextureParamValueToString(paramValue);
-    InternalLogger::Get().LogInternalError("TextureImpl::ConvertTextureParamValue", errorText.str().c_str());
+    LOG_INTERNAL_ERROR(errorText.str().c_str());
     return false;
 }
 
@@ -100,7 +100,7 @@ bool ConvertTextureChannel(TextureChannel channel, unsigned int& outChannel) {
     }
     std::stringstream errorText;
     errorText << "TextureChannel " << TextureUtils::TextureChannelToString(channel);
-    InternalLogger::Get().LogInternalError("TextureImpl::ConvertTextureChannel", errorText.str().c_str());
+    LOG_INTERNAL_ERROR(errorText.str().c_str());
     return false;
 }
 } // namespace
@@ -112,7 +112,7 @@ void TextureImpl::Initialise(unsigned int& id) {
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_maxTextureSlots);
         std::stringstream logText;
         logText << "Max number of texture slots " << _maxTextureSlots;
-        InternalLogger::Get().LogInternalNotification("TextureImpl::Initialise", logText.str().c_str());
+        LOG_INTERNAL_NOTIFICATION(logText.str().c_str());
     }
     glGenTextures(1, &id);
 }
@@ -137,7 +137,7 @@ void TextureImpl::Draw(unsigned int id, TextureType type, unsigned char slot) {
     if (slot > _maxTextureSlots) {
         std::stringstream logText;
         logText << "Provided texture slot " << slot << " exceeded the max number of texture slots " << _maxTextureSlots;
-        InternalLogger::Get().LogInternalError("TextureImpl::Draw", logText.str().c_str());
+        LOG_INTERNAL_ERROR(logText.str().c_str());
         return;
     }
     glActiveTexture(GL_TEXTURE0 + slot);

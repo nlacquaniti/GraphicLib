@@ -6,13 +6,17 @@
 #include <unordered_map>
 
 namespace GraphicLib {
+#define STRINGIFY(str) #str
+#define LOG_SOURCE() STRINGIFY(__FILE__) STRINGIFY(__func__) STRINGIFY(__LINE__)
+#define LOG_INTERNAL_NOTIFICATION(message) InternalLogger::Get().LogInternalNotification(LOG_SOURCE(), message)
+#define LOG_INTERNAL_ERROR(message) InternalLogger::Get().LogInternalError(LOG_SOURCE(), message)
+
 class IExternalLogSystem;
 class InternalLogger final {
 public:
     struct Message {
         Logger::Severity severity{};
         const char* source{};
-        const char* type{};
         const char* text{};
     };
     static InternalLogger& Get();
