@@ -1,6 +1,6 @@
 #include "OpenGLImpl/IndexBufferImpl.h"
 
-#include "OpenGLImpl/glad.h"
+#include <glad/glad.h>
 
 namespace GraphicLib {
 namespace OpenGLImpl {

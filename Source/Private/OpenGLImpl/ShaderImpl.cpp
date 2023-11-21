@@ -1,7 +1,7 @@
 #include "OpenGLImpl/ShaderImpl.h"
 
 #include "InternalLogger.h"
-#include "OpenGLImpl/glad.h"
+#include <glad/glad.h>
 #include <vector>
 
 namespace GraphicLib {
@@ -26,7 +26,7 @@ static bool _compileShader(unsigned int shaderID, unsigned int compilationType) 
 }
 } // namespace
 
-bool ShaderImpl::Load(unsigned int& id, const char* vertexShared, const char* fragmentShader) {
+bool ShaderImpl::Load(unsigned int& id, const char* vertexShared, const char* fragmentShader) const {
     unsigned int vertex, fragment;
     // vertex shader
     vertex = glCreateShader(GL_VERTEX_SHADER);
@@ -63,30 +63,30 @@ bool ShaderImpl::Load(unsigned int& id, const char* vertexShared, const char* fr
     return true;
 }
 
-void ShaderImpl::Bind(unsigned int id) {
+void ShaderImpl::Bind(unsigned int id) const {
     glUseProgram(id);
 }
 
-void ShaderImpl::Unbind(unsigned int) {
+void ShaderImpl::Unbind(unsigned int) const {
     glUseProgram(0);
 }
 
-void ShaderImpl::SetUniformBoolValue(unsigned int id, const char* name, bool value) {
+void ShaderImpl::SetUniformBoolValue(unsigned int id, const char* name, bool value) const {
     Bind(id);
     glUniform1i(glGetUniformLocation(id, name), static_cast<int>(value));
 }
 
-void ShaderImpl::SetUniformIntValue(unsigned int id, const char* name, int value) {
+void ShaderImpl::SetUniformIntValue(unsigned int id, const char* name, int value) const {
     Bind(id);
     glUniform1i(glGetUniformLocation(id, name), value);
 }
 
-void ShaderImpl::SetUniformFloatValue(unsigned int id, const char* name, float value) {
+void ShaderImpl::SetUniformFloatValue(unsigned int id, const char* name, float value) const {
     Bind(id);
     glUniform1f(glGetUniformLocation(id, name), value);
 }
 
-void ShaderImpl::SetUniformMat4Value(unsigned int id, const char* name, const float* value) {
+void ShaderImpl::SetUniformMat4Value(unsigned int id, const char* name, const float* value) const {
     Bind(id);
     glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_FALSE, value);
 }

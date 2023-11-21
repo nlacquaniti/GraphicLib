@@ -7,10 +7,10 @@
 #include <sstream>
 
 #ifdef OPENGL_IMPL
-#include "OpenGLImpl/TextureImpl.h"
-using TextureImpl = GraphicLib::OpenGLImpl::TextureImpl;
+#include "OpenGLImpl/APIImpl.h"
+using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #else
-#error "No VertexBufferImpl has been detected."
+#error "No GraphicAPI has been detected."
 #endif
 
 namespace GraphicLib {
@@ -26,19 +26,19 @@ void Texture::Initialise() {
         stbiFlippedVertically = true;
         stbi_set_flip_vertically_on_load(true);
     }
-    TextureImpl::Initialise(_id);
+    GraphicAPI::Get().GetTextureImpl().Initialise(_id);
 }
 
 void Texture::Bind() {
-    TextureImpl::Bind(_id, _data.Type);
+    GraphicAPI::Get().GetTextureImpl().Bind(_id, _data.Type);
 }
 
 void Texture::Unbind() {
-    TextureImpl::Unbind(_id, _data.Type);
+    GraphicAPI::Get().GetTextureImpl().Unbind(_id, _data.Type);
 }
 
 void Texture::Draw(unsigned char slot) {
-    TextureImpl::Draw(_id, _data.Type, slot);
+    GraphicAPI::Get().GetTextureImpl().Draw(_id, _data.Type, slot);
 }
 
 void Texture::Set(const char* texturePath, TextureType type, const Span<TextureParam>& params) {
@@ -62,7 +62,7 @@ void Texture::Set(const char* texturePath, TextureType type, const Span<TextureP
     _data.Type = type;
     _data.Parameters.SetData(params);
 
-    TextureImpl::Set(_id, _data);
+    GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
 }
 
 const TextureData& Texture::GetData() const {

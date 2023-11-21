@@ -1,11 +1,18 @@
 #pragma once
 
-#include "Utilities/Singleton.h"
+#include "IndexBufferImpl.h"
+#include "ShaderImpl.h"
+#include "TextureImpl.h"
+#include "VertexArrayImpl.h"
+#include "VertexBufferImpl.h"
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-class APIImpl : public Singleton<APIImpl> {
+class APIImpl final {
 public:
+    static APIImpl& Get();
+    static const APIImpl& ConstGet();
+
     const VertexArrayImpl& GetVertexArrayImpl() const;
     VertexArrayImpl& GetVertexArrayImpl();
 
@@ -22,6 +29,7 @@ public:
     ShaderImpl& GetShaderImpl();
 
 private:
+    static APIImpl* _instance;
     VertexArrayImpl _vertexArrayImpl;
     VertexBufferImpl _vertexBufferImpl;
     IndexBufferImpl _indexBufferImpl;

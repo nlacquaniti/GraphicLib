@@ -6,10 +6,10 @@ namespace GraphicLib {
 namespace OpenGLImpl {
 class VertexBufferImpl {
 public:
-    static void Initialise(unsigned int& id);
-    static void Bind(unsigned int id);
-    static void Unbind(unsigned int id);
-    static void Set(unsigned int id, const Span<float>& data, const Span<int>& attributes);
+    void Initialise(unsigned int& id) const;
+    void Bind(unsigned int id) const;
+    void Unbind(unsigned int id) const;
+    void Set(unsigned int id, const Span<float>& data, const Span<int>& attributes) const;
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

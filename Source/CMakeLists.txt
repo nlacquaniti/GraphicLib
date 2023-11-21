@@ -39,7 +39,7 @@ target_compile_definitions(${PROJECT_NAME} PRIVATE DLL_EXPORT)
 if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 set_target_properties(${PROJECT_NAME} PROPERTIES
     COMPILE_OPTIONS 
-	"-Wall;-Wextra;-Wshadow;-Wconversion;-Wpedantic;-Werror;-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-unsafe-buffer-usage"
+	"-Wall;-Wextra;-Wshadow;-Wconversion;-Wpedantic;-Werror;-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-unsafe-buffer-usage;"
 )
 endif()
 

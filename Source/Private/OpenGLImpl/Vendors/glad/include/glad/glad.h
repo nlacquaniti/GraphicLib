@@ -19,6 +19,13 @@
         https://glad.dav1d.de/#profile=compatibility&language=c&specification=gl&loader=on&api=gl%3D4.6
 */
 
+#pragma once
+#ifdef __clang__
+#pragma warning(push)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+#endif
+
 
 #ifndef __glad_h_
 #define __glad_h_
@@ -5166,4 +5173,9 @@ GLAPI PFNGLPOLYGONOFFSETCLAMPPROC glad_glPolygonOffsetClamp;
 }
 #endif
 
+#endif
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#pragma warning(pop)
 #endif

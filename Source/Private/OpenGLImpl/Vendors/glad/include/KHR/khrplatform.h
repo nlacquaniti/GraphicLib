@@ -1,6 +1,13 @@
 #ifndef __khrplatform_h_
 #define __khrplatform_h_
 
+#pragma once
+#ifdef __clang__
+#pragma warning(push)
+#pragma clang diagnostic push
+#pragma clang diagnostic ignored "-Weverything"
+#endif
+
 /*
 ** Copyright (c) 2008-2018 The Khronos Group Inc.
 **
@@ -288,3 +295,8 @@ typedef enum {
 } khronos_boolean_enum_t;
 
 #endif /* __khrplatform_h_ */
+
+#ifdef __clang__
+#pragma clang diagnostic pop
+#pragma warning(pop)
+#endif

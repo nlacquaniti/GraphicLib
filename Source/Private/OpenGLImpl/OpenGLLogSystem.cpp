@@ -1,7 +1,7 @@
 #include "OpenGLImpl/OpenGLLogSystem.h"
 
-#include "OpenGLImpl/glad.h"
-#include <cassert>
+#include <glad/glad.h>
+#include <sstream>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
@@ -17,7 +17,6 @@ Logger::Severity OpenGLSeverityToInternal(GLenum openGLSeverity) {
         case GL_DEBUG_SEVERITY_NOTIFICATION:
             return Logger::Severity::NOTIFICATION;
         default:
-            assert(false);
             return Logger::Severity{};
     }
 }
@@ -72,12 +71,15 @@ void OpenGLLogSystem::_onAttach() {
     glDebugMessageCallback(
         [](GLenum source, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void* userParam) {
             const auto* logSystem = static_cast<const OpenGLLogSystem*>(userParam);
-            assert(logSystem != nullptr);
 
             InternalLogger::Message debugMessage{};
             debugMessage.severity = OpenGLSeverityToInternal(severity);
             debugMessage.source = DebugSourceToString(source);
-            debugMessage.text = message;
+
+            std::stringstream logMessage;
+            logMessage << DebugTypeToString(type) << ": " << message;
+            const std::string logString { logMessage.str() };
+            debugMessage.text = logString.c_str();
 
             logSystem->GetMessageLogCallback()(debugMessage);
         },

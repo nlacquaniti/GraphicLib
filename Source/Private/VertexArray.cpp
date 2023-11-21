@@ -6,29 +6,27 @@
 #include <limits>
 
 #ifdef OPENGL_IMPL
-#include "OpenGLImpl/VertexArrayImpl.h"
-using VertexArrayImpl = GraphicLib::OpenGLImpl::VertexArrayImpl;
-using GraphicAPI = GraphicLib::OpenGLImpl::API;
+#include "OpenGLImpl/APIImpl.h"
+using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #else
-#error "No VertexArrayImpl has been detected."
+#error "No GraphicAPI has been detected."
 #endif
 
 namespace GraphicLib {
 void VertexArray::Initialise() {
-    GraphicAPI::Get().VertexArray().Initialise()
-    VertexArrayImpl::Initialise(_id);
+    GraphicAPI::Get().GetVertexArrayImpl().Initialise(_id);
     _vertexBuffer.Initialise();
     _indexBuffer.Initialise();
 }
 
 void VertexArray::Bind() {
-    VertexArrayImpl::Bind(_id);
+    GraphicAPI::Get().GetVertexArrayImpl().Bind(_id);
     _vertexBuffer.Bind();
     _indexBuffer.Bind();
 }
 
 void VertexArray::Unbind() {
-    VertexArrayImpl::Unbind(_id);
+    GraphicAPI::Get().GetVertexArrayImpl().Unbind(_id);
     _vertexBuffer.Unbind();
     _indexBuffer.Unbind();
 }
@@ -39,7 +37,7 @@ void VertexArray::Draw() {
        LOG_INTERNAL_ERROR("Triangles count exceeded the max number");
         return;
     }
-    VertexArrayImpl::Draw(_id, static_cast<int>(trianglesCount));
+    GraphicAPI::Get().GetVertexArrayImpl().Draw(_id, static_cast<int>(trianglesCount));
 }
 
 const VertexBuffer& VertexArray::GetVertexBuffer() const {

@@ -1,16 +1,17 @@
 #include "Window.h"
 #include <GraphicLib/IndexBuffer.h>
+#include <GraphicLib/Logger.h>
 #include <GraphicLib/Shader.h>
 #include <GraphicLib/Texture.h>
 #include <GraphicLib/Utilities/Span.h>
 #include <GraphicLib/VertexArray.h>
 #include <GraphicLib/VertexBuffer.h>
-#include <GraphicLib/Logger.h>
+#include <imgui/imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
-#include <imgui/imgui.h>
 #include <iostream>
 #include <memory>
+#include <imgui/imgui.h>
 
 const char* vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
@@ -36,6 +37,7 @@ public:
     void Initialise();
     void Start();
     void Render();
+    void RenderDebug();
     void Stop();
 
 private:
@@ -60,6 +62,11 @@ void RenderWindowCallback(void* userData) {
     auto* application = static_cast<Application*>(userData);
     application->Render();
 }
+
+void RenderWindowDebugCallback(void* userData) {
+    auto* application = static_cast<Application*>(userData);
+    application->RenderDebug();
+}
 } // namespace
 
 void Application::Initialise() {
@@ -68,21 +75,10 @@ void Application::Initialise() {
 
     _window.SetOnCloseCallback(CloseWindowCallback);
     _window.SetOnRenderWindowCallback(RenderWindowCallback);
+    _window.SetOnRenderWindowDebugCallback(RenderWindowDebugCallback);
     if (!_window.Create({800, 600}, "Example", this)) {
         return;
     }
-
-    // Setup Dear ImGui context
-    //IMGUI_CHECKVERSION();
-    //ImGui::CreateContext();
-    //ImGuiIO& io = ImGui::GetIO();
-    //(void)io;
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
-    //io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
-    //io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
-    // io.ConfigViewportsNoAutoMerge = true;
-    // io.ConfigViewportsNoTaskBarIcon = true;
 
     _shouldUpdate = true;
 
@@ -130,6 +126,14 @@ void Application::Render() {
     glm::mat4 MVP(1.0f);
     _shader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
     _triangleVA.Draw();
+}
+
+void Application::RenderDebug() {
+    static bool show_demo_window = true;
+
+    if (show_demo_window) {
+        ImGui::ShowDemoWindow(&show_demo_window);
+    }
 }
 
 void Application::Stop() {

@@ -3,29 +3,29 @@
 #include "InternalLogger.h"
 
 #ifdef OPENGL_IMPL
-#include "OpenGLImpl/VertexBufferImpl.h"
-using VertexBufferImpl = GraphicLib::OpenGLImpl::VertexBufferImpl;
+#include "OpenGLImpl/APIImpl.h"
+using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #else
-#error "No VertexBufferImpl has been detected."
+#error "No GraphicAPI has been detected."
 #endif
 
 namespace GraphicLib {
 void VertexBuffer::Initialise() {
-    VertexBufferImpl::Initialise(_id);
+    GraphicAPI::Get().GetVertexBufferImpl().Initialise(_id);
 }
 
 void VertexBuffer::Bind() {
-    VertexBufferImpl::Bind(_id);
+    GraphicAPI::Get().GetVertexBufferImpl().Bind(_id);
 }
 
 void VertexBuffer::Unbind() {
-    VertexBufferImpl::Unbind(_id);
+    GraphicAPI::Get().GetVertexBufferImpl().Unbind(_id);
 }
 
 void VertexBuffer::Set(const Span<float>& vertexData, const Span<int>& vertexAttributes) {
     _vertexData.SetData(vertexData);
     _vertexAttributes.SetData(vertexAttributes);
-    VertexBufferImpl::Set(_id, vertexData, vertexAttributes);
+    GraphicAPI::Get().GetVertexBufferImpl().Set(_id, vertexData, vertexAttributes);
 }
 
 Span<float> VertexBuffer::GetVertexData() const {

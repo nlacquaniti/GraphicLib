@@ -9,6 +9,7 @@ class Window final {
 public:
     using CloseWindowCallback = void (*)(void*);
     using RenderWindowCallback = void (*)(void*);
+    using RenderWindowDebugCallback = void (*)(void*);
     using LogCallback = void(*)(const char*);
 
     Window() = default;
@@ -22,8 +23,10 @@ public:
     void Shutdown();
     void SetOnCloseCallback(CloseWindowCallback closeWindowCallback);
     void SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback);
+    void SetOnRenderWindowDebugCallback(RenderWindowDebugCallback renderWindowDebugCallback);
     void SetLogCallback(LogCallback logCallback);
     WindowSize GetSize() const;
+    void* GetWindowImplPtr() const;
 
 private:
     void _clear();

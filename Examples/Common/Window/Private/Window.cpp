@@ -39,6 +39,10 @@ void Window::SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback
     WindowImpl::SetRenderCallback(renderWindowCallback);
 }
 
+void Window::SetOnRenderWindowDebugCallback(RenderWindowDebugCallback renderWindowDebugCallback) {
+    WindowImpl::SetRenderDebugCallback(renderWindowDebugCallback);
+}
+
 void Window::SetLogCallback(LogCallback logCallback) {
     WindowImpl::SetLogCallback(logCallback);
 }
@@ -47,6 +51,10 @@ WindowSize Window::GetSize() const {
     WindowSize size;
     WindowImpl::GetSize(size.Width, size.Height);
     return size;
+}
+
+void* Window::GetWindowImplPtr() const {
+    return WindowImpl::GetWindowPtr();
 }
 
 void Window::_clear() {

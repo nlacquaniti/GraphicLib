@@ -6,8 +6,10 @@
 #include <unordered_map>
 
 namespace GraphicLib {
-#define STRINGIFY(str) #str
-#define LOG_SOURCE() STRINGIFY(__FILE__) STRINGIFY(__func__) STRINGIFY(__LINE__)
+#define S1(x) #x
+#define S2(x) S1(x)
+#define LOG_SOURCE() __FILE__ ": " S2(__LINE__)
+
 #define LOG_INTERNAL_NOTIFICATION(message) InternalLogger::Get().LogInternalNotification(LOG_SOURCE(), message)
 #define LOG_INTERNAL_ERROR(message) InternalLogger::Get().LogInternalError(LOG_SOURCE(), message)
 

@@ -1,12 +1,13 @@
 target_sources(${PROJECT_NAME} PRIVATE 
+	APIImpl.h
 	ShaderImpl.h
 	VertexArrayImpl.h
 	VertexBufferImpl.h
 	IndexBufferImpl.h
 	OpenGLLogSystem.h
-	glad.h
 	TextureImpl.h
 
+	APIImpl.cpp
 	ShaderImpl.cpp
 	VertexArrayImpl.cpp
 	VertexBufferImpl.cpp

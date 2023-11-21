@@ -1,8 +1,8 @@
 #include "OpenGLImpl/TextureImpl.h"
 
-#include "GraphicLib/Utilities/TextureUtils.h"
 #include "InternalLogger.h"
-#include "glad.h"
+#include "GraphicLib/Utilities/TextureUtils.h"
+#include <glad/glad.h>
 #include <sstream>
 
 namespace GraphicLib {
@@ -81,22 +81,21 @@ bool ConvertTextureParamValue(TextureParamValue paramValue, int& outParamValue) 
 }
 
 bool ConvertTextureChannel(TextureChannel channel, unsigned int& outChannel) {
-    switch (channel)
-    {
-    case TextureChannel::GRAY:
-        outChannel = GL_RED;
-        return true;
-    case TextureChannel::GRAY_ALPHA:
-        outChannel = GL_RG;
-        return true;
-    case TextureChannel::RGB:
-        outChannel = GL_RGB;
-        return true;
-    case TextureChannel::RGBA:
-        outChannel = GL_RGBA;
-        return true;
-    case TextureChannel::NONE:
-        break;
+    switch (channel) {
+        case TextureChannel::GRAY:
+            outChannel = GL_RED;
+            return true;
+        case TextureChannel::GRAY_ALPHA:
+            outChannel = GL_RG;
+            return true;
+        case TextureChannel::RGB:
+            outChannel = GL_RGB;
+            return true;
+        case TextureChannel::RGBA:
+            outChannel = GL_RGBA;
+            return true;
+        case TextureChannel::NONE:
+            break;
     }
     std::stringstream errorText;
     errorText << "TextureChannel " << TextureUtils::TextureChannelToString(channel);
@@ -107,7 +106,7 @@ bool ConvertTextureChannel(TextureChannel channel, unsigned int& outChannel) {
 
 int TextureImpl::_maxTextureSlots{-1};
 
-void TextureImpl::Initialise(unsigned int& id) {
+void TextureImpl::Initialise(unsigned int& id) const {
     if (_maxTextureSlots == -1) {
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_maxTextureSlots);
         std::stringstream logText;
@@ -117,7 +116,7 @@ void TextureImpl::Initialise(unsigned int& id) {
     glGenTextures(1, &id);
 }
 
-void TextureImpl::Bind(unsigned int id, TextureType type) {
+void TextureImpl::Bind(unsigned int id, TextureType type) const {
     unsigned int target{};
     if (!ConvertTextureType(type, target)) {
         return;
@@ -125,7 +124,7 @@ void TextureImpl::Bind(unsigned int id, TextureType type) {
     glBindTexture(target, id);
 }
 
-void TextureImpl::Unbind(unsigned int, TextureType type) {
+void TextureImpl::Unbind(unsigned int, TextureType type) const {
     unsigned int target{};
     if (!ConvertTextureType(type, target)) {
         return;
@@ -133,7 +132,7 @@ void TextureImpl::Unbind(unsigned int, TextureType type) {
     glBindTexture(target, 0);
 }
 
-void TextureImpl::Draw(unsigned int id, TextureType type, unsigned char slot) {
+void TextureImpl::Draw(unsigned int id, TextureType type, unsigned char slot) const {
     if (slot > _maxTextureSlots) {
         std::stringstream logText;
         logText << "Provided texture slot " << slot << " exceeded the max number of texture slots " << _maxTextureSlots;
@@ -144,7 +143,7 @@ void TextureImpl::Draw(unsigned int id, TextureType type, unsigned char slot) {
     Bind(id, type);
 }
 
-void TextureImpl::Set(unsigned int id, const TextureData& textureData) {
+void TextureImpl::Set(unsigned int id, const TextureData& textureData) const {
     Bind(id, textureData.Type);
 
     unsigned int target{};
