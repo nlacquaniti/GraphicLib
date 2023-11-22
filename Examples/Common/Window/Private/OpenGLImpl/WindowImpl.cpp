@@ -47,6 +47,7 @@ bool WindowImpl::Create(int width, int height, const char* title, void* userData
     glfwSwapInterval(1);
     gladLoadGL();
     glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glEnable(GL_DEPTH_TEST);
 
     // Setup Dear ImGui context
     IMGUI_CHECKVERSION();
@@ -93,7 +94,7 @@ void WindowImpl::Render() {
         _onRenderDebugCallback(_userData);
     }
     ImGui::Render();
-    glClear(GL_COLOR_BUFFER_BIT);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (_onRenderCallback != nullptr) {
         _onRenderCallback(_userData);

@@ -16,8 +16,13 @@ void VertexArrayImpl::Unbind(unsigned int) const {
     glBindVertexArray(0);
 }
 
-void VertexArrayImpl::Draw(unsigned int, int trianglesCount) const {
+void VertexArrayImpl::DrawTriangles(unsigned int, int trianglesCount) const {
     glDrawElements(GL_TRIANGLES, trianglesCount, GL_UNSIGNED_INT, nullptr);
 }
+
+void VertexArrayImpl::DrawVertices(unsigned int id, int verticesCount) const {
+    glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+}
+
 } // namespace OpenGLImpl
 } // namespace GraphicLib

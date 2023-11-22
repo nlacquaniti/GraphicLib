@@ -1,4 +1,5 @@
 #include "Window.h"
+#include <GLFW/glfw3.h>
 #include <GraphicLib/IndexBuffer.h>
 #include <GraphicLib/Logger.h>
 #include <GraphicLib/Shader.h>
@@ -11,7 +12,6 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <memory>
-#include <imgui/imgui.h>
 
 const char* vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
@@ -21,7 +21,7 @@ const char* vertexShaderSource = "#version 330 core\n"
                                  "void main()\n"
                                  "{\n"
                                  "   gl_Position = uMVP * vec4(aPos, 1.0);\n"
-                                 "   texCoord = aTexCoord;\n"
+                                 "   texCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
                                  "}\0";
 const char* fragmentShaderSource = "#version 330 core\n"
                                    "out vec4 FragColor;\n"
@@ -41,10 +41,18 @@ public:
     void Stop();
 
 private:
+    glm::mat4 _createProjectionViewMat() const;
     Window _window{};
     GraphicLib::Shader _shader{};
     GraphicLib::VertexArray _triangleVA{};
     GraphicLib::Texture _textureTest{};
+    glm::vec3 _boxPos{};
+    glm::vec3 _boxRot{};
+    glm::vec3 _boxScale{1, 1, 1};
+
+    glm::vec3 _cameraPos{0, 0, -2};
+    glm::vec3 _cameraRot{};
+    float _cameraFOV{45.0f};
     bool _shouldUpdate{};
 };
 
@@ -82,12 +90,14 @@ void Application::Initialise() {
 
     _shouldUpdate = true;
 
-    const float vertices[] = {
-        0.5f, 0.5f, 0.0f, 1.0f, 1.0f,   // top right
-        0.5f, -0.5f, 0.0f, 1.0f, 0.0f,  // bottom right
-        -0.5f, -0.5f, 0.0f, 0.0f, 0.0f, // bottom left
-        -0.5f, 0.5f, 0.0f, 0.0f, 1.0f,  // top left
-    };
+    const float vertices[] = {-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+        1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 1.0f, -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -0.5f, 0.5f, -0.5f,
+        1.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f,
+        0.5f, 1.0f, 0.0f, 0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f,
+        0.5f, 0.5f, 1.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
+        0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
     const int vertexAttributes[] = {3, 2};
 
     const GraphicLib::IndexBufferDataElement indices[] = {
@@ -98,7 +108,7 @@ void Application::Initialise() {
 
     _triangleVA.Initialise();
     _triangleVA.GetVertexBuffer().Set({vertices}, {vertexAttributes});
-    _triangleVA.GetIndexBuffer().Set({indices});
+    //_triangleVA.GetIndexBuffer().Set({indices});
 
     const GraphicLib::TextureParam textureParams[] = {
         {GraphicLib::TextureParamName::WRAP_S, GraphicLib::TextureParamValue::WRAP_REPEAT},
@@ -123,7 +133,13 @@ void Application::Start() {
 void Application::Render() {
     _textureTest.Draw(0);
     _shader.Bind();
-    glm::mat4 MVP(1.0f);
+    glm::mat4 model{ 1.0f };
+    model = glm::rotate(model, glm::radians(_boxRot.x), { 1, 0, 0 });
+    model = glm::rotate(model, glm::radians(_boxRot.y), {0, 1, 0});
+    model = glm::rotate(model, glm::radians(_boxRot.z), {0, 0, 1});
+    model = glm::translate(model, _boxPos);
+
+    glm::mat4 MVP = _createProjectionViewMat() * model;
     _shader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
     _triangleVA.Draw();
 }
@@ -134,10 +150,29 @@ void Application::RenderDebug() {
     if (show_demo_window) {
         ImGui::ShowDemoWindow(&show_demo_window);
     }
+
+    ImGui::Begin("Box transform");
+    {
+        ImGui::DragFloat3("_boxPos", glm::value_ptr(_boxPos));
+        ImGui::DragFloat3("_boxRot", glm::value_ptr(_boxRot));
+    }
+    ImGui::End();
 }
 
 void Application::Stop() {
     _shouldUpdate = false;
+}
+
+glm::mat4 Application::_createProjectionViewMat() const {
+    const WindowSize& windowSize{_window.GetSize()};
+    const glm::mat4 projection{glm::perspective(glm::radians(_cameraFOV),             //
+        static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height), //
+        0.1f,                                                                         //
+        100.0f                                                                        //
+        )};
+    const glm::mat4 view = glm::lookAt(_cameraPos, {0.0f, 0.0f, 0.0f}, {0, 1, 0});
+
+    return projection * view;
 }
 
 int main() {
