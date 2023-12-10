@@ -20,8 +20,12 @@ void VertexArrayImpl::DrawTriangles(unsigned int, int trianglesCount) const {
     glDrawElements(GL_TRIANGLES, trianglesCount, GL_UNSIGNED_INT, nullptr);
 }
 
-void VertexArrayImpl::DrawVertices(unsigned int id, int verticesCount) const {
+void VertexArrayImpl::DrawVertices(unsigned int, int verticesCount) const {
     glDrawArrays(GL_TRIANGLES, 0, verticesCount);
+}
+
+void VertexArrayImpl::Delete(unsigned int& id) const {
+    glDeleteVertexArrays(1, &id);
 }
 
 } // namespace OpenGLImpl

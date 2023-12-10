@@ -5,19 +5,19 @@
 namespace GraphicLib {
 namespace OpenGLImpl {
 void FrameBufferImpl::Initialise(unsigned int& id) const {
-	glGenFrameBuffers(1, &id);
+	glGenFramebuffers(1, &id);
 }
 
 void FrameBufferImpl::Bind(unsigned int id) const {
-	glBindFrameBuffer(GL_FrameBuffer, id);
+	glBindFramebuffer(GL_FRAMEBUFFER, id);
 }
 
 void FrameBufferImpl::Unbind(unsigned int) const {
-	glBindFrameBuffer(GL_FrameBuffer, 0);
+	glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
 void FrameBufferImpl::Delete(unsigned int& id) const {
-    glDeleteFrameBuffers(1, &id);
+    glDeleteFramebuffers(1, &id);
 }
 
 } // namespace OpenGLImpl

@@ -16,9 +16,7 @@ void VertexBufferImpl::Unbind(unsigned int) const {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBufferImpl::Set(unsigned int id, const Span<float>& data, const Span<int>& attributes) const {
-    Bind(id);
-
+void VertexBufferImpl::Set(unsigned int, const Span<float>& data, const Span<int>& attributes) const {
     glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(data.SizeBytes()), data.Data(), GL_STATIC_DRAW);
 
     int numberOfAttributes{};
@@ -36,5 +34,10 @@ void VertexBufferImpl::Set(unsigned int id, const Span<float>& data, const Span<
         attributesSum += attribute;
     }
 }
+
+void VertexBufferImpl::Delete(unsigned int& id) const {
+    glDeleteBuffers(1, &id);
+}
+
 } // namespace OpenGLImpl
 } // namespace GraphicLib

@@ -7,10 +7,11 @@ namespace GraphicLib {
 namespace OpenGLImpl {
 class IndexBufferImpl final {
 public:
-    static void Initialise(unsigned int& id);
-    static void Bind(unsigned int id);
-    static void Unbind(unsigned int id);
-    static void Set(unsigned int id, const Span<IndexBufferDataElement>& data);
+    void Initialise(unsigned int& id) const;
+    void Bind(unsigned int id) const;
+    void Unbind(unsigned int id) const;
+    void Set(unsigned int id, const Span<IndexBufferDataElement>& data) const;
+    void Delete(unsigned int& id) const;
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

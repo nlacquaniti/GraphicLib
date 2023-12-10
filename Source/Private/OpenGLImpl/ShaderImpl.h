@@ -1,7 +1,5 @@
 #pragma once
 
-#include "GraphicLib/Shader.h"
-
 namespace GraphicLib {
 namespace OpenGLImpl {
 class ShaderImpl final {

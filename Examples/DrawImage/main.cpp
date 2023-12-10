@@ -121,6 +121,7 @@ void Application::Initialise() {
     };
 
     _triangleVA.Initialise();
+    _triangleVA.Bind();
     _triangleVA.GetVertexBuffer().Set({vertices}, {vertexAttributes});
     //_triangleVA.GetIndexBuffer().Set({indices});
 
@@ -145,14 +146,14 @@ void Application::Start() {
 }
 
 void Application::Render() {
-    _textureTest.Draw(0);
     _shader.Bind();
+    _triangleVA.Bind();
+    _textureTest.Draw(0);
     glm::mat4 model{1.0f};
     model = glm::rotate(model, glm::radians(_boxRot.x), {1, 0, 0});
     model = glm::rotate(model, glm::radians(_boxRot.y), {0, 1, 0});
     model = glm::rotate(model, glm::radians(_boxRot.z), {0, 0, 1});
     model = glm::translate(model, _boxPos);
-
     glm::mat4 MVP = _createProjectionViewMat() * model;
     _shader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
     _triangleVA.Draw();

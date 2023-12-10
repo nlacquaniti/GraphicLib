@@ -10,6 +10,10 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
+IndexBuffer::~IndexBuffer() {
+    Delete();
+}
+
 void IndexBuffer::Initialise() {
     GraphicAPI::Get().GetIndexBufferImpl().Initialise(_id);
 }
@@ -24,11 +28,15 @@ void IndexBuffer::Unbind() {
 
 void IndexBuffer::Set(const Span<IndexBufferDataElement>& indices) {
     _indices.SetData(indices);
+    Bind();
     GraphicAPI::Get().GetIndexBufferImpl().Set(_id, indices);
+}
+
+void IndexBuffer::Delete() {
+    GraphicAPI::Get().GetIndexBufferImpl().Delete(_id);
 }
 
 Span<IndexBufferDataElement> IndexBuffer::Get() const {
     return {_indices.Data(), _indices.Size()};
 }
-
 } // namespace GraphicLib

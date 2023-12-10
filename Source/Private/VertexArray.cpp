@@ -13,6 +13,11 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
+
+VertexArray::~VertexArray() {
+    Delete();
+}
+
 void VertexArray::Initialise() {
     GraphicAPI::Get().GetVertexArrayImpl().Initialise(_id);
     _vertexBuffer.Initialise();
@@ -39,13 +44,12 @@ void VertexArray::Draw() {
             LOG_INTERNAL_ERROR("Triangles count exceeded the max number");
             return;
         }
-
         GraphicAPI::Get().GetVertexArrayImpl().DrawTriangles(_id, static_cast<int>(trianglesCount));
     }
     else {
         unsigned long long attributesCount{};
         for (unsigned long long i{}; i < _vertexBuffer.GetVertexAttributes().Size(); ++i) {
-            attributesCount += _vertexBuffer.GetVertexAttributes()[i];
+            attributesCount += static_cast<unsigned long long>(_vertexBuffer.GetVertexAttributes()[i]);
         }
 
         const auto verticesCount = _vertexBuffer.GetVertexData().Size() / attributesCount;
@@ -53,9 +57,12 @@ void VertexArray::Draw() {
             LOG_INTERNAL_ERROR("Vertices count exceeded the max number");
             return;
         }
-
         GraphicAPI::Get().GetVertexArrayImpl().DrawVertices(_id, static_cast<int>(verticesCount));
     }
+}
+
+void VertexArray::Delete() {
+    GraphicAPI::Get().GetVertexArrayImpl().Delete(_id);
 }
 
 const VertexBuffer& VertexArray::GetVertexBuffer() const {

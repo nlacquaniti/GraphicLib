@@ -10,6 +10,7 @@ public:
     void Bind(unsigned int id) const;
     void Unbind(unsigned int id) const;
     void Set(unsigned int id, const Span<float>& data, const Span<int>& attributes) const;
+    void Delete(unsigned int& id) const;
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

@@ -5,13 +5,13 @@
 #include "Utilities/Span.h"
 
 namespace GraphicLib {
-enum class TextureType : unsigned char {
+enum class ETextureType : unsigned char {
     NONE,
     TEXTURE_2D,
     CUBE_MAP,
 };
 
-enum class TextureParamName : unsigned char {
+enum class ETextureParamName : unsigned char {
     NONE,
     MIN_FILTER,
     MAG_FILTER,
@@ -19,7 +19,7 @@ enum class TextureParamName : unsigned char {
     WRAP_T,
 };
 
-enum class TextureParamValue : unsigned char {
+enum class ETextureParamValue : unsigned char {
     NONE,
     FILTER_NEAREST,
     FILTER_LIEAR,
@@ -30,24 +30,57 @@ enum class TextureParamValue : unsigned char {
     WRAP_MIRROR_CLAMP_TO_EDGE,
 };
 
-enum class TextureChannel : unsigned char {
+enum class ETextureChannel : unsigned char {
     NONE,
     GRAY,
     GRAY_ALPHA,
     RGB,
     RGBA,
+    STENCIL,
+    DEPTH,
+    DEPTH_STENCIL,
+};
+
+enum class ETextureFormat : unsigned char {
+    NONE,
+    RGBA8,
+    RGBA16F,
+    RGBA32F,
+    SRGB8,
+    SRGB8_ALPHA8,
+    DEPTH16,
+    DEPTH24,
+    DEPTH32F,
+    DEPTH24_STENCIL8,
+    DEPTH32F_STENCIL8,
+};
+
+enum class ETextureDataType : unsigned char {
+    NONE,
+    UNSIGNED_BYTE,
+    FLOAT,
+    HALF_FLOAT,
+    UNSIGNED_SHORT,
+    INT,
+    UNSIGNED_INT,
+    UNSIGNED_INT_24_8,
 };
 
 struct TextureParam {
-    TextureParamName Name{};
-    TextureParamValue Value{};
+    ETextureParamName Name{};
+    ETextureParamValue Value{};
 };
 
-struct TextureData {
-    TextureType Type{};
-    TextureChannel Channel{};
+struct BaseTextureData {
+    ETextureType Type{};
+    ETextureChannel Channel{};
+    ETextureFormat Format{};
+    ETextureDataType DataType{};
     int Width{};
     int Height{};
+};
+
+struct TextureData : BaseTextureData {
     Array<char> FilePath{};
     Array<TextureParam> Parameters{};
     Span<unsigned char> PixelData{};
@@ -63,7 +96,9 @@ public:
     void Bind();
     void Unbind();
     void Draw(unsigned char slot);
-    void Set(const char* filePath, TextureType type, const Span<TextureParam>& params);
+    void Set(const char* filePath, ETextureType type, const Span<TextureParam>& params);
+    void Set(const BaseTextureData& data, const Span<TextureParam>& params);
+    void Delete();
     const TextureData& GetData() const;
     unsigned int GetID() const;
 

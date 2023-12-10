@@ -2,7 +2,6 @@
 
 #include "InternalLogger.h"
 #include "StbImage.h"
-#include <string.h>
 #include <filesystem>
 #include <sstream>
 
@@ -18,6 +17,7 @@ Texture::~Texture() {
     stbi_image_free(_pixelData);
     _pixelData = nullptr;
     _data.PixelData = {};
+    Delete();
 }
 
 void Texture::Initialise() {
@@ -41,7 +41,7 @@ void Texture::Draw(unsigned char slot) {
     GraphicAPI::Get().GetTextureImpl().Draw(_id, _data.Type, slot);
 }
 
-void Texture::Set(const char* texturePath, TextureType type, const Span<TextureParam>& params) {
+void Texture::Set(const char* texturePath, ETextureType type, const Span<TextureParam>& params) {
     const std::filesystem::path filePath{texturePath};
     if (!std::filesystem::exists(filePath)) {
         std::stringstream logText;
@@ -57,12 +57,30 @@ void Texture::Set(const char* texturePath, TextureType type, const Span<TextureP
         LOG_INTERNAL_ERROR(logText.str().c_str());
         return;
     }
+
     _data.PixelData.SetData(_pixelData, sizeof(unsigned char) * static_cast<unsigned long long>(_data.Width * _data.Height * static_cast<int>(_data.Channel)));
     _data.FilePath.SetData({texturePath, strlen(texturePath) + 1});
     _data.Type = type;
+    _data.Format = ETextureFormat::RGBA32F;
+    _data.DataType = ETextureDataType::UNSIGNED_BYTE;
     _data.Parameters.SetData(params);
 
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
+}
+
+void Texture::Set(const BaseTextureData& data, const Span<TextureParam>& params) {
+    _data.Type = data.Type;
+    _data.Channel = data.Channel;
+    _data.Format = data.Format;
+    _data.DataType = data.DataType;
+    _data.Width = data.Width;
+    _data.Height = data.Height;
+    _data.Parameters.SetData(params);
+    GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
+}
+
+void Texture::Delete() {
+    GraphicAPI::Get().GetTextureImpl().Delete(_id, _data.Type);
 }
 
 const TextureData& Texture::GetData() const {

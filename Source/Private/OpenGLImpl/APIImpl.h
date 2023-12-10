@@ -1,6 +1,8 @@
 #pragma once
 
+#include "FrameBufferImpl.h"
 #include "IndexBufferImpl.h"
+#include "RenderBufferImpl.h"
 #include "ShaderImpl.h"
 #include "TextureImpl.h"
 #include "VertexArrayImpl.h"
@@ -10,31 +12,22 @@ namespace GraphicLib {
 namespace OpenGLImpl {
 class APIImpl final {
 public:
-    static APIImpl& Get();
-    static const APIImpl& ConstGet();
-
+    static const APIImpl& Get();
     const VertexArrayImpl& GetVertexArrayImpl() const;
-    VertexArrayImpl& GetVertexArrayImpl();
-
     const VertexBufferImpl& GetVertexBufferImpl() const;
-    VertexBufferImpl& GetVertexBufferImpl();
-
     const IndexBufferImpl& GetIndexBufferImpl() const;
-    IndexBufferImpl& GetIndexBufferImpl();
-
     const TextureImpl& GetTextureImpl() const;
-    TextureImpl& GetTextureImpl();
-
     const ShaderImpl& GetShaderImpl() const;
-    ShaderImpl& GetShaderImpl();
+    const FrameBufferImpl& GetFrameBufferImpl() const;
 
 private:
     static APIImpl* _instance;
-    VertexArrayImpl _vertexArrayImpl;
-    VertexBufferImpl _vertexBufferImpl;
-    IndexBufferImpl _indexBufferImpl;
-    TextureImpl _textureImpl;
-    ShaderImpl _shaderImpl;
+    VertexArrayImpl _vertexArrayImpl{};
+    VertexBufferImpl _vertexBufferImpl{};
+    IndexBufferImpl _indexBufferImpl{};
+    TextureImpl _textureImpl{};
+    ShaderImpl _shaderImpl{};
+    FrameBufferImpl _frameBufferImpl{};
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

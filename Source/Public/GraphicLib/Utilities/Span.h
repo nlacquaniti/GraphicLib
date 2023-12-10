@@ -49,7 +49,7 @@ public:
         _size = size;
     }
 
-    const TSpanType& operator[](unsigned int idx) const { return _data[idx]; }
+    const TSpanType& operator[](unsigned long long idx) const { return _data[idx]; }
     const TSpanType& Front() const { return *_data; }
     const TSpanType& Back() const { return &_data[size - 1]; }
     const TSpanType* Data() const { return _data; }
