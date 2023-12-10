@@ -2,34 +2,37 @@
 
 struct GLFWwindow;
 
+template<typename TCallbackType>
+struct WindowCallbackHandler {
+    void Set(TCallbackType callback, void* userData) {
+        Callback = callback;
+        UserData = userData;
+    }
+    TCallbackType Callback{};
+    void* UserData{};
+};
+
 class WindowImpl final {
 public:
-    using OnRenderCallback = void (*)(void*);
-    using OnRenderDebugCallback = void(*)(void*);
-    using OnWindowClosedCallback = void(*)(void*);
-    using OnWindowLogCallback = void(*)(const char*);
-
-    static bool Create(int width, int height, const char* title, void* userData);
+    static bool Create(int width, int height, const char* title);
     static void Render();
     static void Shutdown();
-    static void SetRenderCallback(OnRenderCallback onRenderCallback);
-    static void SetRenderDebugCallback(OnRenderDebugCallback onRenderDebugCallback);
-    static void SetWindowClosedCallback(OnWindowClosedCallback onWindowClosedCallback);
-    static void SetLogCallback(OnWindowLogCallback onWindowLogCallback);
     static void GetSize(int& width, int& height);
     static GLFWwindow* GetWindowPtr();
+
+    static WindowCallbackHandler<void (*)(const char*, void*)> OnDebugLog;
+    static WindowCallbackHandler<void (*)(void*)> OnRenderDraw;
+    static WindowCallbackHandler<void (*)(void*)> OnRenderDrawDebug;
+    static WindowCallbackHandler<void (*)(void*)> OnWindowClosed;
+    static WindowCallbackHandler<void (*)(int, int, void*)> OnMouseInput;
 
 private:
     static void _clear();
     static void _onWindowClosed(GLFWwindow* window);
     static void _onKeyPressed(GLFWwindow* window, int key, int, int action, int);
+    static void _onMouseButtonCallback(GLFWwindow* window, int button, int action, int);
     static void _onSetWindowSize(GLFWwindow* window, int width, int height);
     static void _invokeLogCallback(const char* message);
 
-    static void* _userData;
-    static OnWindowClosedCallback _onWindowClosedCallback;
-    static OnRenderCallback _onRenderCallback;
-    static OnRenderDebugCallback _onRenderDebugCallback;
-    static OnWindowLogCallback _onWindowLogCallback;
     static GLFWwindow* _window;
 };

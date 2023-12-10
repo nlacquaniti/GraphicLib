@@ -1,5 +1,7 @@
 #pragma once
 
+#include "Window/Input.h"
+
 struct WindowSize {
     int Width{};
     int Height{};
@@ -7,10 +9,11 @@ struct WindowSize {
 
 class Window final {
 public:
-    using CloseWindowCallback = void (*)(void*);
+    using LogCallback = void(*)(const char*, void*);
     using RenderWindowCallback = void (*)(void*);
     using RenderWindowDebugCallback = void (*)(void*);
-    using LogCallback = void(*)(const char*);
+    using CloseWindowCallback = void (*)(void*);
+    using MouseInputCallback = void (*)(EMouseButton, EInputAction, void*);
 
     Window() = default;
     Window(const Window& other) = delete;
@@ -21,14 +24,18 @@ public:
     bool Create(const WindowSize& size, const char* title, void* userData);
     void Render();
     void Shutdown();
-    void SetOnCloseCallback(CloseWindowCallback closeWindowCallback);
+    void SetLogCallback(LogCallback logCallback);
     void SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback);
     void SetOnRenderWindowDebugCallback(RenderWindowDebugCallback renderWindowDebugCallback);
-    void SetLogCallback(LogCallback logCallback);
+    void SetOnCloseCallback(CloseWindowCallback closeWindowCallback);
+    void SetMouseInputCallback(MouseInputCallback mouseInputCallback);
     WindowSize GetSize() const;
     void* GetWindowImplPtr() const;
+    void* GetUserData() const;
 
 private:
+    static void _internalSetMouseInputCallback(int button, int action, void* userData);
     void _clear();
     void* _userData{};
+    MouseInputCallback _mouseInputCallback{};
 };

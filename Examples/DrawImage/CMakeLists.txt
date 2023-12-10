@@ -1,8 +1,10 @@
 add_executable(DrawImageExample
 	main.cpp
 
-	../Common/Window/Public/Window.h
+	../Common/Window/Public/Window/Window.h
+	../Common/Window/Public/Window/Input.h
 	../Common/Window/Private/Window.cpp
+	../Common/Window/Private/Input.cpp
 	../Common/Window/Private/glfw.h
 
 	../Vendors/imgui/imgui.h

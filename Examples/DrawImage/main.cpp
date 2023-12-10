@@ -1,4 +1,6 @@
-#include "Window.h"
+#include "Window/Input.h"
+#include "Window/Window.h"
+
 #include <GLFW/glfw3.h>
 #include <GraphicLib/IndexBuffer.h>
 #include <GraphicLib/Logger.h>
@@ -38,6 +40,7 @@ public:
     void Start();
     void Render();
     void RenderDebug();
+    void OnMouseInput(EMouseButton button, EInputAction action);
     void Stop();
 
 private:
@@ -46,12 +49,17 @@ private:
     GraphicLib::Shader _shader{};
     GraphicLib::VertexArray _triangleVA{};
     GraphicLib::Texture _textureTest{};
+
     glm::vec3 _boxPos{};
-    glm::vec3 _boxRot{};
+    glm::vec3 _boxRot{30, 30, 0};
     glm::vec3 _boxScale{1, 1, 1};
 
-    glm::vec3 _cameraPos{0, 0, -2};
-    glm::vec3 _cameraRot{};
+    glm::vec3 _cameraPos{0, 0, 3};
+    glm::vec3 _cameraDir{0, 0, -1};
+
+    EMouseButton _latestMouseButton{};
+    EInputAction _latestMouseAction{};
+
     float _cameraFOV{45.0f};
     bool _shouldUpdate{};
 };
@@ -75,18 +83,24 @@ void RenderWindowDebugCallback(void* userData) {
     auto* application = static_cast<Application*>(userData);
     application->RenderDebug();
 }
+
+void MouseInputCallback(EMouseButton button, EInputAction action, void* userData) {
+    auto* application = static_cast<Application*>(userData);
+    application->OnMouseInput(button, action);
+}
 } // namespace
 
 void Application::Initialise() {
     GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::NOTIFICATION);
     GraphicLib::Logger::SetCallback(LoggerCallback, nullptr);
 
-    _window.SetOnCloseCallback(CloseWindowCallback);
-    _window.SetOnRenderWindowCallback(RenderWindowCallback);
-    _window.SetOnRenderWindowDebugCallback(RenderWindowDebugCallback);
     if (!_window.Create({800, 600}, "Example", this)) {
         return;
     }
+    _window.SetOnCloseCallback(CloseWindowCallback);
+    _window.SetOnRenderWindowCallback(RenderWindowCallback);
+    _window.SetOnRenderWindowDebugCallback(RenderWindowDebugCallback);
+    _window.SetMouseInputCallback(MouseInputCallback);
 
     _shouldUpdate = true;
 
@@ -111,13 +125,13 @@ void Application::Initialise() {
     //_triangleVA.GetIndexBuffer().Set({indices});
 
     const GraphicLib::TextureParam textureParams[] = {
-        {GraphicLib::TextureParamName::WRAP_S, GraphicLib::TextureParamValue::WRAP_REPEAT},
-        {GraphicLib::TextureParamName::WRAP_T, GraphicLib::TextureParamValue::WRAP_REPEAT},
-        {GraphicLib::TextureParamName::MIN_FILTER, GraphicLib::TextureParamValue::FILTER_LIEAR},
-        {GraphicLib::TextureParamName::MAG_FILTER, GraphicLib::TextureParamValue::FILTER_LIEAR},
+        {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
+        {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
+        {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+        {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
     };
     _textureTest.Initialise();
-    _textureTest.Set("Resources/TextureTest.png", GraphicLib::TextureType::TEXTURE_2D, {textureParams});
+    _textureTest.Set("Resources/TextureTest.png", GraphicLib::ETextureType::TEXTURE_2D, {textureParams});
 
     _shader.Load(vertexShaderSource, fragmentShaderSource);
     _shader.Bind();
@@ -133,8 +147,8 @@ void Application::Start() {
 void Application::Render() {
     _textureTest.Draw(0);
     _shader.Bind();
-    glm::mat4 model{ 1.0f };
-    model = glm::rotate(model, glm::radians(_boxRot.x), { 1, 0, 0 });
+    glm::mat4 model{1.0f};
+    model = glm::rotate(model, glm::radians(_boxRot.x), {1, 0, 0});
     model = glm::rotate(model, glm::radians(_boxRot.y), {0, 1, 0});
     model = glm::rotate(model, glm::radians(_boxRot.z), {0, 0, 1});
     model = glm::translate(model, _boxPos);
@@ -151,12 +165,27 @@ void Application::RenderDebug() {
         ImGui::ShowDemoWindow(&show_demo_window);
     }
 
-    ImGui::Begin("Box transform");
+    ImGui::Begin("Transforms");
     {
         ImGui::DragFloat3("_boxPos", glm::value_ptr(_boxPos));
         ImGui::DragFloat3("_boxRot", glm::value_ptr(_boxRot));
+        ImGui::DragFloat3("_cameraPos", glm::value_ptr(_cameraPos));
+        ImGui::DragFloat3("_cameraDir", glm::value_ptr(_cameraDir));
+        ImGui::DragFloat("_cameraFOV", &_cameraFOV);
     }
     ImGui::End();
+
+    ImGui::Begin("Mouse info");
+    {
+        ImGui::LabelText(InputUtils::MouseButtonToString(_latestMouseButton), "_latestMouseButton");
+        ImGui::LabelText(InputUtils::MouseInputActionToString(_latestMouseAction), "_latestMouseAction");
+    }
+    ImGui::End();
+}
+
+void Application::OnMouseInput(EMouseButton button, EInputAction action) {
+    _latestMouseButton = button;
+    _latestMouseAction = action;
 }
 
 void Application::Stop() {
@@ -170,7 +199,7 @@ glm::mat4 Application::_createProjectionViewMat() const {
         0.1f,                                                                         //
         100.0f                                                                        //
         )};
-    const glm::mat4 view = glm::lookAt(_cameraPos, {0.0f, 0.0f, 0.0f}, {0, 1, 0});
+    const glm::mat4 view = glm::lookAt(_cameraPos, _cameraPos + _cameraDir, {0, 1, 0});
 
     return projection * view;
 }

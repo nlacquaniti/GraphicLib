@@ -8,14 +8,14 @@
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/imgui.h>
 
-void* WindowImpl::_userData{};
-WindowImpl::OnWindowClosedCallback WindowImpl::_onWindowClosedCallback{};
-WindowImpl::OnRenderCallback WindowImpl::_onRenderCallback{};
-WindowImpl::OnRenderDebugCallback WindowImpl::_onRenderDebugCallback{};
-WindowImpl::OnWindowLogCallback WindowImpl::_onWindowLogCallback{};
+WindowCallbackHandler<void (*)(const char*, void*)> WindowImpl::OnDebugLog{};
+WindowCallbackHandler<void (*)(void*)> WindowImpl::OnRenderDraw{};
+WindowCallbackHandler<void (*)(void*)> WindowImpl::OnRenderDrawDebug{};
+WindowCallbackHandler<void (*)(void*)> WindowImpl::OnWindowClosed{};
+WindowCallbackHandler<void (*)(int, int, void*)> WindowImpl::OnMouseInput{};
 GLFWwindow* WindowImpl::_window{};
 
-bool WindowImpl::Create(int width, int height, const char* title, void* userData) {
+bool WindowImpl::Create(int width, int height, const char* title) {
     if (width < 1 || height < 1) {
         _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window with either width or height with 0 or less value");
         return false;
@@ -25,8 +25,6 @@ bool WindowImpl::Create(int width, int height, const char* title, void* userData
         _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window without a title");
         return false;
     }
-
-    _userData = userData;
 
     if (!glfwInit()) {
         _clear();
@@ -40,8 +38,9 @@ bool WindowImpl::Create(int width, int height, const char* title, void* userData
     }
 
     glfwSetWindowCloseCallback(_window, _onWindowClosed);
-    glfwSetKeyCallback(_window, _onKeyPressed);
     glfwSetWindowSizeCallback(_window, _onSetWindowSize);
+    glfwSetKeyCallback(_window, _onKeyPressed);
+    glfwSetMouseButtonCallback(_window, _onMouseButtonCallback);
 
     glfwMakeContextCurrent(_window);
     glfwSwapInterval(1);
@@ -79,6 +78,7 @@ bool WindowImpl::Create(int width, int height, const char* title, void* userData
 }
 
 void WindowImpl::Render() {
+    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     if (_window == nullptr) {
         _invokeLogCallback("OpenGLImpl::WindowImpl::Render: GLFWwindow is null");
         return;
@@ -90,14 +90,14 @@ void WindowImpl::Render() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    if (_onRenderDebugCallback != nullptr) {
-        _onRenderDebugCallback(_userData);
+    if (OnRenderDrawDebug.Callback != nullptr) {
+        OnRenderDrawDebug.Callback(OnRenderDrawDebug.UserData);
     }
     ImGui::Render();
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
-    if (_onRenderCallback != nullptr) {
-        _onRenderCallback(_userData);
+    if (OnRenderDraw.Callback != nullptr) {
+        OnRenderDraw.Callback(OnRenderDraw.UserData);
     }
 
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
@@ -119,22 +119,6 @@ void WindowImpl::Shutdown() {
     _clear();
 }
 
-void WindowImpl::SetRenderCallback(OnRenderCallback onRenderCallback) {
-    _onRenderCallback = onRenderCallback;
-}
-
-void WindowImpl::SetRenderDebugCallback(OnRenderDebugCallback onRenderDebugCallback) {
-    _onRenderDebugCallback = onRenderDebugCallback;
-}
-
-void WindowImpl::SetWindowClosedCallback(OnWindowClosedCallback onWindowClosedCallback) {
-    _onWindowClosedCallback = onWindowClosedCallback;
-}
-
-void WindowImpl::SetLogCallback(OnWindowLogCallback onWindowLogCallback) {
-    _onWindowLogCallback = onWindowLogCallback;
-}
-
 void WindowImpl::GetSize(int& width, int& height) {
     glfwGetWindowSize(_window, &width, &height);
 }
@@ -153,17 +137,11 @@ void WindowImpl::_clear() {
         _window = nullptr;
         glfwTerminate();
     }
-
-    _userData = nullptr;
-    _onWindowClosedCallback = nullptr;
-    _onRenderCallback = nullptr;
-    _onRenderDebugCallback = nullptr;
-    _onWindowLogCallback = nullptr;
 }
 
 void WindowImpl::_onWindowClosed(GLFWwindow*) {
-    if (_onWindowClosedCallback != nullptr) {
-        _onWindowClosedCallback(_userData);
+    if (OnWindowClosed.Callback !=nullptr) {
+        OnWindowClosed.Callback(OnWindowClosed.UserData);
     }
 }
 
@@ -174,13 +152,19 @@ void WindowImpl::_onKeyPressed(GLFWwindow* window, int key, int, int action, int
     }
 }
 
+void WindowImpl::_onMouseButtonCallback(GLFWwindow* window, int button, int action, int) {
+    if (OnMouseInput.Callback != nullptr) {
+        OnMouseInput.Callback(button, action, OnMouseInput.UserData);
+    }
+}
+
 void WindowImpl::_onSetWindowSize(GLFWwindow*, int width, int height) {
     glViewport(0, 0, width, height);
     Render();
 }
 
 void WindowImpl::_invokeLogCallback(const char* message) {
-    if (_onWindowLogCallback != nullptr) {
-        _onWindowLogCallback(message);
+    if (OnDebugLog.Callback != nullptr) {
+        OnDebugLog.Callback(message, OnDebugLog.UserData);
     }
 }
