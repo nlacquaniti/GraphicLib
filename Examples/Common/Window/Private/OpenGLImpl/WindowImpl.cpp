@@ -78,7 +78,6 @@ bool WindowImpl::Create(int width, int height, const char* title) {
 }
 
 void WindowImpl::Render() {
-    glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
     if (_window == nullptr) {
         _invokeLogCallback("OpenGLImpl::WindowImpl::Render: GLFWwindow is null");
         return;
