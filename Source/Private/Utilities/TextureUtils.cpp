@@ -77,6 +77,10 @@ const char* TextureUtils::TextureFormatToString(ETextureFormat format) {
     switch (format) {
         case ETextureFormat::NONE:
             return "NONE";
+        case ETextureFormat::RGBA:
+            return "RGBA";
+        case ETextureFormat::RGB:
+            return "RGB";
         case ETextureFormat::RGBA8:
             return "RGBA8";
         case ETextureFormat::RGBA16F:
@@ -87,12 +91,20 @@ const char* TextureUtils::TextureFormatToString(ETextureFormat format) {
             return "SRGB8";
         case ETextureFormat::SRGB8_ALPHA8:
             return "SRGB8_ALPHA8";
+        case ETextureFormat::DEPTH:
+            return "DEPTH";
         case ETextureFormat::DEPTH16:
             return "DEPTH16";
         case ETextureFormat::DEPTH24:
             return "DEPTH24";
+        case ETextureFormat::DEPTH32:
+            return "DEPTH32";
         case ETextureFormat::DEPTH32F:
             return "DEPTH32F";
+        case ETextureFormat::STENCIL:
+            return "STENCIL";
+        case ETextureFormat::STENCIL8:
+            return "STENCIL8";
         case ETextureFormat::DEPTH24_STENCIL8:
             return "DEPTH24_STENCIL8";
         case ETextureFormat::DEPTH32F_STENCIL8:

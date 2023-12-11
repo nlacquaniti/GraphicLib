@@ -6,15 +6,16 @@ target_sources(${PROJECT_NAME} PRIVATE
 	IndexBufferImpl.h
 	OpenGLLogSystem.h
 	TextureImpl.h
+	Utils/TextureImplUtils.h
 
 	APIImpl.cpp
 	ShaderImpl.cpp
 	VertexArrayImpl.cpp
 	VertexBufferImpl.cpp
 	IndexBufferImpl.cpp
-	
 	OpenGLLogSystem.cpp
 	TextureImpl.cpp
+	Utils/TextureImplUtils.cpp
 
 	Vendors/glad/include/glad/glad.h
 	Vendors/glad/include/KHR/khrplatform.h

@@ -9,22 +9,28 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 
 namespace GraphicLib {
 FrameBuffer::~FrameBuffer() {
-	Delete();
+    Delete();
 }
 
 void FrameBuffer::Initialise() {
-	GraphicAPI::Get().GetFrameBufferImpl().Initialise(_id);
+    GraphicAPI::Get().GetFrameBufferImpl().Initialise(_id);
 }
 
 void FrameBuffer::Bind() {
-	GraphicAPI::Get().GetFrameBufferImpl().Bind(_id);
+    GraphicAPI::Get().GetFrameBufferImpl().Bind(_id);
 }
 
 void FrameBuffer::Unbind() {
-	GraphicAPI::Get().GetFrameBufferImpl().Unbind(_id);
+    GraphicAPI::Get().GetFrameBufferImpl().Unbind(_id);
+}
+
+void FrameBuffer::Set(const Texture& frameBufferTexture) {
+    _texture = frameBufferTexture;
+    Bind();
+
 }
 
 void FrameBuffer::Delete() {
-	GraphicAPI::Get().GetFrameBufferImpl().Delete(_id);
+    GraphicAPI::Get().GetFrameBufferImpl().Delete(_id);
 }
 } // namespace GraphicLib

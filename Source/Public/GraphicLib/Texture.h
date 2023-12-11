@@ -43,14 +43,20 @@ enum class ETextureChannel : unsigned char {
 
 enum class ETextureFormat : unsigned char {
     NONE,
+    RGBA,
+    RGB,
     RGBA8,
     RGBA16F,
     RGBA32F,
     SRGB8,
     SRGB8_ALPHA8,
+    DEPTH,
     DEPTH16,
     DEPTH24,
+    DEPTH32,
     DEPTH32F,
+    STENCIL,
+    STENCIL8,
     DEPTH24_STENCIL8,
     DEPTH32F_STENCIL8,
 };

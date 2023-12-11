@@ -12,9 +12,11 @@ public:
     void Initialise();
     void Bind();
     void Unbind();
+    void Set(const Texture& frameBufferTexture);
     void Delete();
 
 private:
     unsigned int _id{};
+    Texture _texture{};
 };
 } // namespace GraphicLib
