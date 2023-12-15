@@ -4,8 +4,9 @@
 #define GLFW_INCLUDE_NONE
 #include "glfw.h"
 
-#include "imgui/backends/imgui_impl_opengl3.h"
+#include <GraphicLib/Texture.h>
 #include <imgui/backends/imgui_impl_glfw.h>
+#include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
 WindowCallbackHandler<void (*)(const char*, void*)> WindowImpl::OnDebugLog{};
@@ -14,6 +15,7 @@ WindowCallbackHandler<void (*)(void*)> WindowImpl::OnRenderDrawDebug{};
 WindowCallbackHandler<void (*)(void*)> WindowImpl::OnWindowClosed{};
 WindowCallbackHandler<void (*)(int, int, void*)> WindowImpl::OnMouseInput{};
 GLFWwindow* WindowImpl::_window{};
+GraphicLib::FrameBuffer WindowImpl::_windowFrameBuffer{};
 
 bool WindowImpl::Create(int width, int height, const char* title) {
     if (width < 1 || height < 1) {
@@ -74,6 +76,19 @@ bool WindowImpl::Create(int width, int height, const char* title) {
     ImGui_ImplGlfw_InitForOpenGL(_window, true);
     ImGui_ImplOpenGL3_Init("#version 130");
 
+    // FrameBuffer creation.
+    _windowFrameBuffer.Initialise();
+    _windowFrameBuffer.Bind();
+    
+    // Framebuffer config.
+    _windowFrameBuffer.GetTexture().Initialise(GraphicLib::ETextureType::TEXTURE_2D);
+    _windowFrameBuffer.GetRenderBuffer().Initialise();
+    _setFrameBufferConfiguration();
+
+    // Finalise FrameBuffer.
+    _windowFrameBuffer.Set();
+    _windowFrameBuffer.Unbind();
+
     return true;
 }
 
@@ -89,16 +104,27 @@ void WindowImpl::Render() {
     ImGui_ImplOpenGL3_NewFrame();
     ImGui_ImplGlfw_NewFrame();
     ImGui::NewFrame();
-    if (OnRenderDrawDebug.Callback != nullptr) {
-        OnRenderDrawDebug.Callback(OnRenderDrawDebug.UserData);
-    }
-    ImGui::Render();
+
+    _setFrameBufferConfiguration();
+    _windowFrameBuffer.Bind();
+    int width, height;
+    GetSize(width, height);
+    glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
     if (OnRenderDraw.Callback != nullptr) {
         OnRenderDraw.Callback(OnRenderDraw.UserData);
     }
+    _windowFrameBuffer.Unbind();
 
+    if (OnRenderDrawDebug.Callback != nullptr) {
+        OnRenderDrawDebug.Callback(OnRenderDrawDebug.UserData);
+    }
+
+    ImGui::Render();
+    glfwGetFramebufferSize(_window, &width, &height);
+    glViewport(0, 0, width, height);
+    glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     // Update and Render additional Platform Windows
@@ -126,6 +152,10 @@ GLFWwindow* WindowImpl::GetWindowPtr() {
     return _window;
 }
 
+const GraphicLib::FrameBuffer& WindowImpl::GetFrameBuffer() {
+    return _windowFrameBuffer;
+}
+
 void WindowImpl::_clear() {
     if (_window != nullptr) {
         ImGui_ImplOpenGL3_Shutdown();
@@ -139,7 +169,7 @@ void WindowImpl::_clear() {
 }
 
 void WindowImpl::_onWindowClosed(GLFWwindow*) {
-    if (OnWindowClosed.Callback !=nullptr) {
+    if (OnWindowClosed.Callback != nullptr) {
         OnWindowClosed.Callback(OnWindowClosed.UserData);
     }
 }
@@ -158,7 +188,6 @@ void WindowImpl::_onMouseButtonCallback(GLFWwindow* window, int button, int acti
 }
 
 void WindowImpl::_onSetWindowSize(GLFWwindow*, int width, int height) {
-    glViewport(0, 0, width, height);
     Render();
 }
 
@@ -166,4 +195,28 @@ void WindowImpl::_invokeLogCallback(const char* message) {
     if (OnDebugLog.Callback != nullptr) {
         OnDebugLog.Callback(message, OnDebugLog.UserData);
     }
+}
+
+void WindowImpl::_setFrameBufferConfiguration() {
+    int windowWidth, windowHeight;
+    GetSize(windowWidth, windowHeight);
+
+    // FrameBuffer texture.
+    GraphicLib::SetTextureParams frameBufferTextureData{};
+    frameBufferTextureData.Channel = GraphicLib::ETextureChannel::RGBA;
+    frameBufferTextureData.Format = GraphicLib::ETextureFormat::RGBA;
+    frameBufferTextureData.DataType = GraphicLib::ETextureDataType::UNSIGNED_BYTE;
+    frameBufferTextureData.Width = windowWidth;
+    frameBufferTextureData.Height = windowHeight;
+    const GraphicLib::TextureParam frameBufferTextureParams[] = {
+        {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+        {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+    };
+    
+    _windowFrameBuffer.GetTexture().Bind();
+    _windowFrameBuffer.GetTexture().Set(frameBufferTextureData, frameBufferTextureParams);
+
+    // Frame buffer render buffer creation.
+    _windowFrameBuffer.GetRenderBuffer().Bind();
+    _windowFrameBuffer.GetRenderBuffer().Set({GraphicLib::ERenderBufferFormat::DEPTH24, windowWidth, windowHeight});
 }

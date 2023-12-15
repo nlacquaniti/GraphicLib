@@ -2,6 +2,10 @@
 
 #include "Window/Input.h"
 
+namespace GraphicLib {
+class FrameBuffer;
+};
+
 struct WindowSize {
     int Width{};
     int Height{};
@@ -9,7 +13,7 @@ struct WindowSize {
 
 class Window final {
 public:
-    using LogCallback = void(*)(const char*, void*);
+    using LogCallback = void (*)(const char*, void*);
     using RenderWindowCallback = void (*)(void*);
     using RenderWindowDebugCallback = void (*)(void*);
     using CloseWindowCallback = void (*)(void*);
@@ -32,6 +36,7 @@ public:
     WindowSize GetSize() const;
     void* GetWindowImplPtr() const;
     void* GetUserData() const;
+    const GraphicLib::FrameBuffer& GetWindowFrameBuffer() const;
 
 private:
     static void _internalSetMouseInputCallback(int button, int action, void* userData);

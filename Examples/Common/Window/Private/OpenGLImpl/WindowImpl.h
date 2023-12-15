@@ -1,5 +1,7 @@
 #pragma once
 
+#include <GraphicLib/FrameBuffer.h>
+
 struct GLFWwindow;
 
 template<typename TCallbackType>
@@ -19,6 +21,7 @@ public:
     static void Shutdown();
     static void GetSize(int& width, int& height);
     static GLFWwindow* GetWindowPtr();
+    static const GraphicLib::FrameBuffer& GetFrameBuffer();
 
     static WindowCallbackHandler<void (*)(const char*, void*)> OnDebugLog;
     static WindowCallbackHandler<void (*)(void*)> OnRenderDraw;
@@ -33,6 +36,7 @@ private:
     static void _onMouseButtonCallback(GLFWwindow* window, int button, int action, int);
     static void _onSetWindowSize(GLFWwindow* window, int width, int height);
     static void _invokeLogCallback(const char* message);
-
+    static void _setFrameBufferConfiguration();
     static GLFWwindow* _window;
+    static GraphicLib::FrameBuffer _windowFrameBuffer;
 };

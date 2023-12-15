@@ -1,48 +1,15 @@
 #include "OpenGLImpl/FrameBufferImpl.h"
 
 #include "GraphicLib/Texture.h"
+#include "GraphicLib/RenderBuffer.h"
+#include "Utils/TextureImplUtils.h"
+#include "Utils/RenderBufferImplUtils.h"
 #include "InternalLogger.h"
 #include <glad/glad.h>
 #include <sstream>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-namespace {
-bool ConvertTextureFormatToFrameBufferAttachment(ETextureFormat textureFormat, int& outFrameBufferAttachment) {
-    switch (textureFormat) {
-        case ETextureFormat::RGBA:
-        case ETextureFormat::RGB:
-        case ETextureFormat::RGBA8:
-        case ETextureFormat::RGBA16F:
-        case ETextureFormat::RGBA32F:
-        case ETextureFormat::SRGB8:
-        case ETextureFormat::SRGB8_ALPHA8:
-            outFrameBufferAttachment = GL_COLOR_ATTACHMENT0;
-            return true;
-        case ETextureFormat::DEPTH:
-        case ETextureFormat::DEPTH16:
-        case ETextureFormat::DEPTH24:
-        case ETextureFormat::DEPTH32:
-        case ETextureFormat::DEPTH32F:
-            outFrameBufferAttachment = GL_DEPTH_ATTACHMENT;
-            return true;
-        case ETextureFormat::STENCIL:
-        case ETextureFormat::STENCIL8:
-            outFrameBufferAttachment = GL_STENCIL_ATTACHMENT;
-            return true;
-        case ETextureFormat::DEPTH24_STENCIL8:
-        case ETextureFormat::DEPTH32F_STENCIL8:
-            outFrameBufferAttachment = GL_DEPTH_STENCIL_ATTACHMENT;
-            return true;
-        case ETextureFormat::NONE:
-            break;
-    }
-    std::stringstream errorText;
-    errorText << "TextureFormat " << TextureUtils::TextureFormatToString(textureFormat);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
-    return false;
-}
-} // namespace
 void FrameBufferImpl::Initialise(unsigned int& id) const {
     glGenFramebuffers(1, &id);
 }
@@ -55,12 +22,30 @@ void FrameBufferImpl::Unbind(unsigned int) const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBufferImpl::Set(unsigned int, const TextureData& frameBufferTextureData) {
-    int frameBufferAttachment{};
-    if (!ConvertTextureFormatToFrameBufferAttachment(frameBufferTextureData.Format, frameBufferAttachment)) {
+void FrameBufferImpl::Set(unsigned int, const Texture& frameBufferTexture, const RenderBuffer& renderBuffer) const {
+    // Set FrameBuffer Texture.
+    unsigned int frameBufferAttachment{};
+    if (!TextureImplUtils::ConvertTextureFormatToFrameBufferAttachment(frameBufferTexture.GetData().Format, frameBufferAttachment)) {
         return;
     }
-    glFramebufferTexture2D(GL_FRAMEBUFFER,frameBufferAttachment, frameBufferAttachment.
+
+    unsigned int textureTarget{};
+    if (!TextureImplUtils::ConvertTextureType(frameBufferTexture.GetData().Type, textureTarget)) {
+        return;
+    }
+
+    glFramebufferTexture2D(GL_FRAMEBUFFER, frameBufferAttachment, textureTarget, frameBufferTexture.GetID(), 0);
+
+    // Set FrameBuffer RenderBuffer.
+    unsigned int renderBufferAttachment{};
+    if (!RenderBufferImplUtils::ConvertRenderBufferFormatToFrameBufferAttachment(renderBuffer.GetData().Format, renderBufferAttachment)) {
+        return;
+    }
+    glFramebufferRenderbuffer(GL_FRAMEBUFFER, renderBufferAttachment, GL_RENDERBUFFER, renderBuffer.GetID());
+
+    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
+        LOG_INTERNAL_ERROR("FrameBuffer is not completed");
+    }
 }
 
 void FrameBufferImpl::Delete(unsigned int& id) const {

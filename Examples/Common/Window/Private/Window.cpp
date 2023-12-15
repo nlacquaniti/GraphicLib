@@ -65,6 +65,10 @@ void* Window::GetUserData() const {
     return _userData;
 }
 
+const GraphicLib::FrameBuffer& Window::GetWindowFrameBuffer() const {
+    return WindowImpl::GetFrameBuffer();
+}
+
 void Window::_internalSetMouseInputCallback(int button, int action, void* userData) {
     const auto* window = static_cast<Window*>(userData);
     window->_mouseInputCallback(static_cast<EMouseButton>(button), static_cast<EInputAction>(action), window->GetUserData());

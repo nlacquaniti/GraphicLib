@@ -19,6 +19,7 @@ public:
     const TextureImpl& GetTextureImpl() const;
     const ShaderImpl& GetShaderImpl() const;
     const FrameBufferImpl& GetFrameBufferImpl() const;
+    const RenderBufferImpl& GetRenderBufferImpl() const;
 
 private:
     static APIImpl* _instance;
@@ -28,6 +29,7 @@ private:
     TextureImpl _textureImpl{};
     ShaderImpl _shaderImpl{};
     FrameBufferImpl _frameBufferImpl{};
+    RenderBufferImpl _renderBufferImpl{};
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

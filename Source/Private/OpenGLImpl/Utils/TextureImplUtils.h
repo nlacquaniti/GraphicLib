@@ -12,6 +12,7 @@ public:
     static bool ConvertTextureChannel(ETextureChannel channel, unsigned int& outChannel);
     static bool ConvertTextureFormat(ETextureFormat format, int& outFormat);
     static bool ConvertTextureDataType(ETextureDataType dataType, unsigned int& outDataType);
+    static bool ConvertTextureFormatToFrameBufferAttachment(ETextureFormat textureFormat, unsigned int& outFrameBufferAttachment);
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

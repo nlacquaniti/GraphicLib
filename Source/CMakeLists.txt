@@ -6,9 +6,12 @@ add_library(${PROJECT_NAME} SHARED
 	Public/${PROJECT_NAME}/VertexArray.h
 	Public/${PROJECT_NAME}/VertexBuffer.h
 	Public/${PROJECT_NAME}/Texture.h
+	Public/${PROJECT_NAME}/FrameBuffer.h
+	Public/${PROJECT_NAME}/RenderBuffer.h
 	Public/${PROJECT_NAME}/Utilities/Array.h
 	Public/${PROJECT_NAME}/Utilities/Span.h
 	Public/${PROJECT_NAME}/Utilities/TextureUtils.h
+	Public/${PROJECT_NAME}/Utilities/RenderBufferUtils.h
 
 	Private/IExternalLogSystem.h
 	Private/IExternalLogSystem.cpp
@@ -16,12 +19,15 @@ add_library(${PROJECT_NAME} SHARED
 	Private/Shader.cpp
 	Private/VertexArray.cpp
 	Private/VertexBuffer.cpp
+	Private/Texture.cpp
+	Private/FrameBuffer.cpp
+	Private/RenderBuffer.cpp
 	Private/Logger.cpp
 	Private/InternalLogger.h
 	Private/InternalLogger.cpp
-	Private/Texture.cpp
 	Private/StbImage.h
 	Private/Utilities/TextureUtils.cpp
+	Private/Utilities/RenderBufferUtils.cpp
 
 	Private/Vendor/stb/stb_image.h
 )

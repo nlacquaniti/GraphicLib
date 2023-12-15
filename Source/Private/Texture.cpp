@@ -16,16 +16,16 @@ namespace GraphicLib {
 Texture::~Texture() {
     stbi_image_free(_pixelData);
     _pixelData = nullptr;
-    _data.PixelData = {};
     Delete();
 }
 
-void Texture::Initialise() {
+void Texture::Initialise(ETextureType type) {
     static bool stbiFlippedVertically{};
     if (!stbiFlippedVertically) {
         stbiFlippedVertically = true;
         stbi_set_flip_vertically_on_load(true);
     }
+    _data.Type = type;
     GraphicAPI::Get().GetTextureImpl().Initialise(_id);
 }
 
@@ -41,7 +41,7 @@ void Texture::Draw(unsigned char slot) {
     GraphicAPI::Get().GetTextureImpl().Draw(_id, _data.Type, slot);
 }
 
-void Texture::Set(const char* texturePath, ETextureType type, const Span<TextureParam>& params) {
+void Texture::Set(const char* texturePath, const Span<TextureParam>& params) {
     const std::filesystem::path filePath{texturePath};
     if (!std::filesystem::exists(filePath)) {
         std::stringstream logText;
@@ -60,7 +60,6 @@ void Texture::Set(const char* texturePath, ETextureType type, const Span<Texture
 
     _data.PixelData.SetData(_pixelData, sizeof(unsigned char) * static_cast<unsigned long long>(_data.Width * _data.Height * static_cast<int>(_data.Channel)));
     _data.FilePath.SetData({texturePath, strlen(texturePath) + 1});
-    _data.Type = type;
     _data.Format = ETextureFormat::RGBA32F;
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
     _data.Parameters.SetData(params);
@@ -68,14 +67,14 @@ void Texture::Set(const char* texturePath, ETextureType type, const Span<Texture
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
 }
 
-void Texture::Set(const BaseTextureData& data, const Span<TextureParam>& params) {
-    _data.Type = data.Type;
-    _data.Channel = data.Channel;
-    _data.Format = data.Format;
-    _data.DataType = data.DataType;
-    _data.Width = data.Width;
-    _data.Height = data.Height;
+void Texture::Set(const SetTextureParams& setParams, const Span<TextureParam>& params) {
+    _data.Width = setParams.Width;
+    _data.Height = setParams.Height;
+    _data.Channel = setParams.Channel;
+    _data.Format = setParams.Format;
+    _data.DataType = setParams.DataType;
     _data.Parameters.SetData(params);
+
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
 }
 

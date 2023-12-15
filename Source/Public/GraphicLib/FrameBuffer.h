@@ -1,6 +1,8 @@
 #pragma once
 
 #include "GraphicLib/DLL_API.h"
+#include "GraphicLib/Texture.h"
+#include "GraphicLib/RenderBuffer.h"
 
 namespace GraphicLib {
 class DLL_API FrameBuffer final {
@@ -12,11 +14,16 @@ public:
     void Initialise();
     void Bind();
     void Unbind();
-    void Set(const Texture& frameBufferTexture);
+    void Set();
     void Delete();
+    const Texture& GetTexture() const;
+    Texture& GetTexture();
+    const RenderBuffer& GetRenderBuffer() const;
+    RenderBuffer& GetRenderBuffer();
 
 private:
     unsigned int _id{};
     Texture _texture{};
+    RenderBuffer _renderBuffer{};
 };
 } // namespace GraphicLib

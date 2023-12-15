@@ -77,19 +77,24 @@ struct TextureParam {
     ETextureParamValue Value{};
 };
 
-struct BaseTextureData {
+struct SetTextureParams {
+    int Width{};
+    int Height{};
+    ETextureChannel Channel{};
+    ETextureFormat Format{};
+    ETextureDataType DataType{};
+};
+
+struct TextureData {
+    Array<char> FilePath{};
+    Array<TextureParam> Parameters{};
+    Span<unsigned char> PixelData{};
+    int Width{};
+    int Height{};
     ETextureType Type{};
     ETextureChannel Channel{};
     ETextureFormat Format{};
     ETextureDataType DataType{};
-    int Width{};
-    int Height{};
-};
-
-struct TextureData : BaseTextureData {
-    Array<char> FilePath{};
-    Array<TextureParam> Parameters{};
-    Span<unsigned char> PixelData{};
 };
 
 class DLL_API Texture final {
@@ -98,17 +103,18 @@ public:
     Texture(const Texture& other) = default;
     Texture& operator=(const Texture& other) = default;
     ~Texture();
-    void Initialise();
+    void Initialise(ETextureType type);
     void Bind();
     void Unbind();
     void Draw(unsigned char slot);
-    void Set(const char* filePath, ETextureType type, const Span<TextureParam>& params);
-    void Set(const BaseTextureData& data, const Span<TextureParam>& params);
+    void Set(const char* filePath, const Span<TextureParam>& params);
+    void Set(const SetTextureParams& setParams, const Span<TextureParam>& params);
     void Delete();
     const TextureData& GetData() const;
     unsigned int GetID() const;
 
 private:
+    void _setTextureFromFile();
     TextureData _data{};
     unsigned char* _pixelData{};
     unsigned int _id;

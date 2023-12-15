@@ -11,8 +11,10 @@ public:
     Array(const Array& other) = default;
     Array& operator=(const Array& other) = default;
     ~Array() {
-        delete[] _data;
-        _data = nullptr;
+        if (_data != nullptr) {
+            delete[] _data;
+            _data = nullptr;
+        }
     }
 
     // Element Access

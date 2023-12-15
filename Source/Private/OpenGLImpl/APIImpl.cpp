@@ -42,5 +42,10 @@ const ShaderImpl& APIImpl::GetShaderImpl() const {
 const FrameBufferImpl& APIImpl::GetFrameBufferImpl() const {
     return _frameBufferImpl;
 }
+
+const RenderBufferImpl& APIImpl::GetRenderBufferImpl() const {
+    return _renderBufferImpl;
+}
+
 } // namespace OpenGLImpl
 } // namespace GraphicLib

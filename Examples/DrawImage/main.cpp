@@ -2,6 +2,7 @@
 #include "Window/Window.h"
 
 #include <GLFW/glfw3.h>
+#include <GraphicLib/FrameBuffer.h>
 #include <GraphicLib/IndexBuffer.h>
 #include <GraphicLib/Logger.h>
 #include <GraphicLib/Shader.h>
@@ -131,8 +132,9 @@ void Application::Initialise() {
         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
     };
-    _textureTest.Initialise();
-    _textureTest.Set("Resources/TextureTest.png", GraphicLib::ETextureType::TEXTURE_2D, {textureParams});
+    _textureTest.Initialise(GraphicLib::ETextureType::TEXTURE_2D);
+    _textureTest.Bind();
+    _textureTest.Set("Resources/TextureTest.png", {textureParams});
 
     _shader.Load(vertexShaderSource, fragmentShaderSource);
     _shader.Bind();
@@ -162,9 +164,10 @@ void Application::Render() {
 void Application::RenderDebug() {
     static bool show_demo_window = true;
 
-    if (show_demo_window) {
-        ImGui::ShowDemoWindow(&show_demo_window);
-    }
+    // if (show_demo_window) {
+    //     ImGui::ShowDemoWindow(&show_demo_window);
+    // }
+    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
 
     ImGui::Begin("Transforms");
     {
@@ -180,6 +183,21 @@ void Application::RenderDebug() {
     {
         ImGui::LabelText(InputUtils::MouseButtonToString(_latestMouseButton), "_latestMouseButton");
         ImGui::LabelText(InputUtils::MouseInputActionToString(_latestMouseAction), "_latestMouseAction");
+    }
+    ImGui::End();
+
+    ImGui::Begin("Scene");
+    {
+        const ImVec2& pos = ImGui::GetCursorScreenPos();
+        const WindowSize& windowSize = _window.GetSize();
+
+        ImGui::GetWindowDrawList()->AddImage(                                                                              //
+            reinterpret_cast<void*>(static_cast<unsigned long long>(_window.GetWindowFrameBuffer().GetTexture().GetID())), //
+            pos,                                                                                                           //
+            {pos.x + windowSize.Width, pos.y + windowSize.Height},                                                         //
+            {0, 1},                                                                                                        //
+            {1, 0}                                                                                                         //
+        );
     }
     ImGui::End();
 }

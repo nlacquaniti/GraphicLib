@@ -24,13 +24,27 @@ void FrameBuffer::Unbind() {
     GraphicAPI::Get().GetFrameBufferImpl().Unbind(_id);
 }
 
-void FrameBuffer::Set(const Texture& frameBufferTexture) {
-    _texture = frameBufferTexture;
-    Bind();
-
+void FrameBuffer::Set() {
+    GraphicAPI::Get().GetFrameBufferImpl().Set(_id, _texture, _renderBuffer);
 }
 
 void FrameBuffer::Delete() {
     GraphicAPI::Get().GetFrameBufferImpl().Delete(_id);
+}
+
+const Texture& FrameBuffer::GetTexture() const {
+    return _texture;
+}
+
+Texture& FrameBuffer::GetTexture() {
+    return _texture;
+}
+
+const RenderBuffer& FrameBuffer::GetRenderBuffer() const {
+    return _renderBuffer;
+}
+
+RenderBuffer& FrameBuffer::GetRenderBuffer() {
+    return _renderBuffer;
 }
 } // namespace GraphicLib
