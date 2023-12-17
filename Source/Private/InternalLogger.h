@@ -31,6 +31,7 @@ public:
     void DetachExternalLogSystem(std::size_t id);
 
 private:
+    InternalLogger() = default;
     static InternalLogger* _instance;
     std::unordered_map<std::size_t, std::unique_ptr<IExternalLogSystem>> _externalLogSystems{};
     Logger::Severity _severity{};

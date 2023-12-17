@@ -10,7 +10,7 @@ Window::~Window() {
     _clear();
 }
 
-bool Window::Create(const WindowSize& size, const char* title, void* userData) {
+bool Window::Initialise(const WindowSize& size, const char* title, void* userData) {
     static bool _createdCalled{};
     bool bSuccess{};
     if (!_createdCalled) {
@@ -22,8 +22,8 @@ bool Window::Create(const WindowSize& size, const char* title, void* userData) {
     return bSuccess;
 }
 
-void Window::Render() {
-    WindowImpl::Render();
+void Window::Update() {
+    WindowImpl::Update();
 }
 
 void Window::Shutdown() {
@@ -32,6 +32,10 @@ void Window::Shutdown() {
 
 void Window::SetLogCallback(LogCallback logCallback) {
     WindowImpl::OnDebugLog.Set(logCallback, _userData);
+}
+
+void Window::SetUpdateCallback(UpdateCallback updateCallback) {
+    WindowImpl::OnUpdate.Set(updateCallback, _userData);
 }
 
 void Window::SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback) {
@@ -44,11 +48,6 @@ void Window::SetOnRenderWindowDebugCallback(RenderWindowDebugCallback renderWind
 
 void Window::SetOnCloseCallback(CloseWindowCallback closeWindowCallback) {
     WindowImpl::OnWindowClosed.Set(closeWindowCallback, _userData);
-}
-
-void Window::SetMouseInputCallback(MouseInputCallback mouseInputCallback) {
-    _mouseInputCallback = mouseInputCallback;
-    WindowImpl::OnMouseInput.Set(_internalSetMouseInputCallback, this);
 }
 
 WindowSize Window::GetSize() const {
@@ -67,11 +66,6 @@ void* Window::GetUserData() const {
 
 const GraphicLib::FrameBuffer& Window::GetWindowFrameBuffer() const {
     return WindowImpl::GetFrameBuffer();
-}
-
-void Window::_internalSetMouseInputCallback(int button, int action, void* userData) {
-    const auto* window = static_cast<Window*>(userData);
-    window->_mouseInputCallback(static_cast<EMouseButton>(button), static_cast<EInputAction>(action), window->GetUserData());
 }
 
 void Window::_clear() {

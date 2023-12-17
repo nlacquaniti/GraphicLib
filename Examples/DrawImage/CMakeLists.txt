@@ -3,8 +3,15 @@ add_executable(DrawImageExample
 
 	../Common/Window/Public/Window/Window.h
 	../Common/Window/Public/Window/Input.h
+	../Common/Window/Public/Utils/CallbackHandler.h
+	../Common/Window/Public/Utils/InputUtils.h
 	../Common/Window/Private/Window.cpp
 	../Common/Window/Private/Input.cpp
+	../Common/Window/Private/InputImpl.h
+	../Common/Window/Private/InputImpl.cpp
+	../Common/Window/Private/InputImplUtils.h
+	../Common/Window/Private/InputImplUtils.cpp
+	../Common/Window/Private/Utils/InputUtils.cpp
 	../Common/Window/Private/glfw.h
 
 	../Vendors/imgui/imgui.h

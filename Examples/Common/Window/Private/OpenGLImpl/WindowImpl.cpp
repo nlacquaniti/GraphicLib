@@ -9,11 +9,11 @@
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
-WindowCallbackHandler<void (*)(const char*, void*)> WindowImpl::OnDebugLog{};
-WindowCallbackHandler<void (*)(void*)> WindowImpl::OnRenderDraw{};
-WindowCallbackHandler<void (*)(void*)> WindowImpl::OnRenderDrawDebug{};
-WindowCallbackHandler<void (*)(void*)> WindowImpl::OnWindowClosed{};
-WindowCallbackHandler<void (*)(int, int, void*)> WindowImpl::OnMouseInput{};
+CallbackHandler<void (*)(const char*, void*)> WindowImpl::OnDebugLog{};
+CallbackHandler<void (*)(double, void*)> WindowImpl::OnUpdate{};
+CallbackHandler<void (*)(void*)> WindowImpl::OnRenderDraw{};
+CallbackHandler<void (*)(void*)> WindowImpl::OnRenderDrawDebug{};
+CallbackHandler<void (*)(void*)> WindowImpl::OnWindowClosed{};
 GLFWwindow* WindowImpl::_window{};
 GraphicLib::FrameBuffer WindowImpl::_windowFrameBuffer{};
 
@@ -41,8 +41,6 @@ bool WindowImpl::Create(int width, int height, const char* title) {
 
     glfwSetWindowCloseCallback(_window, _onWindowClosed);
     glfwSetWindowSizeCallback(_window, _onSetWindowSize);
-    glfwSetKeyCallback(_window, _onKeyPressed);
-    glfwSetMouseButtonCallback(_window, _onMouseButtonCallback);
 
     glfwMakeContextCurrent(_window);
     glfwSwapInterval(1);
@@ -79,7 +77,7 @@ bool WindowImpl::Create(int width, int height, const char* title) {
     // FrameBuffer creation.
     _windowFrameBuffer.Initialise();
     _windowFrameBuffer.Bind();
-    
+
     // Framebuffer config.
     _windowFrameBuffer.GetTexture().Initialise(GraphicLib::ETextureType::TEXTURE_2D);
     _windowFrameBuffer.GetRenderBuffer().Initialise();
@@ -92,13 +90,22 @@ bool WindowImpl::Create(int width, int height, const char* title) {
     return true;
 }
 
-void WindowImpl::Render() {
-    if (_window == nullptr) {
-        _invokeLogCallback("OpenGLImpl::WindowImpl::Render: GLFWwindow is null");
+void WindowImpl::Update() {
+    if (glfwWindowShouldClose(_window)) {
+        OnWindowClosed.Invoke();
+        _clear();
         return;
     }
 
+    // Calculate delta time.
+    static double previousTime = glfwGetTime();
+    const double currentTime = glfwGetTime();
+    const double deltaTime = currentTime - previousTime;
+    previousTime = currentTime;
+
     glfwPollEvents();
+
+    OnUpdate.Invoke(deltaTime);
 
     // Start the Dear ImGui frame
     ImGui_ImplOpenGL3_NewFrame();
@@ -111,15 +118,10 @@ void WindowImpl::Render() {
     GetSize(width, height);
     glViewport(0, 0, width, height);
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-    if (OnRenderDraw.Callback != nullptr) {
-        OnRenderDraw.Callback(OnRenderDraw.UserData);
-    }
+    OnRenderDraw.Invoke();
     _windowFrameBuffer.Unbind();
 
-    if (OnRenderDrawDebug.Callback != nullptr) {
-        OnRenderDrawDebug.Callback(OnRenderDrawDebug.UserData);
-    }
+    OnRenderDrawDebug.Invoke();
 
     ImGui::Render();
     glfwGetFramebufferSize(_window, &width, &height);
@@ -127,7 +129,7 @@ void WindowImpl::Render() {
     glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
-    // Update and Render additional Platform Windows
+    // Update and Update additional Platform Windows
     // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
     //  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
@@ -141,7 +143,9 @@ void WindowImpl::Render() {
 }
 
 void WindowImpl::Shutdown() {
-    _clear();
+    if (_window != nullptr) {
+        glfwSetWindowShouldClose(_window, GLFW_TRUE);
+    }
 }
 
 void WindowImpl::GetSize(int& width, int& height) {
@@ -166,35 +170,24 @@ void WindowImpl::_clear() {
         _window = nullptr;
         glfwTerminate();
     }
+
+    OnDebugLog.Clear();
+    OnUpdate.Clear();
+    OnRenderDraw.Clear();
+    OnRenderDrawDebug.Clear();
+    OnWindowClosed.Clear();
 }
 
 void WindowImpl::_onWindowClosed(GLFWwindow*) {
-    if (OnWindowClosed.Callback != nullptr) {
-        OnWindowClosed.Callback(OnWindowClosed.UserData);
-    }
-}
-
-void WindowImpl::_onKeyPressed(GLFWwindow* window, int key, int, int action, int) {
-    if (key == GLFW_KEY_ESCAPE && action == GLFW_PRESS) {
-        glfwSetWindowShouldClose(window, GLFW_TRUE);
-        _onWindowClosed(window);
-    }
-}
-
-void WindowImpl::_onMouseButtonCallback(GLFWwindow* window, int button, int action, int) {
-    if (OnMouseInput.Callback != nullptr) {
-        OnMouseInput.Callback(button, action, OnMouseInput.UserData);
-    }
+    Shutdown();
 }
 
 void WindowImpl::_onSetWindowSize(GLFWwindow*, int width, int height) {
-    Render();
+    Update();
 }
 
 void WindowImpl::_invokeLogCallback(const char* message) {
-    if (OnDebugLog.Callback != nullptr) {
-        OnDebugLog.Callback(message, OnDebugLog.UserData);
-    }
+    OnDebugLog.Invoke(message);
 }
 
 void WindowImpl::_setFrameBufferConfiguration() {
@@ -212,7 +205,7 @@ void WindowImpl::_setFrameBufferConfiguration() {
         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
     };
-    
+
     _windowFrameBuffer.GetTexture().Bind();
     _windowFrameBuffer.GetTexture().Set(frameBufferTextureData, frameBufferTextureParams);
 

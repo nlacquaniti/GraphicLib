@@ -1,5 +1,6 @@
 #include "Window/Input.h"
 #include "Window/Window.h"
+#include "Utils/InputUtils.h"
 
 #include <GLFW/glfw3.h>
 #include <GraphicLib/FrameBuffer.h>
@@ -15,6 +16,7 @@
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <memory>
+#include <string>
 
 const char* vertexShaderSource = "#version 330 core\n"
                                  "layout (location = 0) in vec3 aPos;\n"
@@ -39,14 +41,16 @@ class Application {
 public:
     void Initialise();
     void Start();
+    void ProcessInput(EInputKey key, EInputAction action);
+    void Update(double deltaTime);
     void Render();
     void RenderDebug();
-    void OnMouseInput(EMouseButton button, EInputAction action);
     void Stop();
 
 private:
     glm::mat4 _createProjectionViewMat() const;
     Window _window{};
+    Input _input{};
     GraphicLib::Shader _shader{};
     GraphicLib::VertexArray _triangleVA{};
     GraphicLib::Texture _textureTest{};
@@ -58,50 +62,58 @@ private:
     glm::vec3 _cameraPos{0, 0, 3};
     glm::vec3 _cameraDir{0, 0, -1};
 
-    EMouseButton _latestMouseButton{};
-    EInputAction _latestMouseAction{};
+    EInputKey _latestKey{};
+    EInputAction _latestKeyAction{};
+    bool _isRightMousePressed{};
 
+    double _deltaTime{};
     float _cameraFOV{45.0f};
     bool _shouldUpdate{};
 };
 
-namespace {
-void LoggerCallback(const GraphicLib::Logger::Message& message) {
-    std::cout << "[" << message.source << "]";
-    std::cout << ": \"" << message.text << "\"\n" << std::endl;
-}
-void CloseWindowCallback(void* userData) {
-    auto* application = static_cast<Application*>(userData);
-    application->Stop();
-}
-
-void RenderWindowCallback(void* userData) {
-    auto* application = static_cast<Application*>(userData);
-    application->Render();
-}
-
-void RenderWindowDebugCallback(void* userData) {
-    auto* application = static_cast<Application*>(userData);
-    application->RenderDebug();
-}
-
-void MouseInputCallback(EMouseButton button, EInputAction action, void* userData) {
-    auto* application = static_cast<Application*>(userData);
-    application->OnMouseInput(button, action);
-}
-} // namespace
-
 void Application::Initialise() {
-    GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::NOTIFICATION);
-    GraphicLib::Logger::SetCallback(LoggerCallback, nullptr);
+    GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::MEDIUM);
+    GraphicLib::Logger::SetCallback(
+        [](const GraphicLib::Logger::Message& message) {
+            std::cout << "[" << message.source << "]";
+            std::cout << ": \"" << message.text << "\"\n" << std::endl;
+        },
+        nullptr);
 
-    if (!_window.Create({800, 600}, "Example", this)) {
+    if (!_window.Initialise({800, 600}, "Example", this)) {
         return;
     }
-    _window.SetOnCloseCallback(CloseWindowCallback);
-    _window.SetOnRenderWindowCallback(RenderWindowCallback);
-    _window.SetOnRenderWindowDebugCallback(RenderWindowDebugCallback);
-    _window.SetMouseInputCallback(MouseInputCallback);
+
+    if (!_input.Initialise(_window)) {
+        return;
+    }
+
+    _window.SetOnCloseCallback([](void* userData) {
+        auto* application = static_cast<Application*>(userData);
+        application->Stop();
+    });
+
+    _window.SetUpdateCallback([](double deltaTime, void* userData) {
+        auto* application = static_cast<Application*>(userData);
+        application->Update(deltaTime);
+    });
+
+    _window.SetOnRenderWindowCallback([](void* userData) {
+        auto* application = static_cast<Application*>(userData);
+        application->Render();
+    });
+
+    _window.SetOnRenderWindowDebugCallback([](void* userData) {
+        auto* application = static_cast<Application*>(userData);
+        application->RenderDebug();
+    });
+
+    _input.SetKeyInputCallback(
+        [](EInputKey key, EInputAction action, void* userData) {
+            auto* application = static_cast<Application*>(userData);
+            application->ProcessInput(key, action);
+        },
+        this);
 
     _shouldUpdate = true;
 
@@ -143,8 +155,19 @@ void Application::Initialise() {
 
 void Application::Start() {
     while (_shouldUpdate) {
-        _window.Render();
+        _window.Update();
     }
+}
+
+void Application::ProcessInput(EInputKey key, EInputAction action) {
+    _latestKey = key;
+    _latestKeyAction = action;
+}
+
+void Application::Update(double deltaTime) {
+    _deltaTime = deltaTime;
+
+    _isRightMousePressed = _input.IsKeyPressed(EInputKey::MOUSE_RIGHT);
 }
 
 void Application::Render() {
@@ -179,10 +202,13 @@ void Application::RenderDebug() {
     }
     ImGui::End();
 
-    ImGui::Begin("Mouse info");
+    ImGui::Begin("Info");
     {
-        ImGui::LabelText(InputUtils::MouseButtonToString(_latestMouseButton), "_latestMouseButton");
-        ImGui::LabelText(InputUtils::MouseInputActionToString(_latestMouseAction), "_latestMouseAction");
+        ImGui::TextColored({0, 255, 0, 255}, "Delta time: %.0fms", _deltaTime * 1000);
+        ImGui::TextColored({0, 255, 0, 255}, "Mouse pos: [%.0f, %.0f]", _input.GetMousePosition().X, _input.GetMousePosition().Y);
+        ImGui::Text("_isRightMousePressed: %d", _isRightMousePressed);
+        ImGui::LabelText(InputUtils::InputKeyToString(_latestKey), "_latestMouseButton");
+        ImGui::LabelText(InputUtils::MouseInputActionToString(_latestKeyAction), "_latestMouseAction");
     }
     ImGui::End();
 
@@ -190,7 +216,6 @@ void Application::RenderDebug() {
     {
         const ImVec2& pos = ImGui::GetCursorScreenPos();
         const WindowSize& windowSize = _window.GetSize();
-
         ImGui::GetWindowDrawList()->AddImage(                                                                              //
             reinterpret_cast<void*>(static_cast<unsigned long long>(_window.GetWindowFrameBuffer().GetTexture().GetID())), //
             pos,                                                                                                           //
@@ -200,11 +225,6 @@ void Application::RenderDebug() {
         );
     }
     ImGui::End();
-}
-
-void Application::OnMouseInput(EMouseButton button, EInputAction action) {
-    _latestMouseButton = button;
-    _latestMouseAction = action;
 }
 
 void Application::Stop() {
