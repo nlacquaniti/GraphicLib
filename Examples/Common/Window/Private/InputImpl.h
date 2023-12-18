@@ -1,9 +1,9 @@
 #pragma once
 
-#include "Utils/CallbackHandler.h"
 #include "Window/Input.h"
+#include "Utils/CallbackHandler.h"
 
-class GLFWwindow;
+struct GLFWwindow;
 
 class InputImpl final {
 public:

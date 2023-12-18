@@ -15,7 +15,7 @@ public:
     static const GraphicLib::FrameBuffer& GetFrameBuffer();
 
     static CallbackHandler<void (*)(const char*, void*)> OnDebugLog;
-    static CallbackHandler<void (*)(double, void*)> OnUpdate;
+    static CallbackHandler<void (*)(float, void*)> OnUpdate;
     static CallbackHandler<void (*)(void*)> OnRenderDraw;
     static CallbackHandler<void (*)(void*)> OnRenderDrawDebug;
     static CallbackHandler<void (*)(void*)> OnWindowClosed;

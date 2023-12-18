@@ -1,4 +1,5 @@
 #include "InputImplUtils.h"
+
 #include <GLFW/glfw3.h>
 
 bool InputImplUtils::InputKeyToGLFWKey(EInputKey inputKey, int& outKey) {

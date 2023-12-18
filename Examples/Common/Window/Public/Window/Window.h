@@ -12,7 +12,7 @@ struct WindowSize {
 class Window final {
 public:
     using LogCallback = void (*)(const char*, void*);
-    using UpdateCallback = void(*)(double, void*);
+    using UpdateCallback = void(*)(float, void*);
     using RenderWindowCallback = void (*)(void*);
     using RenderWindowDebugCallback = void (*)(void*);
     using CloseWindowCallback = void (*)(void*);

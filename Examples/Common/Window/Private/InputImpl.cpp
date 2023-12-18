@@ -2,14 +2,17 @@
 
 #include "InputImplUtils.h"
 #include "Utils/InputUtils.h"
+
 #include <GLFW/glfw3.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 
 CallbackHandler<Input::KeyInputCallback> InputImpl::OnKeyInput{};
 GLFWwindow* InputImpl::_window{};
 
 bool InputImpl::Initialise(void* window) {
     _window = static_cast<GLFWwindow*>(window);
-    glfwSetKeyCallback(_window, [](GLFWwindow*, int glfwKey, int, int glfwAction, int) {
+    glfwSetKeyCallback(_window, [](GLFWwindow* window, int glfwKey, int glfwScancode, int glfwAction, int glfwMods) {
+        ImGui_ImplGlfw_KeyCallback(window, glfwKey, glfwScancode, glfwAction, glfwMods);
         EInputKey key{};
         EInputAction action{};
         if (!InputImplUtils::GLFWKeyToInputKey(glfwKey, key) || !InputImplUtils::GLFWActionToInputAction(glfwAction, action)) {

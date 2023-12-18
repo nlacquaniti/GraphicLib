@@ -1,4 +1,5 @@
 #pragma once
+
 #include "Window/Input.h"
 
 class InputImplUtils {

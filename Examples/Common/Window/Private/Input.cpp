@@ -1,7 +1,7 @@
 #include "Window/Input.h"
 
-#include "InputImpl.h"
 #include "Window/Window.h"
+#include "InputImpl.h"
 
 Input::~Input() {
     Shutdown();

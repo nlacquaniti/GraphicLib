@@ -5,14 +5,14 @@ add_executable(DrawImageExample
 	../Common/Window/Public/Window/Input.h
 	../Common/Window/Public/Utils/CallbackHandler.h
 	../Common/Window/Public/Utils/InputUtils.h
+
 	../Common/Window/Private/Window.cpp
 	../Common/Window/Private/Input.cpp
-	../Common/Window/Private/InputImpl.h
-	../Common/Window/Private/InputImpl.cpp
+	"../Common/Window/Private/InputImpl.h"
+	"../Common/Window/Private/InputImpl.cpp"
 	../Common/Window/Private/InputImplUtils.h
 	../Common/Window/Private/InputImplUtils.cpp
 	../Common/Window/Private/Utils/InputUtils.cpp
-	../Common/Window/Private/glfw.h
 
 	../Vendors/imgui/imgui.h
 	../Vendors/imgui/imgui.cpp
@@ -39,7 +39,6 @@ target_include_directories(DrawImageExample PRIVATE
 
 if(GL_ENABLE_OPENGL)
 	target_sources(DrawImageExample PRIVATE 
-		../Common/Window/Private/OpenGLImpl/glad.h
 		../Common/Window/Private/OpenGLImpl/WindowImpl.h
 		../Common/Window/Private/OpenGLImpl/WindowImpl.cpp
 

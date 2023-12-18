@@ -1,16 +1,17 @@
 #include "WindowImpl.h"
 
-#include "glad.h"
+#include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
-#include "glfw.h"
+#include <GLFW/glfw3.h>
 
-#include <GraphicLib/Texture.h>
 #include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/backends/imgui_impl_opengl3.h>
 #include <imgui/imgui.h>
 
+#include <GraphicLib/Texture.h>
+
 CallbackHandler<void (*)(const char*, void*)> WindowImpl::OnDebugLog{};
-CallbackHandler<void (*)(double, void*)> WindowImpl::OnUpdate{};
+CallbackHandler<void (*)(float, void*)> WindowImpl::OnUpdate{};
 CallbackHandler<void (*)(void*)> WindowImpl::OnRenderDraw{};
 CallbackHandler<void (*)(void*)> WindowImpl::OnRenderDrawDebug{};
 CallbackHandler<void (*)(void*)> WindowImpl::OnWindowClosed{};
@@ -22,6 +23,7 @@ bool WindowImpl::Create(int width, int height, const char* title) {
         _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window with either width or height with 0 or less value");
         return false;
     }
+    
 
     if (title == nullptr) {
         _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window without a title");
@@ -98,9 +100,9 @@ void WindowImpl::Update() {
     }
 
     // Calculate delta time.
-    static double previousTime = glfwGetTime();
-    const double currentTime = glfwGetTime();
-    const double deltaTime = currentTime - previousTime;
+    static auto previousTime = static_cast<float>(glfwGetTime());
+    const auto currentTime = static_cast<float>(glfwGetTime());
+    const auto deltaTime = currentTime - previousTime;
     previousTime = currentTime;
 
     glfwPollEvents();

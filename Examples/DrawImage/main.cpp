@@ -1,6 +1,6 @@
+#include "Utils/InputUtils.h"
 #include "Window/Input.h"
 #include "Window/Window.h"
-#include "Utils/InputUtils.h"
 
 #include <GLFW/glfw3.h>
 #include <GraphicLib/FrameBuffer.h>
@@ -11,6 +11,7 @@
 #include <GraphicLib/Utilities/Span.h>
 #include <GraphicLib/VertexArray.h>
 #include <GraphicLib/VertexBuffer.h>
+#include <imgui/backends/imgui_impl_glfw.h>
 #include <imgui/imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -42,7 +43,7 @@ public:
     void Initialise();
     void Start();
     void ProcessInput(EInputKey key, EInputAction action);
-    void Update(double deltaTime);
+    void Update(float deltaTime);
     void Render();
     void RenderDebug();
     void Stop();
@@ -59,8 +60,13 @@ private:
     glm::vec3 _boxRot{30, 30, 0};
     glm::vec3 _boxScale{1, 1, 1};
 
+    // Camera data
     glm::vec3 _cameraPos{0, 0, 3};
-    glm::vec3 _cameraDir{0, 0, -1};
+    glm::vec3 _cameraDir{};
+    glm::vec3 _cameraDirRight{};
+    glm::vec3 _cameraRot{0, -90, 0};
+    float _cameraMovementSpeed{5.0f};
+    float _cameraRotSpeed{100.0f};
 
     EInputKey _latestKey{};
     EInputAction _latestKeyAction{};
@@ -93,7 +99,7 @@ void Application::Initialise() {
         application->Stop();
     });
 
-    _window.SetUpdateCallback([](double deltaTime, void* userData) {
+    _window.SetUpdateCallback([](float deltaTime, void* userData) {
         auto* application = static_cast<Application*>(userData);
         application->Update(deltaTime);
     });
@@ -164,10 +170,48 @@ void Application::ProcessInput(EInputKey key, EInputAction action) {
     _latestKeyAction = action;
 }
 
-void Application::Update(double deltaTime) {
+void Application::Update(float deltaTime) {
     _deltaTime = deltaTime;
 
+    const double yawCos = glm::cos(glm::radians(_cameraRot.y));
+    const double yawSin = glm::sin(glm::radians(_cameraRot.y));
+    const double pitchCos = glm::cos(glm::radians(_cameraRot.x));
+    const double pitchSin = glm::sin(glm::radians(_cameraRot.x));
+    _cameraDir.x = yawCos * pitchCos;
+    _cameraDir.y = pitchSin;
+    _cameraDir.z = yawSin * pitchCos;
+    glm::normalize(_cameraDir);
+    _cameraDirRight = glm::normalize(glm::cross(_cameraDir, {0, 1, 0}));
+
+    if (_input.IsKeyPressed(EInputKey::W)) {
+        _cameraPos += _cameraDir * _cameraMovementSpeed * deltaTime;
+    }
+    if (_input.IsKeyPressed(EInputKey::S)) {
+        _cameraPos -= _cameraDir * _cameraMovementSpeed * deltaTime;
+    }
+    if (_input.IsKeyPressed(EInputKey::D)) {
+        _cameraPos += _cameraDirRight * _cameraMovementSpeed * deltaTime;
+    }
+    if (_input.IsKeyPressed(EInputKey::A)) {
+        _cameraPos -= _cameraDirRight * _cameraMovementSpeed * deltaTime;
+    }
+
+    if (_input.IsKeyPressed(EInputKey::E)) {
+        _cameraRot.y += _cameraRotSpeed * deltaTime;
+        if (_cameraRot.y > 360.0f) {
+            _cameraRot.y = 0.0f;
+        }
+    }
+    if (_input.IsKeyPressed(EInputKey::Q)) {
+        _cameraRot.y -= _cameraRotSpeed * deltaTime;
+        if (_cameraRot.y < 0.0f) {
+            _cameraRot.y = 360.0f;
+        }
+    }
+
     _isRightMousePressed = _input.IsKeyPressed(EInputKey::MOUSE_RIGHT);
+    if (_isRightMousePressed) {
+    }
 }
 
 void Application::Render() {
@@ -194,11 +238,19 @@ void Application::RenderDebug() {
 
     ImGui::Begin("Transforms");
     {
+        ImGui::SeparatorText("Box");
         ImGui::DragFloat3("_boxPos", glm::value_ptr(_boxPos));
         ImGui::DragFloat3("_boxRot", glm::value_ptr(_boxRot));
+
+        ImGui::SeparatorText("Camera");
         ImGui::DragFloat3("_cameraPos", glm::value_ptr(_cameraPos));
-        ImGui::DragFloat3("_cameraDir", glm::value_ptr(_cameraDir));
+        ImGui::DragFloat3("_cameraRot", glm::value_ptr(_cameraRot));
+        ImGui::InputFloat("_cameraSpeed", &_cameraMovementSpeed);
+        ImGui::InputFloat("_cameraRotSpeed", &_cameraRotSpeed);
         ImGui::DragFloat("_cameraFOV", &_cameraFOV);
+        ImGui::Text("_cameraDir [%.2f,%.2f,%.2f]", _cameraDir.x, _cameraDir.y, _cameraDir.z);
+        ImGui::Text("_cameraDirRight [%.2f,%.2f,%.2f]", _cameraDirRight.x, _cameraDirRight.y, _cameraDirRight.z);
+        ImGui::Text("_cameraDirLeft [%.2f,%.2f,%.2f]", -_cameraDirRight.x, -_cameraDirRight.y, -_cameraDirRight.z);
     }
     ImGui::End();
 
@@ -238,8 +290,8 @@ glm::mat4 Application::_createProjectionViewMat() const {
         0.1f,                                                                         //
         100.0f                                                                        //
         )};
-    const glm::mat4 view = glm::lookAt(_cameraPos, _cameraPos + _cameraDir, {0, 1, 0});
 
+    const glm::mat4 view = glm::lookAt(_cameraPos, _cameraPos + _cameraDir, {0, 1, 0});
     return projection * view;
 }
 
