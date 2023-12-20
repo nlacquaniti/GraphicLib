@@ -68,9 +68,9 @@ private:
     float _cameraMovementSpeed{5.0f};
     float _cameraRotSpeed{100.0f};
 
-    EInputKey _latestKey{};
-    EInputAction _latestKeyAction{};
-    bool _isRightMousePressed{};
+    // Mouse
+    bool _isMouseBeingDragged{};
+    MousePosition _mouseDraggedStartingPosition{};
 
     double _deltaTime{};
     float _cameraFOV{45.0f};
@@ -166,8 +166,6 @@ void Application::Start() {
 }
 
 void Application::ProcessInput(EInputKey key, EInputAction action) {
-    _latestKey = key;
-    _latestKeyAction = action;
 }
 
 void Application::Update(float deltaTime) {
@@ -208,9 +206,19 @@ void Application::Update(float deltaTime) {
             _cameraRot.y = 360.0f;
         }
     }
+    
+    if (_input.IsKeyPressed(EInputKey::MOUSE_RIGHT) && !_isMouseBeingDragged) {
+        _isMouseBeingDragged = true;
+        _mouseDraggedStartingPosition = _input.GetMousePosition();
+    }
 
-    _isRightMousePressed = _input.IsKeyPressed(EInputKey::MOUSE_RIGHT);
-    if (_isRightMousePressed) {
+    if (_input.IsKeyReleased(EInputKey::MOUSE_RIGHT) && _isMouseBeingDragged) {
+        _isMouseBeingDragged = false;
+        _mouseDraggedStartingPosition = {};
+    }
+
+    if (_isMouseBeingDragged) {
+
     }
 }
 
@@ -256,11 +264,14 @@ void Application::RenderDebug() {
 
     ImGui::Begin("Info");
     {
-        ImGui::TextColored({0, 255, 0, 255}, "Delta time: %.0fms", _deltaTime * 1000);
-        ImGui::TextColored({0, 255, 0, 255}, "Mouse pos: [%.0f, %.0f]", _input.GetMousePosition().X, _input.GetMousePosition().Y);
-        ImGui::Text("_isRightMousePressed: %d", _isRightMousePressed);
-        ImGui::LabelText(InputUtils::InputKeyToString(_latestKey), "_latestMouseButton");
-        ImGui::LabelText(InputUtils::MouseInputActionToString(_latestKeyAction), "_latestMouseAction");
+        ImGui::SeparatorText("Performance");
+        ImGui::Text("Delta time: %.0fms", _deltaTime * 1000);
+        ImGui::Text("FPS: %.0f", 1 / _deltaTime);
+
+        ImGui::SeparatorText("Input");
+        ImGui::Text("Mouse pos: [%.0f, %.0f]", _input.GetMousePosition().X, _input.GetMousePosition().Y);
+        ImGui::Text("Dragging: %s", _isMouseBeingDragged ? "on" : "off");
+        ImGui::Text("Dragging start mouse pos: [%.0f, %.0f]", _mouseDraggedStartingPosition.X, _mouseDraggedStartingPosition.Y);
     }
     ImGui::End();
 
