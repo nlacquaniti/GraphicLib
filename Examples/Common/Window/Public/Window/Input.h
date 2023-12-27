@@ -141,11 +141,20 @@ enum class EInputKey : int {
 struct MousePosition {
     double X{};
     double Y{};
+    bool operator==(const MousePosition& other) const {
+        constexpr double epsilon = 0.01;
+        const bool xIsEqual = other.X == X + epsilon || other.X == X - epsilon;
+        const bool yIsEqual = other.Y == Y + epsilon || other.Y == Y - epsilon;
+        return xIsEqual && yIsEqual;
+    }
+    bool operator!=(const MousePosition& other) const { return !(*this == other); }
+    MousePosition operator+(const MousePosition& other) const { return {X + other.X, Y + other.Y}; }
+    MousePosition operator-(const MousePosition& other) const { return {X - other.X, Y - other.Y}; }
 };
 
 class Input final {
 public:
-    using KeyInputCallback = void(*)(EInputKey, EInputAction, void*);
+    using KeyInputCallback = void (*)(EInputKey, EInputAction, void*);
 
     Input() = default;
     Input(const Input& other) = delete;

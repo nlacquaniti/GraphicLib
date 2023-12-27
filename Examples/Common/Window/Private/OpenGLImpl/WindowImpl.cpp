@@ -35,6 +35,10 @@ bool WindowImpl::Create(int width, int height, const char* title) {
         return false;
     }
 
+
+    // Set window hints to create a maximized window
+    glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
+
     _window = glfwCreateWindow(width, height, title, nullptr, nullptr);
     if (_window == nullptr) {
         _clear();

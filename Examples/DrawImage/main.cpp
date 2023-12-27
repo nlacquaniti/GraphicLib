@@ -38,6 +38,21 @@ const char* fragmentShaderSource = "#version 330 core\n"
                                    "   FragColor = texture(uTexture, texCoord);\n"
                                    "}\n\0";
 
+struct Transform {
+    glm::vec3 Position{};
+    glm::vec3 Rotation{};
+    glm::vec3 Scale{1, 1, 1};
+    glm::mat4 Matrix() const {
+        glm::mat4 model{1.0f};
+        model = glm::scale(model, Scale);
+        model = glm::rotate(model, glm::radians(Rotation.x), {1, 0, 0});
+        model = glm::rotate(model, glm::radians(Rotation.y), {0, 1, 0});
+        model = glm::rotate(model, glm::radians(Rotation.z), {0, 0, 1});
+        model = glm::translate(model, Position);
+        return model;
+    }
+};
+
 class Application {
 public:
     void Initialise();
@@ -56,21 +71,25 @@ private:
     GraphicLib::VertexArray _triangleVA{};
     GraphicLib::Texture _textureTest{};
 
-    glm::vec3 _boxPos{};
-    glm::vec3 _boxRot{30, 30, 0};
-    glm::vec3 _boxScale{1, 1, 1};
+    // Box 1
+    Transform _box{};
+
+    // Box 2
+    Transform _box1{{1.2, 0, 0}};
 
     // Camera data
     glm::vec3 _cameraPos{0, 0, 3};
     glm::vec3 _cameraDir{};
     glm::vec3 _cameraDirRight{};
-    glm::vec3 _cameraRot{0, -90, 0};
+    glm::vec3 _cameraRot{0, 270, 0};
     float _cameraMovementSpeed{5.0f};
     float _cameraRotSpeed{100.0f};
 
     // Mouse
     bool _isMouseBeingDragged{};
     MousePosition _mouseDraggedStartingPosition{};
+    double yDiff{};
+    double xDiff{};
 
     double _deltaTime{};
     float _cameraFOV{45.0f};
@@ -86,7 +105,7 @@ void Application::Initialise() {
         },
         nullptr);
 
-    if (!_window.Initialise({800, 600}, "Example", this)) {
+    if (!_window.Initialise({1920, 1080}, "Example", this)) {
         return;
     }
 
@@ -123,14 +142,44 @@ void Application::Initialise() {
 
     _shouldUpdate = true;
 
-    const float vertices[] = {-0.5f, -0.5f, -0.5f, 0.0f, 0.0f, 0.5f, -0.5f, -0.5f, 1.0f, 0.0f, 0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, -0.5f, 1.0f, 1.0f,
-        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f, 0.5f, 1.0f,
-        1.0f, 0.5f, 0.5f, 0.5f, 1.0f, 1.0f, -0.5f, 0.5f, 0.5f, 0.0f, 1.0f, -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -0.5f, 0.5f, -0.5f,
-        1.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -0.5f, 0.5f, 0.5f, 1.0f, 0.0f, 0.5f, 0.5f,
-        0.5f, 1.0f, 0.0f, 0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, -0.5f, 0.5f, 0.0f, 0.0f, 0.5f,
-        0.5f, 0.5f, 1.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, 0.5f, -0.5f, -0.5f, 1.0f, 1.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f, 0.5f, -0.5f, 0.5f, 1.0f, 0.0f,
-        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f, -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, -0.5f, 0.5f, -0.5f, 0.0f, 1.0f, 0.5f, 0.5f, -0.5f, 1.0f, 1.0f, 0.5f, 0.5f, 0.5f, 1.0f,
-        0.0f, 0.5f, 0.5f, 0.5f, 1.0f, 0.0f, -0.5f, 0.5f, 0.5f, 0.0f, 0.0f, -0.5f, 0.5f, -0.5f, 0.0f, 1.0f};
+    const float vertices[] = {
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, //
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  //
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  //
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, //
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  //
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   //
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    //
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    //
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,   //
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  //
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,   //
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,  //
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  //
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,   //
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    //
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  //
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  //
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   //
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    //
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, //
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,  //
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   //
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   //
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  //
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, //
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  //
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    //
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    //
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,   //
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f   //
+    };
     const int vertexAttributes[] = {3, 2};
 
     const GraphicLib::IndexBufferDataElement indices[] = {
@@ -201,12 +250,8 @@ void Application::Update(float deltaTime) {
         }
     }
     if (_input.IsKeyPressed(EInputKey::Q)) {
-        _cameraRot.y -= _cameraRotSpeed * deltaTime;
-        if (_cameraRot.y < 0.0f) {
-            _cameraRot.y = 360.0f;
-        }
     }
-    
+
     if (_input.IsKeyPressed(EInputKey::MOUSE_RIGHT) && !_isMouseBeingDragged) {
         _isMouseBeingDragged = true;
         _mouseDraggedStartingPosition = _input.GetMousePosition();
@@ -218,7 +263,49 @@ void Application::Update(float deltaTime) {
     }
 
     if (_isMouseBeingDragged) {
+        const MousePosition& mousePosition = _input.GetMousePosition();
+        if (mousePosition == _mouseDraggedStartingPosition) {
+            return;
+        }
 
+        constexpr double _deadZone = 0;
+        constexpr double _minDiff = 2;
+        yDiff = std::abs(mousePosition.Y - _mouseDraggedStartingPosition.Y);
+        xDiff = std::abs(mousePosition.X - _mouseDraggedStartingPosition.X);
+
+        const bool chooseX = xDiff > yDiff;
+        const bool chooseY = yDiff > xDiff;
+
+        if (chooseY && yDiff - _minDiff > 0) {
+            if (mousePosition.Y > _mouseDraggedStartingPosition.Y + _deadZone) {
+                _cameraRot.x -= _cameraRotSpeed * deltaTime;
+                if (_cameraRot.x <= -90) {
+                    _cameraRot.x = -90;
+                }
+            }
+            if (mousePosition.Y < _mouseDraggedStartingPosition.Y - _deadZone) {
+                _cameraRot.x += _cameraRotSpeed * deltaTime;
+                if (_cameraRot.x >= 90) {
+                    _cameraRot.x = 90;
+                }
+            }
+        }
+        if (chooseX && xDiff - _minDiff > 0) {
+            if (mousePosition.X > _mouseDraggedStartingPosition.X + _deadZone) {
+                _cameraRot.y += _cameraRotSpeed * deltaTime;
+                if (_cameraRot.y > 360.0f) {
+                    _cameraRot.y = 0.0f;
+                }
+            }
+            if (mousePosition.X < _mouseDraggedStartingPosition.X - _deadZone) {
+                _cameraRot.y -= _cameraRotSpeed * deltaTime;
+                if (_cameraRot.y < 0.0f) {
+                    _cameraRot.y = 360.0f;
+                }
+            }
+        }
+
+        _mouseDraggedStartingPosition = mousePosition;
     }
 }
 
@@ -226,12 +313,11 @@ void Application::Render() {
     _shader.Bind();
     _triangleVA.Bind();
     _textureTest.Draw(0);
-    glm::mat4 model{1.0f};
-    model = glm::rotate(model, glm::radians(_boxRot.x), {1, 0, 0});
-    model = glm::rotate(model, glm::radians(_boxRot.y), {0, 1, 0});
-    model = glm::rotate(model, glm::radians(_boxRot.z), {0, 0, 1});
-    model = glm::translate(model, _boxPos);
-    glm::mat4 MVP = _createProjectionViewMat() * model;
+    const glm::mat4 PV = _createProjectionViewMat();
+    glm::mat4 MVP = PV * _box.Matrix();
+    _shader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
+    _triangleVA.Draw();
+    MVP = PV * _box1.Matrix();
     _shader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
     _triangleVA.Draw();
 }
@@ -247,8 +333,8 @@ void Application::RenderDebug() {
     ImGui::Begin("Transforms");
     {
         ImGui::SeparatorText("Box");
-        ImGui::DragFloat3("_boxPos", glm::value_ptr(_boxPos));
-        ImGui::DragFloat3("_boxRot", glm::value_ptr(_boxRot));
+        ImGui::DragFloat3("_boxPos", glm::value_ptr(_box.Position));
+        ImGui::DragFloat3("_boxRot", glm::value_ptr(_box.Rotation));
 
         ImGui::SeparatorText("Camera");
         ImGui::DragFloat3("_cameraPos", glm::value_ptr(_cameraPos));
@@ -272,6 +358,8 @@ void Application::RenderDebug() {
         ImGui::Text("Mouse pos: [%.0f, %.0f]", _input.GetMousePosition().X, _input.GetMousePosition().Y);
         ImGui::Text("Dragging: %s", _isMouseBeingDragged ? "on" : "off");
         ImGui::Text("Dragging start mouse pos: [%.0f, %.0f]", _mouseDraggedStartingPosition.X, _mouseDraggedStartingPosition.Y);
+        ImGui::Text("xDiff: %.0f", xDiff);
+        ImGui::Text("yDiff: %.0f", yDiff);
     }
     ImGui::End();
 
