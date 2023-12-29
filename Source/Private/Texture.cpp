@@ -3,7 +3,8 @@
 #include "InternalLogger.h"
 #include "StbImage.h"
 #include <filesystem>
-#include <sstream>
+#include <fmt/format.h>
+#include <string>
 
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
@@ -39,22 +40,21 @@ void Texture::Unbind() {
 
 void Texture::Draw(unsigned char slot) {
     GraphicAPI::Get().GetTextureImpl().Draw(_id, _data.Type, slot);
+    Bind();
 }
 
 void Texture::Set(const char* texturePath, const Span<TextureParam>& params) {
     const std::filesystem::path filePath{texturePath};
     if (!std::filesystem::exists(filePath)) {
-        std::stringstream logText;
-        logText << "File \"" << texturePath << "\" doesn't exist";
-        LOG_INTERNAL_ERROR(logText.str().c_str());
+        const std::string& logText = fmt::format("File \"{}\" doesn't exist", texturePath);
+        LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     _pixelData = stbi_load(std::filesystem::absolute(filePath).string().c_str(), &_data.Width, &_data.Height, reinterpret_cast<int*>(&_data.Channel), 0);
     if (_pixelData == nullptr) {
-        std::stringstream logText;
-        logText << "Can't read pixel data for \"" << texturePath << "\"";
-        LOG_INTERNAL_ERROR(logText.str().c_str());
+        const std::string& logText = fmt::format("Can't read pixel data for \"{}\"", texturePath);
+        LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
@@ -64,6 +64,7 @@ void Texture::Set(const char* texturePath, const Span<TextureParam>& params) {
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
     _data.Parameters.SetData(params);
 
+    Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
 }
 
@@ -75,10 +76,12 @@ void Texture::Set(const SetTextureParams& setParams, const Span<TextureParam>& p
     _data.DataType = setParams.DataType;
     _data.Parameters.SetData(params);
 
+    Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
 }
 
 void Texture::Delete() {
+    Bind();
     GraphicAPI::Get().GetTextureImpl().Delete(_id, _data.Type);
 }
 

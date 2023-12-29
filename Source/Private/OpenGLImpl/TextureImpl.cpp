@@ -1,9 +1,10 @@
 #include "OpenGLImpl/TextureImpl.h"
 
-#include "OpenGLImpl/Utils/TextureImplUtils.h"
 #include "InternalLogger.h"
+#include "OpenGLImpl/Utils/TextureImplUtils.h"
+#include <fmt/format.h>
+#include <string>
 #include <glad/glad.h>
-#include <sstream>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
@@ -12,9 +13,8 @@ int TextureImpl::_maxTextureSlots{-1};
 void TextureImpl::Initialise(unsigned int& id) const {
     if (_maxTextureSlots == -1) {
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_maxTextureSlots);
-        std::stringstream logText;
-        logText << "Max number of texture slots " << _maxTextureSlots;
-        LOG_INTERNAL_NOTIFICATION(logText.str().c_str());
+        const std::string& logText = fmt::format("Max number of texture slots {}", _maxTextureSlots);
+        LOG_INTERNAL_NOTIFICATION(logText.c_str());
     }
     glGenTextures(1, &id);
 }
@@ -37,18 +37,14 @@ void TextureImpl::Unbind(unsigned int, ETextureType type) const {
 
 void TextureImpl::Draw(unsigned int id, ETextureType type, unsigned char slot) const {
     if (slot > _maxTextureSlots) {
-        std::stringstream logText;
-        logText << "Provided texture slot " << slot << " exceeded the max number of texture slots " << _maxTextureSlots;
-        LOG_INTERNAL_ERROR(logText.str().c_str());
+        const std::string& logText = fmt::format("Provided texture slot {} exceeded the max number of texture slots {}", slot, _maxTextureSlots);
+        LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
     glActiveTexture(GL_TEXTURE0 + slot);
-    Bind(id, type);
 }
 
 void TextureImpl::Set(unsigned int id, const TextureData& textureData) const {
-    Bind(id, textureData.Type);
-
     unsigned int target{};
     if (!TextureImplUtils::ConvertTextureType(textureData.Type, target)) {
         return;
@@ -91,7 +87,6 @@ void TextureImpl::Set(unsigned int id, const TextureData& textureData) const {
 }
 
 void TextureImpl::Delete(unsigned int& id, ETextureType type) const {
-    Bind(id, type);
     glDeleteTextures(1, &id);
 }
 

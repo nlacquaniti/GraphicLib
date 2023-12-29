@@ -3,7 +3,8 @@
 #include "GraphicLib/Utilities/RenderBufferUtils.h"
 #include "InternalLogger.h"
 #include <glad/glad.h>
-#include <sstream>
+#include <fmt/format.h>
+#include <string>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
@@ -28,9 +29,8 @@ bool ConvertRenderBufferFormat(ERenderBufferFormat format, unsigned int& outForm
         case ERenderBufferFormat::NONE:
             break;
     }
-    std::stringstream errorText;
-    errorText << "RenderBufferFormat " << RenderBufferUtils::RenderBufferFormatToString(format);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
+    const std::string& errorText = fmt::format("RenderBufferFormat {}", RenderBufferUtils::RenderBufferFormatToString(format));
+    LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
 } // namespace

@@ -8,8 +8,8 @@ add_executable(DrawImageExample
 
 	../Common/Window/Private/Window.cpp
 	../Common/Window/Private/Input.cpp
-	"../Common/Window/Private/InputImpl.h"
-	"../Common/Window/Private/InputImpl.cpp"
+	../Common/Window/Private/InputImpl.h
+	../Common/Window/Private/InputImpl.cpp
 	../Common/Window/Private/InputImplUtils.h
 	../Common/Window/Private/InputImplUtils.cpp
 	../Common/Window/Private/Utils/InputUtils.cpp

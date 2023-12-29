@@ -12,6 +12,7 @@ add_library(${PROJECT_NAME} SHARED
 	Public/${PROJECT_NAME}/Utilities/Span.h
 	Public/${PROJECT_NAME}/Utilities/TextureUtils.h
 	Public/${PROJECT_NAME}/Utilities/RenderBufferUtils.h
+	Public/${PROJECT_NAME}/Utilities/ShaderUtils.h
 
 	Private/IExternalLogSystem.h
 	Private/IExternalLogSystem.cpp
@@ -28,25 +29,79 @@ add_library(${PROJECT_NAME} SHARED
 	Private/StbImage.h
 	Private/Utilities/TextureUtils.cpp
 	Private/Utilities/RenderBufferUtils.cpp
+	Private/Utilities/ShaderUtils.cpp
 
-	Private/Vendor/stb/stb_image.h
+	Private/Vendors/stb/stb_image.h
 )
+
+if(GL_ENABLE_OPENGL)
+	target_sources(${PROJECT_NAME} PRIVATE 
+		Private/OpenGLImpl/APIImpl.h
+		Private/OpenGLImpl/ShaderImpl.h
+		Private/OpenGLImpl/VertexArrayImpl.h
+		Private/OpenGLImpl/VertexBufferImpl.h
+		Private/OpenGLImpl/IndexBufferImpl.h
+		Private/OpenGLImpl/OpenGLLogSystem.h
+		Private/OpenGLImpl/TextureImpl.h
+		Private/OpenGLImpl/FrameBufferImpl.h
+		Private/OpenGLImpl/RenderBufferImpl.h
+		Private/OpenGLImpl/Utils/TextureImplUtils.h
+		Private/OpenGLImpl/Utils/RenderBufferImplUtils.h
+		Private/OpenGLImpl/Utils/ShaderImplUtils.h
+	
+		Private/OpenGLImpl/APIImpl.cpp
+		Private/OpenGLImpl/ShaderImpl.cpp
+		Private/OpenGLImpl/VertexArrayImpl.cpp
+		Private/OpenGLImpl/VertexBufferImpl.cpp
+		Private/OpenGLImpl/IndexBufferImpl.cpp
+		Private/OpenGLImpl/OpenGLLogSystem.cpp
+		Private/OpenGLImpl/TextureImpl.cpp
+		Private/OpenGLImpl/FrameBufferImpl.cpp
+		Private/OpenGLImpl/RenderBufferImpl.cpp
+		Private/OpenGLImpl/Utils/TextureImplUtils.cpp
+		Private/OpenGLImpl/Utils/RenderBufferImplUtils.cpp
+		Private/OpenGLImpl/Utils/ShaderImplUtils.cpp
+	
+		Private/OpenGLImpl/Vendors/glad/include/glad/glad.h
+		Private/OpenGLImpl/Vendors/glad/include/KHR/khrplatform.h
+		Private/OpenGLImpl/Vendors/glad/src/glad.c
+	)
+endif()
 
 target_include_directories(${PROJECT_NAME} PUBLIC 
 	Public
 )
 target_include_directories(${PROJECT_NAME} PRIVATE 
 	Private
-	Private/Vendor
+	Private/Vendors
 )
-
-target_compile_definitions(${PROJECT_NAME} PRIVATE DLL_EXPORT)
-
-if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
-set_target_properties(${PROJECT_NAME} PROPERTIES
-    COMPILE_OPTIONS 
-	"-Wall;-Wextra;-Wshadow;-Wconversion;-Wpedantic;-Werror;-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-unsafe-buffer-usage;"
-)
+if(GL_ENABLE_OPENGL)
+	target_include_directories(${PROJECT_NAME} PRIVATE 
+		Private/OpenGLImpl/Vendors/glad/include/
+	)
 endif()
 
-add_subdirectory(Private)
+target_compile_definitions(${PROJECT_NAME} PRIVATE DLL_EXPORT)
+if(GL_ENABLE_OPENGL)
+	target_compile_definitions(${PROJECT_NAME} PRIVATE OPENGL_IMPL)
+endif()
+
+set_target_properties(${PROJECT_NAME} PROPERTIES DEBUG_POSTFIX Debug)
+if(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
+	set_target_properties(${PROJECT_NAME} PROPERTIES
+	    COMPILE_OPTIONS 
+		"-Wall;-Wextra;-Wshadow;-Wconversion;-Wpedantic;-Werror;-Wno-c++98-compat;-Wno-c++98-compat-pedantic;-Wno-unsafe-buffer-usage;"
+	)
+endif()
+
+add_subdirectory(Private/Vendors/fmt)
+target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
+#add_dependencies(${PROJECT_NAME} fmt)
+#target_link_libraries(${PROJECT_NAME} PRIVATE fmt)
+#add_custom_command(
+#	TARGET ${PROJECT_NAME} 
+#	POST_BUILD
+#	COMMAND ${CMAKE_COMMAND} -E copy
+#		$<TARGET_FILE:fmt>
+#		$<TARGET_FILE_DIR:${PROJECT_NAME}>
+#)

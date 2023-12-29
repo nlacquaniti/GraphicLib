@@ -42,6 +42,7 @@ void InternalLogger::LogInternalNotification(const char* source, const char* tex
 }
 
 void InternalLogger::LogInternalError(const char* source, const char* text) {
+
     LogMessage({Logger::Severity::HIGH, source, text});
 }
 

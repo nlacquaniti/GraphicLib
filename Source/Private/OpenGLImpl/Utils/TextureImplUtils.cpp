@@ -3,7 +3,8 @@
 #include "GraphicLib/Utilities/TextureUtils.h"
 #include "InternalLogger.h"
 #include <glad/glad.h>
-#include <sstream>
+#include <fmt/format.h>
+#include <string>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
@@ -18,9 +19,8 @@ bool TextureImplUtils::ConvertTextureType(ETextureType type, unsigned int& outTy
         case ETextureType::NONE:
             break;
     }
-    std::stringstream errorText;
-    errorText << "TextureType " << TextureUtils::TextureTypeToString(type);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
+    const std::string& errorText = fmt::format("TextureType {}", TextureUtils::TextureTypeToString(type));
+    LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
 
@@ -41,9 +41,8 @@ bool TextureImplUtils::ConvertTextureParamName(ETextureParamName paramName, unsi
         case ETextureParamName::NONE:
             break;
     }
-    std::stringstream errorText;
-    errorText << "TextureParamName " << TextureUtils::TextureParamNameToString(paramName);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
+    const std::string& errorText = fmt::format("TextureParamName {}", TextureUtils::TextureParamNameToString(paramName));
+    LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
 
@@ -73,9 +72,8 @@ bool TextureImplUtils::ConvertTextureParamValue(ETextureParamValue paramValue, i
         case ETextureParamValue::NONE:
             break;
     }
-    std::stringstream errorText;
-    errorText << "TextureParamValue " << TextureUtils::TextureParamValueToString(paramValue);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
+    const std::string& errorText = fmt::format("TextureParamValue {}", TextureUtils::TextureParamValueToString(paramValue));
+    LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
 
@@ -105,9 +103,8 @@ bool TextureImplUtils::ConvertTextureChannel(ETextureChannel channel, unsigned i
         case ETextureChannel::NONE:
             break;
     }
-    std::stringstream errorText;
-    errorText << "TextureChannel " << TextureUtils::TextureChannelToString(channel);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
+    const std::string& errorText = fmt::format("TextureChannel {}", TextureUtils::TextureChannelToString(channel));
+    LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
 
@@ -164,9 +161,8 @@ bool TextureImplUtils::ConvertTextureFormat(ETextureFormat format, int& outForma
         case ETextureFormat::NONE:
             break;
     }
-    std::stringstream errorText;
-    errorText << "TextureFormat " << TextureUtils::TextureFormatToString(format);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
+    const std::string& errorText = fmt::format("TextureFormat {}", TextureUtils::TextureFormatToString(format));
+    LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
 
@@ -196,9 +192,8 @@ bool TextureImplUtils::ConvertTextureDataType(ETextureDataType dataType, unsigne
         case ETextureDataType::NONE:
             break;
     }
-    std::stringstream errorText;
-    errorText << "TextureDataType " << TextureUtils::TextureDataTypeToString(dataType);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
+    const std::string& errorText = fmt::format("TextureDataType {}", TextureUtils::TextureDataTypeToString(dataType));
+    LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
 
@@ -231,9 +226,8 @@ bool TextureImplUtils::ConvertTextureFormatToFrameBufferAttachment(ETextureForma
         case ETextureFormat::NONE:
             break;
     }
-    std::stringstream errorText;
-    errorText << "TextureFormat " << TextureUtils::TextureFormatToString(textureFormat);
-    LOG_INTERNAL_ERROR(errorText.str().c_str());
+    const std::string& errorText = fmt::format("TextureFormat {}", TextureUtils::TextureFormatToString(textureFormat));
+    LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
 

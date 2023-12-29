@@ -1,7 +1,8 @@
 #include "OpenGLImpl/OpenGLLogSystem.h"
 
 #include <glad/glad.h>
-#include <sstream>
+#include <fmt/format.h>
+#include <string>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
@@ -76,10 +77,8 @@ void OpenGLLogSystem::_onAttach() {
             debugMessage.severity = OpenGLSeverityToInternal(severity);
             debugMessage.source = DebugSourceToString(source);
 
-            std::stringstream logMessage;
-            logMessage << DebugTypeToString(type) << ": " << message;
-            const std::string logString { logMessage.str() };
-            debugMessage.text = logString.c_str();
+            const std::string& logMessage = fmt::format("{}: {}", DebugTypeToString(type), message);
+            debugMessage.text = logMessage.c_str();
 
             logSystem->GetMessageLogCallback()(debugMessage);
         },

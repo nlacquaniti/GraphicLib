@@ -18,25 +18,19 @@
 #include <iostream>
 #include <memory>
 #include <string>
+const char* gridVertexShaderSource = "#version 330 core\n"
+                                     "uniform mat4 uVP;\n"
+                                     "void main()\n"
+                                     "{\n"
+                                     "   gl_Position = uMVP * vec4(aPos, 1.0);\n"
+                                     "}\0";
 
-const char* vertexShaderSource = "#version 330 core\n"
-                                 "layout (location = 0) in vec3 aPos;\n"
-                                 "layout (location = 1) in vec2 aTexCoord;\n"
-                                 "uniform mat4 uMVP;\n"
-                                 "out vec2 texCoord;\n"
-                                 "void main()\n"
-                                 "{\n"
-                                 "   gl_Position = uMVP * vec4(aPos, 1.0);\n"
-                                 "   texCoord = vec2(aTexCoord.x, aTexCoord.y);\n"
-                                 "}\0";
-const char* fragmentShaderSource = "#version 330 core\n"
-                                   "out vec4 FragColor;\n"
-                                   "in vec2 texCoord;\n"
-                                   "uniform sampler2D uTexture;\n"
-                                   "void main()\n"
-                                   "{\n"
-                                   "   FragColor = texture(uTexture, texCoord);\n"
-                                   "}\n\0";
+const char* gridFragmentShaderSource = "#version 330 core\n"
+                                       "out vec4 FragColor;\n"
+                                       "void main()\n"
+                                       "{\n"
+                                       "   FragColor = texture(uTexture, texCoord);\n"
+                                       "}\n\0";
 
 struct Transform {
     glm::vec3 Position{};
@@ -88,8 +82,6 @@ private:
     // Mouse
     bool _isMouseBeingDragged{};
     MousePosition _mouseDraggedStartingPosition{};
-    double yDiff{};
-    double xDiff{};
 
     double _deltaTime{};
     float _cameraFOV{45.0f};
@@ -203,7 +195,13 @@ void Application::Initialise() {
     _textureTest.Bind();
     _textureTest.Set("Resources/TextureTest.png", {textureParams});
 
-    _shader.Load(vertexShaderSource, fragmentShaderSource);
+
+    const GraphicLib::ShaderParam shaderParams[] = {
+        {GraphicLib::Span<char>("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
+        {GraphicLib::Span<char>("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
+    };
+    _shader.Initialise();
+    _shader.Set(shaderParams);
     _shader.Bind();
     _shader.SetUniformIntValue("uTexture", 0);
 }
@@ -268,40 +266,30 @@ void Application::Update(float deltaTime) {
             return;
         }
 
-        constexpr double _deadZone = 0;
-        constexpr double _minDiff = 2;
-        yDiff = std::abs(mousePosition.Y - _mouseDraggedStartingPosition.Y);
-        xDiff = std::abs(mousePosition.X - _mouseDraggedStartingPosition.X);
+        constexpr double _deadZone = 2;
 
-        const bool chooseX = xDiff > yDiff;
-        const bool chooseY = yDiff > xDiff;
-
-        if (chooseY && yDiff - _minDiff > 0) {
-            if (mousePosition.Y > _mouseDraggedStartingPosition.Y + _deadZone) {
-                _cameraRot.x -= _cameraRotSpeed * deltaTime;
-                if (_cameraRot.x <= -90) {
-                    _cameraRot.x = -90;
-                }
-            }
-            if (mousePosition.Y < _mouseDraggedStartingPosition.Y - _deadZone) {
-                _cameraRot.x += _cameraRotSpeed * deltaTime;
-                if (_cameraRot.x >= 90) {
-                    _cameraRot.x = 90;
-                }
+        if (mousePosition.Y > _mouseDraggedStartingPosition.Y + _deadZone) {
+            _cameraRot.x -= _cameraRotSpeed * deltaTime;
+            if (_cameraRot.x <= -90) {
+                _cameraRot.x = -90;
             }
         }
-        if (chooseX && xDiff - _minDiff > 0) {
-            if (mousePosition.X > _mouseDraggedStartingPosition.X + _deadZone) {
-                _cameraRot.y += _cameraRotSpeed * deltaTime;
-                if (_cameraRot.y > 360.0f) {
-                    _cameraRot.y = 0.0f;
-                }
+        if (mousePosition.Y < _mouseDraggedStartingPosition.Y - _deadZone) {
+            _cameraRot.x += _cameraRotSpeed * deltaTime;
+            if (_cameraRot.x >= 90) {
+                _cameraRot.x = 90;
             }
-            if (mousePosition.X < _mouseDraggedStartingPosition.X - _deadZone) {
-                _cameraRot.y -= _cameraRotSpeed * deltaTime;
-                if (_cameraRot.y < 0.0f) {
-                    _cameraRot.y = 360.0f;
-                }
+        }
+        if (mousePosition.X > _mouseDraggedStartingPosition.X + _deadZone) {
+            _cameraRot.y += _cameraRotSpeed * deltaTime;
+            if (_cameraRot.y > 360.0f) {
+                _cameraRot.y = 0.0f;
+            }
+        }
+        if (mousePosition.X < _mouseDraggedStartingPosition.X - _deadZone) {
+            _cameraRot.y -= _cameraRotSpeed * deltaTime;
+            if (_cameraRot.y < 0.0f) {
+                _cameraRot.y = 360.0f;
             }
         }
 
@@ -358,8 +346,6 @@ void Application::RenderDebug() {
         ImGui::Text("Mouse pos: [%.0f, %.0f]", _input.GetMousePosition().X, _input.GetMousePosition().Y);
         ImGui::Text("Dragging: %s", _isMouseBeingDragged ? "on" : "off");
         ImGui::Text("Dragging start mouse pos: [%.0f, %.0f]", _mouseDraggedStartingPosition.X, _mouseDraggedStartingPosition.Y);
-        ImGui::Text("xDiff: %.0f", xDiff);
-        ImGui::Text("yDiff: %.0f", yDiff);
     }
     ImGui::End();
 

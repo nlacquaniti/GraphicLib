@@ -7,6 +7,6 @@
 [submodule "Examples/Vendors/imgui"]
 	path = Examples/Vendors/imgui
 	url = https://github.com/ocornut/imgui.git
-[submodule "Source/Private/Vendor/fmt"]
-	path = Source/Private/Vendor/fmt
+[submodule "Source/Private/Vendors/fmt"]
+	path = Source/Private/Vendors/fmt
 	url = https://github.com/fmtlib/fmt.git
