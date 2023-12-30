@@ -96,12 +96,3 @@ endif()
 
 add_subdirectory(Private/Vendors/fmt)
 target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt-header-only)
-#add_dependencies(${PROJECT_NAME} fmt)
-#target_link_libraries(${PROJECT_NAME} PRIVATE fmt)
-#add_custom_command(
-#	TARGET ${PROJECT_NAME} 
-#	POST_BUILD
-#	COMMAND ${CMAKE_COMMAND} -E copy
-#		$<TARGET_FILE:fmt>
-#		$<TARGET_FILE_DIR:${PROJECT_NAME}>
-#)

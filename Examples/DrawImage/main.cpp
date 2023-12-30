@@ -18,19 +18,6 @@
 #include <iostream>
 #include <memory>
 #include <string>
-const char* gridVertexShaderSource = "#version 330 core\n"
-                                     "uniform mat4 uVP;\n"
-                                     "void main()\n"
-                                     "{\n"
-                                     "   gl_Position = uMVP * vec4(aPos, 1.0);\n"
-                                     "}\0";
-
-const char* gridFragmentShaderSource = "#version 330 core\n"
-                                       "out vec4 FragColor;\n"
-                                       "void main()\n"
-                                       "{\n"
-                                       "   FragColor = texture(uTexture, texCoord);\n"
-                                       "}\n\0";
 
 struct Transform {
     glm::vec3 Position{};
@@ -59,11 +46,16 @@ public:
 
 private:
     glm::mat4 _createProjectionViewMat() const;
+
     Window _window{};
     Input _input{};
-    GraphicLib::Shader _shader{};
-    GraphicLib::VertexArray _triangleVA{};
-    GraphicLib::Texture _textureTest{};
+
+    GraphicLib::VertexArray _boxVA{};
+    GraphicLib::Shader _boxShader{};
+    GraphicLib::Texture _boxTexture{};
+
+    GraphicLib::VertexArray _gridVA{};
+    GraphicLib::Shader _gridShader{};
 
     // Box 1
     Transform _box{};
@@ -72,19 +64,21 @@ private:
     Transform _box1{{1.2, 0, 0}};
 
     // Camera data
-    glm::vec3 _cameraPos{0, 0, 3};
+    glm::vec3 _cameraPos{0, 0, 0};
     glm::vec3 _cameraDir{};
     glm::vec3 _cameraDirRight{};
-    glm::vec3 _cameraRot{0, 270, 0};
+    glm::vec3 _cameraRot{0, 0, 0};
     float _cameraMovementSpeed{5.0f};
     float _cameraRotSpeed{100.0f};
+    float _cameraFOV{45.0f};
+    float _cameraNear{0.1f};
+    float _cameraFar{100.0f};
 
     // Mouse
     bool _isMouseBeingDragged{};
     MousePosition _mouseDraggedStartingPosition{};
 
     double _deltaTime{};
-    float _cameraFOV{45.0f};
     bool _shouldUpdate{};
 };
 
@@ -180,10 +174,10 @@ void Application::Initialise() {
         {1, 2, 3}, // second triangle
     };
 
-    _triangleVA.Initialise();
-    _triangleVA.Bind();
-    _triangleVA.GetVertexBuffer().Set({vertices}, {vertexAttributes});
-    //_triangleVA.GetIndexBuffer().Set({indices});
+    _boxVA.Initialise();
+    _boxVA.Bind();
+    _boxVA.GetVertexBuffer().Set({vertices}, {vertexAttributes});
+    //_boxVA.GetIndexBuffer().Set({indices});
 
     const GraphicLib::TextureParam textureParams[] = {
         {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
@@ -191,19 +185,39 @@ void Application::Initialise() {
         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
     };
-    _textureTest.Initialise(GraphicLib::ETextureType::TEXTURE_2D);
-    _textureTest.Bind();
-    _textureTest.Set("Resources/TextureTest.png", {textureParams});
+    _boxTexture.Initialise(GraphicLib::ETextureType::TEXTURE_2D);
+    _boxTexture.Bind();
+    _boxTexture.Set("Resources/TextureTest.png", {textureParams});
 
-
-    const GraphicLib::ShaderParam shaderParams[] = {
+    const GraphicLib::ShaderParam boxShaderParams[] = {
         {GraphicLib::Span<char>("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
         {GraphicLib::Span<char>("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
-    _shader.Initialise();
-    _shader.Set(shaderParams);
-    _shader.Bind();
-    _shader.SetUniformIntValue("uTexture", 0);
+    _boxShader.Initialise();
+    _boxShader.Set(boxShaderParams);
+    _boxShader.Bind();
+    _boxShader.SetUniformIntValue("uTexture", 0);
+    _boxShader.Unbind();
+
+    const float gridVertices[] = {
+        1, 1, 0,   //
+        -1, -1, 0, //
+        -1, 1, 0,  //
+        -1, -1, 0, //
+        1, 1, 0,   //
+        1, -1, 0,  //
+    };
+    const int gridVertexAttributes[] = {3};
+    _gridVA.Initialise();
+    _gridVA.Bind();
+    _gridVA.GetVertexBuffer().Set({gridVertices}, {gridVertexAttributes});
+
+    const GraphicLib::ShaderParam gridShaderParams[] = {
+        {GraphicLib::Span<char>("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
+        {GraphicLib::Span<char>("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
+    };
+    _gridShader.Initialise();
+    _gridShader.Set(gridShaderParams);
 }
 
 void Application::Start() {
@@ -239,15 +253,6 @@ void Application::Update(float deltaTime) {
     }
     if (_input.IsKeyPressed(EInputKey::A)) {
         _cameraPos -= _cameraDirRight * _cameraMovementSpeed * deltaTime;
-    }
-
-    if (_input.IsKeyPressed(EInputKey::E)) {
-        _cameraRot.y += _cameraRotSpeed * deltaTime;
-        if (_cameraRot.y > 360.0f) {
-            _cameraRot.y = 0.0f;
-        }
-    }
-    if (_input.IsKeyPressed(EInputKey::Q)) {
     }
 
     if (_input.IsKeyPressed(EInputKey::MOUSE_RIGHT) && !_isMouseBeingDragged) {
@@ -298,16 +303,33 @@ void Application::Update(float deltaTime) {
 }
 
 void Application::Render() {
-    _shader.Bind();
-    _triangleVA.Bind();
-    _textureTest.Draw(0);
-    const glm::mat4 PV = _createProjectionViewMat();
+    const WindowSize& windowSize{_window.GetSize()};
+    glm::mat4 projection{glm::perspective(glm::radians(_cameraFOV),                   //
+        static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height), //
+        _cameraNear,                                                                  //
+        _cameraFar                                                                    //
+        )};
+
+    glm::mat4 view = glm::lookAt(_cameraPos, _cameraPos + _cameraDir, {0, 1, 0});
+
+    _gridShader.Bind();
+    _gridShader.SetUniformMat4Value("uView", glm::value_ptr(view));
+    _gridShader.SetUniformMat4Value("uProj", glm::value_ptr(projection));
+    _gridShader.SetUniformFloatValue("uNear", _cameraNear);
+    _gridShader.SetUniformFloatValue("uFar", _cameraFar);
+    _gridVA.Bind();
+    _gridVA.Draw();
+
+    _boxShader.Bind();
+    glm::mat4 PV = _createProjectionViewMat();
     glm::mat4 MVP = PV * _box.Matrix();
-    _shader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
-    _triangleVA.Draw();
-    MVP = PV * _box1.Matrix();
-    _shader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
-    _triangleVA.Draw();
+    _boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
+    _boxVA.Bind();
+    _boxTexture.Draw(0);
+    _boxVA.Draw();
+    // MVP = PV * _box1.Matrix();
+    //_boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
+    //_boxVA.Draw();
 }
 
 void Application::RenderDebug() {
