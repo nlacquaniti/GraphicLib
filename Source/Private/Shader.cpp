@@ -1,7 +1,7 @@
 #include "GraphicLib/Shader.h"
 
 #include "InternalLogger.h"
-#include <fmt/format.h>
+#include "FmtFormat.h"
 #include <string>
 
 #ifdef OPENGL_IMPL

@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-class InputImpl final {
+class InputImpl {
 public:
     static bool Initialise(void* window);
     static void Shutdown();

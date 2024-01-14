@@ -5,7 +5,7 @@
 #include "GraphicLib/Utilities/Span.h"
 
 namespace GraphicLib {
-class DLL_API VertexBuffer final {
+class DLL_API VertexBuffer {
 public:
     VertexBuffer() = default;
     ~VertexBuffer();

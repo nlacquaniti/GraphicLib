@@ -25,7 +25,7 @@ struct ShaderData {
     EShaderType Type{};
 };
 
-class DLL_API Shader final {
+class DLL_API Shader {
 public:
     Shader() = default;
     Shader(const Shader& other) = default;

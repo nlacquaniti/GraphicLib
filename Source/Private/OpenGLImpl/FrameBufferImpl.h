@@ -4,7 +4,7 @@ namespace GraphicLib {
 class Texture;
 class RenderBuffer;
 namespace OpenGLImpl {
-class FrameBufferImpl final {
+class FrameBufferImpl {
 public:
     void Initialise(unsigned int& id) const;
     void Bind(unsigned int id) const;

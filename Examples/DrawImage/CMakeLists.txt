@@ -32,8 +32,6 @@ target_include_directories(DrawImageExample PRIVATE
 	../Common/Window/Public
 	../Common/Window/Private
 	../Vendors
-	../Vendors/glfw/include
-	../Vendors/glm
 	../Vendors/imgui
 )
 
@@ -59,8 +57,8 @@ endif()
 add_dependencies(DrawImageExample ${PROJECT_NAME})
 target_link_libraries(DrawImageExample PRIVATE ${PROJECT_NAME})
 
-add_dependencies(DrawImageExample glfw)
 target_link_libraries(DrawImageExample PRIVATE glfw)
+target_link_libraries(DrawImageExample PRIVATE glm)
 
 add_custom_command(
 	TARGET DrawImageExample 
@@ -76,12 +74,4 @@ add_custom_command(
 	COMMAND ${CMAKE_COMMAND} -E copy_directory
 		${CMAKE_CURRENT_SOURCE_DIR}/Resources
 		$<TARGET_FILE_DIR:DrawImageExample>/Resources
-)
-
-add_custom_command(
-	    TARGET DrawImageExample
-	    POST_BUILD
-	    COMMAND ${CMAKE_COMMAND} -E copy_if_different
-			$<TARGET_FILE:glfw>
-			$<TARGET_FILE_DIR:DrawImageExample>
 )

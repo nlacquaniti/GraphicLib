@@ -14,7 +14,7 @@ namespace GraphicLib {
 #define LOG_INTERNAL_ERROR(message) InternalLogger::Get().LogInternalError(LOG_SOURCE(), message)
 
 class IExternalLogSystem;
-class InternalLogger final {
+class InternalLogger {
 public:
     struct Message {
         Logger::Severity severity{};

@@ -5,7 +5,7 @@
 #include "GraphicLib/RenderBuffer.h"
 
 namespace GraphicLib {
-class DLL_API FrameBuffer final {
+class DLL_API FrameBuffer {
 public:
     FrameBuffer() = default;
     ~FrameBuffer();

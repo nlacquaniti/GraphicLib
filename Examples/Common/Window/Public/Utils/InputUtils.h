@@ -2,7 +2,7 @@
 
 #include "Window/Input.h"
 
-class InputUtils final {
+class InputUtils {
 public:
     static const char* MouseInputActionToString(EInputAction inputAction);
     static const char* InputKeyToString(EInputKey inputKey);

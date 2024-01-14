@@ -5,7 +5,7 @@
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-class IndexBufferImpl final {
+class IndexBufferImpl {
 public:
     void Initialise(unsigned int& id) const;
     void Bind(unsigned int id) const;

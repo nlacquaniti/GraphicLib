@@ -2,17 +2,20 @@
 
 #include "InternalLogger.h"
 #include "OpenGLImpl/Utils/TextureImplUtils.h"
-#include <fmt/format.h>
+#include "FmtFormat.h"
 #include <string>
 #include <glad/glad.h>
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-int TextureImpl::_maxTextureSlots{-1};
+unsigned int TextureImpl::_maxTextureSlots{0};
 
 void TextureImpl::Initialise(unsigned int& id) const {
-    if (_maxTextureSlots == -1) {
-        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &_maxTextureSlots);
+    static bool _isMaxTextureSlotsInitialised = false;
+    if (!_isMaxTextureSlotsInitialised) {
+        int maxTextureSlots;
+        glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureSlots);
+        _maxTextureSlots = static_cast<unsigned int>(maxTextureSlots);
         const std::string& logText = fmt::format("Max number of texture slots {}", _maxTextureSlots);
         LOG_INTERNAL_NOTIFICATION(logText.c_str());
     }
@@ -35,7 +38,7 @@ void TextureImpl::Unbind(unsigned int, ETextureType type) const {
     glBindTexture(target, 0);
 }
 
-void TextureImpl::Draw(unsigned int id, ETextureType type, unsigned char slot) const {
+void TextureImpl::Draw(unsigned int, ETextureType, unsigned int slot) const {
     if (slot > _maxTextureSlots) {
         const std::string& logText = fmt::format("Provided texture slot {} exceeded the max number of texture slots {}", slot, _maxTextureSlots);
         LOG_INTERNAL_ERROR(logText.c_str());
@@ -44,7 +47,7 @@ void TextureImpl::Draw(unsigned int id, ETextureType type, unsigned char slot) c
     glActiveTexture(GL_TEXTURE0 + slot);
 }
 
-void TextureImpl::Set(unsigned int id, const TextureData& textureData) const {
+void TextureImpl::Set(unsigned int, const TextureData& textureData) const {
     unsigned int target{};
     if (!TextureImplUtils::ConvertTextureType(textureData.Type, target)) {
         return;
@@ -86,7 +89,7 @@ void TextureImpl::Set(unsigned int id, const TextureData& textureData) const {
     glGenerateMipmap(target);
 }
 
-void TextureImpl::Delete(unsigned int& id, ETextureType type) const {
+void TextureImpl::Delete(unsigned int& id, ETextureType) const {
     glDeleteTextures(1, &id);
 }
 

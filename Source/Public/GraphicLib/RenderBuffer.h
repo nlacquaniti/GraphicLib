@@ -18,7 +18,7 @@ struct RenderBufferData {
     int Height{};
 };
 
-class DLL_API RenderBuffer final {
+class DLL_API RenderBuffer {
 public:
     RenderBuffer() = default;
     ~RenderBuffer();

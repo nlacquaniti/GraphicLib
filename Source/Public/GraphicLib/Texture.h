@@ -97,7 +97,7 @@ struct TextureData {
     ETextureDataType DataType{};
 };
 
-class DLL_API Texture final {
+class DLL_API Texture {
 public:
     Texture() = default;
     Texture(const Texture& other) = default;
@@ -106,7 +106,7 @@ public:
     void Initialise(ETextureType type);
     void Bind();
     void Unbind();
-    void Draw(unsigned char slot);
+    void Draw(unsigned int slot);
     void Set(const char* filePath, const Span<TextureParam>& params);
     void Set(const SetTextureParams& setParams, const Span<TextureParam>& params);
     void Delete();

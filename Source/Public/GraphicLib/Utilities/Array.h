@@ -1,10 +1,11 @@
 #pragma once
 
+#include "GraphicLib/DLL_API.h"
 #include "GraphicLib/Utilities/Span.h"
 
 namespace GraphicLib {
 template<typename TArrayType>
-class Array final {
+class DLL_API Array {
 public:
     using SizeType = unsigned long long;
 

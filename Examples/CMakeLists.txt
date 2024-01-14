@@ -1,2 +1,2 @@
 add_subdirectory(DrawImage)
-add_subdirectory(Vendors/glfw)
+add_subdirectory(Vendors)

@@ -5,7 +5,7 @@
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-class ShaderImplUtils final {
+class ShaderImplUtils {
 public:
     static std::string LoadFromFile(const char* shaderPath);
     static bool ConvertShaderType(EShaderType type, unsigned int& outType);

@@ -5,7 +5,7 @@
 #include "GraphicLib/VertexBuffer.h"
 
 namespace GraphicLib {
-class DLL_API VertexArray final {
+class DLL_API VertexArray {
 public:
     VertexArray() = default;
     ~VertexArray();

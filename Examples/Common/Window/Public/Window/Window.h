@@ -9,7 +9,7 @@ struct WindowSize {
     int Height{};
 };
 
-class Window final {
+class Window {
 public:
     using LogCallback = void (*)(const char*, void*);
     using UpdateCallback = void(*)(float, void*);

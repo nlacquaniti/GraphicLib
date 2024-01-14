@@ -3,9 +3,9 @@
 #include "GraphicLib/Utilities/ShaderUtils.h"
 #include "InternalLogger.h"
 #include "Utils/ShaderImplUtils.h"
+#include "FmtFormat.h"
 #include <glad/glad.h>
 #include <vector>
-#include <fmt/format.h>
 #include <string>
 
 namespace GraphicLib {
@@ -53,7 +53,7 @@ bool ShaderImpl::Set(unsigned int id, const Span<ShaderData>& shadersData) const
         glDeleteShader(shaderID);
     }
 
-    return successfullyCompiled;
+    return successfullyCompiled == 1;
 }
 
 void ShaderImpl::SetUniformBoolValue(unsigned int id, const char* name, bool value) const {

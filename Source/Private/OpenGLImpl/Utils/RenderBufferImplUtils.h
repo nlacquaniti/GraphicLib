@@ -4,7 +4,7 @@
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-class RenderBufferImplUtils final {
+class RenderBufferImplUtils {
 public:
     static bool ConvertRenderBufferFormatToFrameBufferAttachment(ERenderBufferFormat format, unsigned int& outFrameBufferAttachment);
 };

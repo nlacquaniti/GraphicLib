@@ -2,7 +2,7 @@
 
 namespace GraphicLib {
 template<typename TSpanType>
-class Span final {
+class Span {
 public:
     using SizeType = unsigned long long;
 

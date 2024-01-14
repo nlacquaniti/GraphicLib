@@ -2,8 +2,8 @@
 
 #include "InternalLogger.h"
 #include "StbImage.h"
+#include "FmtFormat.h"
 #include <filesystem>
-#include <fmt/format.h>
 #include <string>
 
 #ifdef OPENGL_IMPL
@@ -38,7 +38,7 @@ void Texture::Unbind() {
     GraphicAPI::Get().GetTextureImpl().Unbind(_id, _data.Type);
 }
 
-void Texture::Draw(unsigned char slot) {
+void Texture::Draw(unsigned int slot) {
     GraphicAPI::Get().GetTextureImpl().Draw(_id, _data.Type, slot);
     Bind();
 }

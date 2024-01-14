@@ -2,8 +2,8 @@
 
 #include "GraphicLib/Utilities/RenderBufferUtils.h"
 #include "InternalLogger.h"
+#include "FmtFormat.h"
 #include <glad/glad.h>
-#include <fmt/format.h>
 #include <string>
 
 namespace GraphicLib {

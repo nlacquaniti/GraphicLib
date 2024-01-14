@@ -152,7 +152,7 @@ struct MousePosition {
     MousePosition operator-(const MousePosition& other) const { return {X - other.X, Y - other.Y}; }
 };
 
-class Input final {
+class Input {
 public:
     using KeyInputCallback = void (*)(EInputKey, EInputAction, void*);
 

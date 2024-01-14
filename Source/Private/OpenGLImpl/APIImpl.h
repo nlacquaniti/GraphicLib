@@ -10,7 +10,7 @@
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-class APIImpl final {
+class APIImpl {
 public:
     static const APIImpl& Get();
     const VertexArrayImpl& GetVertexArrayImpl() const;

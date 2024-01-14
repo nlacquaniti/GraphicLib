@@ -25,6 +25,11 @@
 #pragma clang diagnostic ignored "-Weverything"
 #endif
 
+#ifdef _MSC_VER
+#pragma warning(push, 0)
+#endif
+
+
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
@@ -2538,5 +2543,9 @@ int gladLoadGLLoader(GLADloadproc load) {
 
 #ifdef __clang__
 #pragma clang diagnostic pop
+#pragma warning(pop)
+#endif
+
+#ifdef _MSC_VER
 #pragma warning(pop)
 #endif

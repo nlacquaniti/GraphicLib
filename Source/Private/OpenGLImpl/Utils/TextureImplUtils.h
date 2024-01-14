@@ -4,7 +4,7 @@
 
 namespace GraphicLib {
 namespace OpenGLImpl {
-class TextureImplUtils final {
+class TextureImplUtils {
 public:
     static bool ConvertTextureType(ETextureType type, unsigned int& outType);
     static bool ConvertTextureParamName(ETextureParamName paramName, unsigned int& outParamName);

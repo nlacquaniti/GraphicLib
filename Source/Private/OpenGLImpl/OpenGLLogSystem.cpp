@@ -1,7 +1,7 @@
 #include "OpenGLImpl/OpenGLLogSystem.h"
 
+#include "FmtFormat.h"
 #include <glad/glad.h>
-#include <fmt/format.h>
 #include <string>
 
 namespace GraphicLib {

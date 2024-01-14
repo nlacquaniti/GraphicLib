@@ -4,7 +4,7 @@
 #include "GraphicLib/Texture.h"
 
 namespace GraphicLib {
-class DLL_API TextureUtils final {
+class DLL_API TextureUtils {
 public:
     static const char* TextureTypeToString(ETextureType textureType);
     static const char* TextureParamNameToString(ETextureParamName paramName);

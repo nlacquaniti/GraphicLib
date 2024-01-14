@@ -11,7 +11,7 @@ struct IndexBufferDataElement {
     unsigned int E3{};
 };
 
-class DLL_API IndexBuffer final {
+class DLL_API IndexBuffer {
 public:
     IndexBuffer() = default;
     ~IndexBuffer();

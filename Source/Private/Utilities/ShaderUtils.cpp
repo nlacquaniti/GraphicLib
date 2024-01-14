@@ -1,7 +1,7 @@
 #include "GraphicLib/Utilities/ShaderUtils.h"
 
 #include "InternalLogger.h"
-#include <fmt/format.h>
+#include "FmtFormat.h"
 #include <fstream>
 #include <string>
 

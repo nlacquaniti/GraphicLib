@@ -4,7 +4,7 @@
 #include "GraphicLib/Shader.h"
 
 namespace GraphicLib {
-class DLL_API ShaderUtils final {
+class DLL_API ShaderUtils {
 public:
     static const char* ShaderTypeToString(EShaderType shaderType);
 };

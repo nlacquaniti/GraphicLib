@@ -5,7 +5,7 @@
 
 struct GLFWwindow;
 
-class WindowImpl final {
+class WindowImpl {
 public:
     static bool Create(int width, int height, const char* title);
     static void Update();
