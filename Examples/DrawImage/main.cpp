@@ -91,7 +91,7 @@ void Application::Initialise() {
         },
         nullptr);
 
-    if (!_window.Initialise({1920, 1080}, "Example", this)) {
+    if (!_window.Initialise("Example", this)) {
         return;
     }
 
@@ -335,10 +335,27 @@ void Application::Render() {
 void Application::RenderDebug() {
     static bool show_demo_window = true;
 
-    // if (show_demo_window) {
-    //     ImGui::ShowDemoWindow(&show_demo_window);
-    // }
-    ImGui::DockSpaceOverViewport(ImGui::GetMainViewport(), ImGuiDockNodeFlags_PassthruCentralNode);
+    const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
+    ImGui::DockSpaceOverViewport(mainViewport, ImGuiDockNodeFlags_PassthruCentralNode);
+
+    if (show_demo_window) {
+         //ImGui::ShowDemoWindow(&show_demo_window);
+    }
+
+    ImGui::Begin("Scene");
+    {
+        const ImVec2& pos = ImGui::GetCursorScreenPos();
+        const WindowSize& windowSize = _window.GetSize();
+        ImGui::GetWindowDrawList()->AddImage(                                                                              //
+            reinterpret_cast<void*>(static_cast<unsigned long long>(_window.GetWindowFrameBuffer().GetTexture().GetID())), //
+            pos,                                                                                                           //
+            {pos.x + windowSize.Width, pos.y + windowSize.Height},                                                         //
+            {0, 1},                                                                                                        //
+            {1, 0}                                                                                                         //
+        );
+    }
+    ImGui::End();
+
 
     ImGui::Begin("Transforms");
     {
@@ -363,25 +380,13 @@ void Application::RenderDebug() {
         ImGui::SeparatorText("Performance");
         ImGui::Text("Delta time: %.0fms", _deltaTime * 1000);
         ImGui::Text("FPS: %.0f", 1 / _deltaTime);
+        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+        ImGui::Text("Resolution %dx%d", mode->width, mode->height);
 
         ImGui::SeparatorText("Input");
         ImGui::Text("Mouse pos: [%.0f, %.0f]", _input.GetMousePosition().X, _input.GetMousePosition().Y);
         ImGui::Text("Dragging: %s", _isMouseBeingDragged ? "on" : "off");
         ImGui::Text("Dragging start mouse pos: [%.0f, %.0f]", _mouseDraggedStartingPosition.X, _mouseDraggedStartingPosition.Y);
-    }
-    ImGui::End();
-
-    ImGui::Begin("Scene");
-    {
-        const ImVec2& pos = ImGui::GetCursorScreenPos();
-        const WindowSize& windowSize = _window.GetSize();
-        ImGui::GetWindowDrawList()->AddImage(                                                                              //
-            reinterpret_cast<void*>(static_cast<unsigned long long>(_window.GetWindowFrameBuffer().GetTexture().GetID())), //
-            pos,                                                                                                           //
-            {pos.x + windowSize.Width, pos.y + windowSize.Height},                                                         //
-            {0, 1},                                                                                                        //
-            {1, 0}                                                                                                         //
-        );
     }
     ImGui::End();
 }

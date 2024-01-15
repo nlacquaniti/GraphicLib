@@ -18,13 +18,7 @@ CallbackHandler<void (*)(void*)> WindowImpl::OnWindowClosed{};
 GLFWwindow* WindowImpl::_window{};
 GraphicLib::FrameBuffer WindowImpl::_windowFrameBuffer{};
 
-bool WindowImpl::Create(int width, int height, const char* title) {
-    if (width < 1 || height < 1) {
-        _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window with either width or height with 0 or less value");
-        return false;
-    }
-    
-
+bool WindowImpl::Create(const char* title) {
     if (title == nullptr) {
         _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window without a title");
         return false;
@@ -35,11 +29,10 @@ bool WindowImpl::Create(int width, int height, const char* title) {
         return false;
     }
 
-
-    // Set window hints to create a maximized window
     glfwWindowHint(GLFW_MAXIMIZED, GLFW_TRUE);
 
-    _window = glfwCreateWindow(width, height, title, nullptr, nullptr);
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    _window = glfwCreateWindow(mode->width, mode->height, title, nullptr, nullptr);
     if (_window == nullptr) {
         _clear();
         return false;
@@ -60,11 +53,11 @@ bool WindowImpl::Create(int width, int height, const char* title) {
     IMGUI_CHECKVERSION();
     ImGui::CreateContext();
     ImGuiIO& io = ImGui::GetIO();
-    (void)io;
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
+    io.FontGlobalScale = 2.5f;
     io.ConfigViewportsNoAutoMerge = true;
     io.ConfigViewportsNoTaskBarIcon = true;
 

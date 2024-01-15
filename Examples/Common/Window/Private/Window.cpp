@@ -10,11 +10,11 @@ Window::~Window() {
     _clear();
 }
 
-bool Window::Initialise(const WindowSize& size, const char* title, void* userData) {
+bool Window::Initialise(const char* title, void* userData) {
     static bool _createdCalled{};
     bool bSuccess{};
     if (!_createdCalled) {
-        bSuccess = WindowImpl::Create(size.Width, size.Height, title);
+        bSuccess = WindowImpl::Create(title);
         _userData = userData;
         _createdCalled = true;
     }

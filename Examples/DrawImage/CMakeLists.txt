@@ -75,3 +75,22 @@ add_custom_command(
 		${CMAKE_CURRENT_SOURCE_DIR}/Resources
 		$<TARGET_FILE_DIR:DrawImageExample>/Resources
 )
+
+add_custom_command(
+	TARGET DrawImageExample
+	POST_BUILD
+	COMMAND ${CMAKE_COMMAND} -E copy
+		${CMAKE_CURRENT_SOURCE_DIR}/imgui.ini
+		$<TARGET_FILE_DIR:DrawImageExample>/imgui.ini
+)
+
+if(GL_ENABLE_EXAMPLES_SYMLINK)
+	add_custom_command(
+	    TARGET DrawImageExample
+	    POST_BUILD
+	    COMMAND ${CMAKE_COMMAND} -E create_symlink 
+			${CMAKE_CURRENT_SOURCE_DIR}/imgui.ini
+			$<TARGET_FILE_DIR:DrawImageExample>/imgui.ini
+	    COMMENT "Creating symbolic link: ${SYMLINK_DEST} -> ${SOURCE_FILE}"
+	)
+endif()

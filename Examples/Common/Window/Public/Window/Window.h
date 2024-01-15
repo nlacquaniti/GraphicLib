@@ -23,7 +23,7 @@ public:
     Window& operator=(const Window& other) = delete;
     Window& operator=(const Window&& other) = delete;
     ~Window();
-    bool Initialise(const WindowSize& size, const char* title, void* userData);
+    bool Initialise(const char* title, void* userData);
     void Update();
     void Shutdown();
     void SetLogCallback(LogCallback logCallback);

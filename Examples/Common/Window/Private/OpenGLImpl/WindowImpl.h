@@ -7,7 +7,7 @@ struct GLFWwindow;
 
 class WindowImpl {
 public:
-    static bool Create(int width, int height, const char* title);
+    static bool Create(const char* title);
     static void Update();
     static void Shutdown();
     static void GetSize(int& width, int& height);

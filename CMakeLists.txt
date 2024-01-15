@@ -7,6 +7,7 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(GL_ENABLE_OPENGL "Use OpenGL has a graphic library" ON)
 option(GL_ENABLE_EXAMPLES "Build example projects" OFF)
+option(GL_ENABLE_EXAMPLES_SYMLINK "Enable example projects files symlink" ON)
 
 
 add_library(${PROJECT_NAME} SHARED
