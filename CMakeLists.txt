@@ -123,7 +123,11 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	)
 endif()
 
-target_link_libraries(${PROJECT_NAME} PRIVATE fmt::fmt)
+target_link_libraries(
+	${PROJECT_NAME} PRIVATE 
+	fmt::fmt
+	assimp
+)
 
 if(GL_ENABLE_EXAMPLES)
 	add_subdirectory(Examples)
