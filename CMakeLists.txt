@@ -126,7 +126,7 @@ endif()
 target_link_libraries(
 	${PROJECT_NAME} PRIVATE 
 	fmt::fmt
-	assimp
+	# assimp
 )
 
 if(GL_ENABLE_EXAMPLES)

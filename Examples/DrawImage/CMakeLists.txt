@@ -59,6 +59,7 @@ target_link_libraries(DrawImageExample PRIVATE ${PROJECT_NAME})
 
 target_link_libraries(DrawImageExample PRIVATE glfw)
 target_link_libraries(DrawImageExample PRIVATE glm)
+target_link_libraries(DrawImageExample PRIVATE imgui)
 
 add_custom_command(
 	TARGET DrawImageExample 
