@@ -1,15 +1,14 @@
 #include "OpenGLImpl/ShaderImpl.h"
 
+#include "FmtFormat.h"
 #include "GraphicLib/Utilities/ShaderUtils.h"
 #include "InternalLogger.h"
 #include "Utils/ShaderImplUtils.h"
-#include "FmtFormat.h"
 #include <glad/glad.h>
-#include <vector>
 #include <string>
+#include <vector>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 void ShaderImpl::Initialise(unsigned int& id) const {
     id = glCreateProgram();
 }
@@ -22,11 +21,11 @@ void ShaderImpl::Unbind(unsigned int) const {
     glUseProgram(0);
 }
 
-bool ShaderImpl::Set(unsigned int id, const Span<ShaderData>& shadersData) const {
+bool ShaderImpl::Set(unsigned int id, const std::vector<ShaderData>& shadersData) const {
     std::vector<unsigned int> shaderIDs{};
-    shaderIDs.reserve(shadersData.Size());
+    shaderIDs.reserve(shadersData.size());
 
-    for (Span<ShaderData>::SizeType i = 0; i < shadersData.Size(); ++i) {
+    for (size_t i = 0; i < shadersData.size(); ++i) {
         const ShaderData& shaderData = shadersData[i];
         unsigned int shaderID{};
         if (!_createShader(shaderData, shaderID)) {
@@ -85,9 +84,9 @@ bool ShaderImpl::_createShader(const ShaderData& shaderData, unsigned int& id) c
         return false;
     }
 
-    const std::string& shaderContent = ShaderImplUtils::LoadFromFile(shaderData.FilePath.Data());
+    const std::string& shaderContent = ShaderImplUtils::LoadFromFile(shaderData.FilePath.c_str());
     if (shaderContent.empty()) {
-        const std::string& logText = fmt::format("Can't open shader at path {}", shaderData.FilePath.Data());
+        const std::string& logText = fmt::format("Can't open shader at path {}", shaderData.FilePath.c_str());
         LOG_INTERNAL_ERROR(logText.c_str());
         return false;
     }
@@ -114,6 +113,4 @@ bool ShaderImpl::_createShader(const ShaderData& shaderData, unsigned int& id) c
 
     return true;
 }
-
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

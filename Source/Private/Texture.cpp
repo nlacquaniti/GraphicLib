@@ -1,8 +1,8 @@
 #include "GraphicLib/Texture.h"
 
+#include "FmtFormat.h"
 #include "InternalLogger.h"
 #include "StbImage.h"
-#include "FmtFormat.h"
 #include <filesystem>
 #include <string>
 
@@ -15,8 +15,8 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 
 namespace GraphicLib {
 Texture::~Texture() {
-    stbi_image_free(_pixelData);
-    _pixelData = nullptr;
+    stbi_image_free(_data.PixelData);
+    _data.PixelData = nullptr;
     Delete();
 }
 
@@ -43,7 +43,7 @@ void Texture::Draw(unsigned int slot) {
     Bind();
 }
 
-void Texture::Set(const char* texturePath, const Span<TextureParam>& params) {
+void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params) {
     const std::filesystem::path filePath{texturePath};
     if (!std::filesystem::exists(filePath)) {
         const std::string& logText = fmt::format("File \"{}\" doesn't exist", texturePath);
@@ -51,30 +51,31 @@ void Texture::Set(const char* texturePath, const Span<TextureParam>& params) {
         return;
     }
 
-    _pixelData = stbi_load(std::filesystem::absolute(filePath).string().c_str(), &_data.Width, &_data.Height, reinterpret_cast<int*>(&_data.Channel), 0);
-    if (_pixelData == nullptr) {
+    unsigned char* pixelData =
+        stbi_load(std::filesystem::absolute(filePath).string().c_str(), &_data.Width, &_data.Height, reinterpret_cast<int*>(&_data.Channel), 0);
+    if (pixelData == nullptr) {
         const std::string& logText = fmt::format("Can't read pixel data for \"{}\"", texturePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
-    _data.PixelData.SetData(_pixelData, sizeof(unsigned char) * static_cast<unsigned long long>(_data.Width * _data.Height * static_cast<int>(_data.Channel)));
-    _data.FilePath.SetData({texturePath, strlen(texturePath) + 1});
+    _data.PixelData = pixelData;
+    _data.FilePath = std::move(texturePath);
     _data.Format = ETextureFormat::RGBA32F;
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
-    _data.Parameters.SetData(params);
+    _data.Parameters = std::move(params);
 
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
 }
 
-void Texture::Set(const SetTextureParams& setParams, const Span<TextureParam>& params) {
+void Texture::Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params) {
     _data.Width = setParams.Width;
     _data.Height = setParams.Height;
     _data.Channel = setParams.Channel;
     _data.Format = setParams.Format;
     _data.DataType = setParams.DataType;
-    _data.Parameters.SetData(params);
+    _data.Parameters = std::move(params);
 
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);

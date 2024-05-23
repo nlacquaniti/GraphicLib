@@ -1,8 +1,8 @@
 #pragma once
 
 #include "DLL_API.h"
-#include "Utilities/Array.h"
-#include "Utilities/Span.h"
+#include <string>
+#include <vector>
 
 namespace GraphicLib {
 enum class EShaderType : unsigned char {
@@ -15,13 +15,8 @@ enum class EShaderType : unsigned char {
     TESS_EVALUATION,
 };
 
-struct ShaderParam {
-    Span<char> FilePath{};
-    EShaderType Type{};
-};
-
 struct ShaderData {
-    Array<char> FilePath{};
+    std::string FilePath{};
     EShaderType Type{};
 };
 
@@ -34,17 +29,17 @@ public:
     void Initialise();
     void Bind() const;
     void Unbind() const;
-    void Set(const Span<ShaderParam>& params);
+    void Set(std::vector<ShaderData>&& data);
     void SetUniformBoolValue(const char* name, bool value) const;
     void SetUniformIntValue(const char* name, int value) const;
     void SetUniformFloatValue(const char* name, float value) const;
     void SetUniformMat4Value(const char* name, float* value) const;
     void Delete();
-    Span<ShaderData> GetData() const;
+    const std::vector<ShaderData>& GetData() const;
     unsigned int GetID() const;
 
 private:
+    std::vector<ShaderData> _data{};
     unsigned int _id{};
-    Array<ShaderData> _data{};
 };
 } // namespace GraphicLib

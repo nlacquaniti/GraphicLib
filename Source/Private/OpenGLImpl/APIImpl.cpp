@@ -5,8 +5,7 @@
 #include <glad/glad.h>
 #include <memory>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 APIImpl* APIImpl::_instance{};
 
 const APIImpl& APIImpl::Get() {
@@ -46,6 +45,4 @@ const FrameBufferImpl& APIImpl::GetFrameBufferImpl() const {
 const RenderBufferImpl& APIImpl::GetRenderBufferImpl() const {
     return _renderBufferImpl;
 }
-
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

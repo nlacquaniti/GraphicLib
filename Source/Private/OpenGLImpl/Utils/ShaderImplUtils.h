@@ -3,12 +3,10 @@
 #include "GraphicLib\Shader.h"
 #include <string>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 class ShaderImplUtils {
 public:
     static std::string LoadFromFile(const char* shaderPath);
     static bool ConvertShaderType(EShaderType type, unsigned int& outType);
 };
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

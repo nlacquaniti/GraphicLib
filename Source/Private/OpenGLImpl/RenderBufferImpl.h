@@ -2,8 +2,7 @@
 
 #include "GraphicLib/RenderBuffer.h"
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 class RenderBufferImpl {
 public:
     void Initialise(unsigned int& id) const;
@@ -12,5 +11,4 @@ public:
     void Set(unsigned id, const RenderBufferData& data) const;
     void Delete(unsigned int& id) const;
 };
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

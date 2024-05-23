@@ -1,13 +1,12 @@
 #include "OpenGLImpl/TextureImpl.h"
 
+#include "FmtFormat.h"
 #include "InternalLogger.h"
 #include "OpenGLImpl/Utils/TextureImplUtils.h"
-#include "FmtFormat.h"
-#include <string>
 #include <glad/glad.h>
+#include <string>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 unsigned int TextureImpl::_maxTextureSlots{0};
 
 void TextureImpl::Initialise(unsigned int& id) const {
@@ -20,6 +19,7 @@ void TextureImpl::Initialise(unsigned int& id) const {
         LOG_INTERNAL_NOTIFICATION(logText.c_str());
     }
     glGenTextures(1, &id);
+    _isMaxTextureSlotsInitialised = true;
 }
 
 void TextureImpl::Bind(unsigned int id, ETextureType type) const {
@@ -69,7 +69,7 @@ void TextureImpl::Set(unsigned int, const TextureData& textureData) const {
     }
 
     // Assign texture Parameters.
-    for (unsigned long long i{}; i < textureData.Parameters.Size(); ++i) {
+    for (unsigned long long i{}; i < textureData.Parameters.size(); ++i) {
         const TextureParam& param = textureData.Parameters[i];
 
         unsigned int paramName{};
@@ -85,13 +85,11 @@ void TextureImpl::Set(unsigned int, const TextureData& textureData) const {
         glTexParameteri(target, paramName, paramValue);
     }
 
-    glTexImage2D(target, 0, internalFormat, textureData.Width, textureData.Height, 0, textureFormat, textureDataType, textureData.PixelData.Data());
+    glTexImage2D(target, 0, internalFormat, textureData.Width, textureData.Height, 0, textureFormat, textureDataType, textureData.PixelData);
     glGenerateMipmap(target);
 }
 
 void TextureImpl::Delete(unsigned int& id, ETextureType) const {
     glDeleteTextures(1, &id);
 }
-
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

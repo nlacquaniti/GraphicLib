@@ -2,8 +2,7 @@
 
 #include <glad/glad.h>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 void VertexArrayImpl::Initialise(unsigned int& id) const {
     glGenVertexArrays(1, &id);
 }
@@ -27,6 +26,4 @@ void VertexArrayImpl::DrawVertices(unsigned int, int verticesCount) const {
 void VertexArrayImpl::Delete(unsigned int& id) const {
     glDeleteVertexArrays(1, &id);
 }
-
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

@@ -2,11 +2,9 @@
 
 #include "GraphicLib/RenderBuffer.h"
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 class RenderBufferImplUtils {
 public:
     static bool ConvertRenderBufferFormatToFrameBufferAttachment(ERenderBufferFormat format, unsigned int& outFrameBufferAttachment);
 };
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

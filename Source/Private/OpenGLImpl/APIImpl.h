@@ -8,8 +8,7 @@
 #include "VertexArrayImpl.h"
 #include "VertexBufferImpl.h"
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 class APIImpl {
 public:
     static const APIImpl& Get();
@@ -31,5 +30,4 @@ private:
     FrameBufferImpl _frameBufferImpl{};
     RenderBufferImpl _renderBufferImpl{};
 };
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

@@ -24,22 +24,22 @@ void VertexBuffer::Unbind() {
     GraphicAPI::Get().GetVertexBufferImpl().Unbind(_id);
 }
 
-void VertexBuffer::Set(const Span<float>& vertexData, const Span<int>& vertexAttributes) {
-    _vertexData.SetData(vertexData);
-    _vertexAttributes.SetData(vertexAttributes);
+void VertexBuffer::Set(std::vector<float>&& vertexData, std::vector<int>&& vertexAttributes) {
+    _vertexData = std::move(vertexData);
+    _vertexAttributes = std::move(vertexAttributes);
     Bind();
-    GraphicAPI::Get().GetVertexBufferImpl().Set(_id, vertexData, vertexAttributes);
+    GraphicAPI::Get().GetVertexBufferImpl().Set(_id, _vertexData, _vertexAttributes);
 }
 
 void VertexBuffer::Delete() {
     GraphicAPI::Get().GetVertexBufferImpl().Delete(_id);
 }
 
-Span<float> VertexBuffer::GetVertexData() const {
-    return {_vertexData.Data(), _vertexData.Size()};
+const std::vector<float>& VertexBuffer::GetVertexData() const {
+    return _vertexData;
 }
 
-Span<int> VertexBuffer::GetVertexAttributes() const {
-    return {_vertexAttributes.Data(), _vertexAttributes.Size()};
+const std::vector<int>& VertexBuffer::GetVertexAttributes() const {
+    return _vertexAttributes;
 }
 } // namespace GraphicLib

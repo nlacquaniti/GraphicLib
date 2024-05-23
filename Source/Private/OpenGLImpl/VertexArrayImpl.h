@@ -1,7 +1,6 @@
 #pragma once
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 class VertexArrayImpl {
 public:
     void Initialise(unsigned int& id) const;
@@ -11,5 +10,4 @@ public:
     void DrawVertices(unsigned int id, int verticesCount) const;
     void Delete(unsigned int& id) const;
 };
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

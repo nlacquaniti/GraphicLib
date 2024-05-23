@@ -2,8 +2,7 @@
 
 #include "GraphicLib/Texture.h"
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 class TextureImpl {
 public:
     void Initialise(unsigned int& id) const;
@@ -16,5 +15,4 @@ public:
 private:
     static unsigned int _maxTextureSlots;
 };
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

@@ -17,6 +17,7 @@ class IExternalLogSystem;
 class InternalLogger {
 public:
     struct Message {
+        Logger::Category category{};
         Logger::Severity severity{};
         const char* source{};
         const char* text{};

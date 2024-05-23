@@ -1,8 +1,8 @@
 #pragma once
 
 #include "GraphicLib/DLL_API.h"
-#include "Utilities/Array.h"
-#include "Utilities/Span.h"
+#include <string>
+#include <vector>
 
 namespace GraphicLib {
 enum class ETextureType : unsigned char {
@@ -86,9 +86,9 @@ struct SetTextureParams {
 };
 
 struct TextureData {
-    Array<char> FilePath{};
-    Array<TextureParam> Parameters{};
-    Span<unsigned char> PixelData{};
+    std::string FilePath{};
+    std::vector<TextureParam> Parameters{};
+    unsigned char* PixelData{};
     int Width{};
     int Height{};
     ETextureType Type{};
@@ -107,8 +107,8 @@ public:
     void Bind();
     void Unbind();
     void Draw(unsigned int slot);
-    void Set(const char* filePath, const Span<TextureParam>& params);
-    void Set(const SetTextureParams& setParams, const Span<TextureParam>& params);
+    void Set(std::string&& texturePath, std::vector<TextureParam>&& params);
+    void Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params);
     void Delete();
     const TextureData& GetData() const;
     unsigned int GetID() const;
@@ -116,7 +116,6 @@ public:
 private:
     void _setTextureFromFile();
     TextureData _data{};
-    unsigned char* _pixelData{};
     unsigned int _id;
 };
 } // namespace GraphicLib

@@ -4,8 +4,7 @@
 #include <glad/glad.h>
 #include <string>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 namespace {
 Logger::Severity OpenGLSeverityToInternal(GLenum openGLSeverity) {
     switch (openGLSeverity) {
@@ -73,13 +72,14 @@ void OpenGLLogSystem::_onAttach() {
         [](GLenum source, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void* userParam) {
             const auto* logSystem = static_cast<const OpenGLLogSystem*>(userParam);
 
-            InternalLogger::Message debugMessage{};
-            debugMessage.severity = OpenGLSeverityToInternal(severity);
-            debugMessage.source = DebugSourceToString(source);
-
             const std::string& logMessage = fmt::format("{}: {}", DebugTypeToString(type), message);
-            debugMessage.text = logMessage.c_str();
 
+            InternalLogger::Message debugMessage{
+                Logger::Category::GRAPHIC_API,
+                OpenGLSeverityToInternal(severity),
+                DebugSourceToString(source),
+                logMessage.c_str(),
+            };
             logSystem->GetMessageLogCallback()(debugMessage);
         },
         this);
@@ -89,5 +89,4 @@ void OpenGLLogSystem::_onDetach() {
     glDisable(GL_DEBUG_OUTPUT);
     glDebugMessageCallback(nullptr, nullptr);
 }
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

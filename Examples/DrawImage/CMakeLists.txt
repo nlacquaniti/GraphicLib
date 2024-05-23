@@ -1,3 +1,5 @@
+set(IMGUI_ROOT_DIR ${FETCHCONTENT_BASE_DIR}/imgui-src)
+
 add_executable(DrawImageExample
 	main.cpp
 
@@ -14,25 +16,25 @@ add_executable(DrawImageExample
 	../Common/Window/Private/InputImplUtils.cpp
 	../Common/Window/Private/Utils/InputUtils.cpp
 
-	../Vendors/imgui/imgui.h
-	../Vendors/imgui/imgui.cpp
-	../Vendors/imgui/imgui_demo.cpp
-	../Vendors/imgui/imgui_draw.cpp
-	../Vendors/imgui/imgui_internal.h
-	../Vendors/imgui/imgui_tables.cpp
-	../Vendors/imgui/imgui_widgets.cpp
-	../Vendors/imgui/imstb_rectpack.h
-	../Vendors/imgui/imstb_textedit.h
-	../Vendors/imgui/imstb_truetype.h
-	../Vendors/imgui/backends/imgui_impl_glfw.h
-	../Vendors/imgui/backends/imgui_impl_glfw.cpp
+  ${IMGUI_ROOT_DIR}/imgui.h
+	${IMGUI_ROOT_DIR}/imgui.cpp
+	${IMGUI_ROOT_DIR}/imgui_demo.cpp
+	${IMGUI_ROOT_DIR}/imgui_draw.cpp
+	${IMGUI_ROOT_DIR}/imgui_internal.h
+	${IMGUI_ROOT_DIR}/imgui_tables.cpp
+	${IMGUI_ROOT_DIR}/imgui_widgets.cpp
+	${IMGUI_ROOT_DIR}/imstb_rectpack.h
+	${IMGUI_ROOT_DIR}/imstb_textedit.h
+	${IMGUI_ROOT_DIR}/imstb_truetype.h
+	${IMGUI_ROOT_DIR}/backends/imgui_impl_glfw.h
+	${IMGUI_ROOT_DIR}/backends/imgui_impl_glfw.cpp
 )
 
 target_include_directories(DrawImageExample PRIVATE
 	../Common/Window/Public
 	../Common/Window/Private
 	../Vendors
-	../Vendors/imgui
+    ${IMGUI_ROOT_DIR}/
 )
 
 if(GL_ENABLE_OPENGL)
@@ -43,8 +45,8 @@ if(GL_ENABLE_OPENGL)
 		../Vendors/glad/include/glad/glad.h
 		../Vendors/glad/include/KHR/khrplatform.h
 		../Vendors/glad/src/glad.c
-		../Vendors/imgui/backends/imgui_impl_opengl3.h
-		../Vendors/imgui/backends/imgui_impl_opengl3.cpp
+		${IMGUI_ROOT_DIR}/backends/imgui_impl_opengl3.h
+		${IMGUI_ROOT_DIR}/backends/imgui_impl_opengl3.cpp
 	)
 
 	target_include_directories(DrawImageExample PRIVATE
@@ -54,12 +56,13 @@ if(GL_ENABLE_OPENGL)
 	target_compile_definitions(DrawImageExample PRIVATE OPENGL_IMPL)
 endif()
 
+target_compile_definitions(DrawImageExample PRIVATE EXEC_PATH="${CMAKE_CURRENT_BINARY_DIR}/")
+
 add_dependencies(DrawImageExample ${PROJECT_NAME})
 target_link_libraries(DrawImageExample PRIVATE ${PROJECT_NAME})
 
 target_link_libraries(DrawImageExample PRIVATE glfw)
 target_link_libraries(DrawImageExample PRIVATE glm)
-target_link_libraries(DrawImageExample PRIVATE imgui)
 
 add_custom_command(
 	TARGET DrawImageExample 

@@ -1,9 +1,9 @@
 #include "OpenGLImpl/IndexBufferImpl.h"
+#include "GraphicLib/IndexBuffer.h"
 
 #include <glad/glad.h>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 void IndexBufferImpl::Initialise(unsigned int& id) const {
     glGenBuffers(1, &id);
 }
@@ -16,9 +16,9 @@ void IndexBufferImpl::Unbind(unsigned int) const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void IndexBufferImpl::Set(unsigned int id, const Span<IndexBufferDataElement>& data) const {
+void IndexBufferImpl::Set(unsigned int id, const std::vector<IndexBufferDataElement>& data) const {
     Bind(id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<long long>(data.SizeBytes()), data.Data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<long long>(data.size() * sizeof(IndexBufferDataElement)), data.data(), GL_STATIC_DRAW);
 }
 
 void IndexBufferImpl::Delete(unsigned int& id) const {
@@ -26,5 +26,4 @@ void IndexBufferImpl::Delete(unsigned int& id) const {
     glDeleteBuffers(1, &id);
 }
 
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

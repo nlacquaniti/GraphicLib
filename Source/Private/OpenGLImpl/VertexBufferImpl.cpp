@@ -2,8 +2,7 @@
 
 #include <glad/glad.h>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 void VertexBufferImpl::Initialise(unsigned int& id) const {
     glGenBuffers(1, &id);
 }
@@ -16,16 +15,16 @@ void VertexBufferImpl::Unbind(unsigned int) const {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBufferImpl::Set(unsigned int, const Span<float>& data, const Span<int>& attributes) const {
-    glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(data.SizeBytes()), data.Data(), GL_STATIC_DRAW);
+void VertexBufferImpl::Set(unsigned int, const std::vector<float>& data, const std::vector<int>& attributes) const {
+    glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(data.size() * sizeof(float)), data.data(), GL_STATIC_DRAW);
 
     int numberOfAttributes{};
-    for (unsigned int i{}; i < attributes.Size(); ++i) {
+    for (unsigned int i{}; i < attributes.size(); ++i) {
         numberOfAttributes += attributes[i];
     }
 
     int attributesSum{};
-    for (unsigned int i{}; i < attributes.Size(); ++i) {
+    for (unsigned int i{}; i < attributes.size(); ++i) {
         const int attribute{attributes[i]};
         constexpr unsigned long long sizeOfFloat{sizeof(float)};
         glVertexAttribPointer(i, attribute, GL_FLOAT, GL_FALSE, numberOfAttributes * static_cast<int>(sizeOfFloat),
@@ -38,6 +37,4 @@ void VertexBufferImpl::Set(unsigned int, const Span<float>& data, const Span<int
 void VertexBufferImpl::Delete(unsigned int& id) const {
     glDeleteBuffers(1, &id);
 }
-
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

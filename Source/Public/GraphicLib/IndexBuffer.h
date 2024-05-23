@@ -1,8 +1,7 @@
 #pragma once
 
 #include "DLL_API.h"
-#include "GraphicLib/Utilities/Array.h"
-#include "GraphicLib/Utilities/Span.h"
+#include <vector>
 
 namespace GraphicLib {
 struct IndexBufferDataElement {
@@ -20,12 +19,12 @@ public:
     void Initialise();
     void Bind();
     void Unbind();
-    void Set(const Span<IndexBufferDataElement>& indices);
+    void Set(std::vector<IndexBufferDataElement>&& indices);
     void Delete();
-    Span<IndexBufferDataElement> Get() const;
+    const std::vector<IndexBufferDataElement>& Get() const;
 
 private:
-    Array<IndexBufferDataElement> _indices{};
+    std::vector<IndexBufferDataElement> _indices{};
     unsigned int _id{};
 };
 } // namespace GraphicLib

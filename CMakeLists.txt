@@ -4,6 +4,7 @@ project(GraphicLib)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
+# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(GL_ENABLE_OPENGL "Use OpenGL has a graphic library" ON)
 option(GL_ENABLE_EXAMPLES "Build example projects" OFF)
@@ -20,8 +21,6 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Public/${PROJECT_NAME}/Texture.h
 	Source/Public/${PROJECT_NAME}/FrameBuffer.h
 	Source/Public/${PROJECT_NAME}/RenderBuffer.h
-	Source/Public/${PROJECT_NAME}/Utilities/Array.h
-	Source/Public/${PROJECT_NAME}/Utilities/Span.h
 	Source/Public/${PROJECT_NAME}/Utilities/TextureUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/RenderBufferUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/ShaderUtils.h
@@ -121,6 +120,9 @@ elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 		-Wno-c++98-compat-pedantic
 		-Wno-unsafe-buffer-usage
 	)
+if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebInfo")
+  add_compile_options(-gdwarf)
+endif()
 endif()
 
 target_link_libraries(

@@ -1,13 +1,13 @@
 #include "OpenGLImpl/RenderBufferImpl.h"
 
+#include "FmtFormat.h"
 #include "GraphicLib/Utilities/RenderBufferUtils.h"
 #include "InternalLogger.h"
-#include "FmtFormat.h"
 #include <glad/glad.h>
 #include <string>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+
+namespace GraphicLib::OpenGLImpl {
 namespace {
 bool ConvertRenderBufferFormat(ERenderBufferFormat format, unsigned int& outFormat) {
     switch (format) {
@@ -59,5 +59,4 @@ void RenderBufferImpl::Set(unsigned, const RenderBufferData& data) const {
 void RenderBufferImpl::Delete(unsigned int& id) const {
     glDeleteRenderbuffers(1, &id);
 }
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

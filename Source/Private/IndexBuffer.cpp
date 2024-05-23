@@ -1,7 +1,5 @@
 #include "GraphicLib/IndexBuffer.h"
 
-#include "InternalLogger.h"
-
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
 using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
@@ -26,17 +24,17 @@ void IndexBuffer::Unbind() {
     GraphicAPI::Get().GetIndexBufferImpl().Unbind(_id);
 }
 
-void IndexBuffer::Set(const Span<IndexBufferDataElement>& indices) {
-    _indices.SetData(indices);
+void IndexBuffer::Set(std::vector<IndexBufferDataElement>&& indices) {
+    _indices = std::move(indices);
     Bind();
-    GraphicAPI::Get().GetIndexBufferImpl().Set(_id, indices);
+    GraphicAPI::Get().GetIndexBufferImpl().Set(_id, _indices);
 }
 
 void IndexBuffer::Delete() {
     GraphicAPI::Get().GetIndexBufferImpl().Delete(_id);
 }
 
-Span<IndexBufferDataElement> IndexBuffer::Get() const {
-    return {_indices.Data(), _indices.Size()};
+const std::vector<IndexBufferDataElement>& IndexBuffer::Get() const {
+    return _indices;
 }
 } // namespace GraphicLib

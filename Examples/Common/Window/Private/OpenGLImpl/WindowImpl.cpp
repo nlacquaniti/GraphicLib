@@ -4,11 +4,13 @@
 #define GLFW_INCLUDE_NONE
 #include <GLFW/glfw3.h>
 
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/backends/imgui_impl_opengl3.h>
-#include <imgui/imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <backends/imgui_impl_opengl3.h>
+#include <imgui.h>
 
 #include <GraphicLib/Texture.h>
+
+#include <vector>
 
 CallbackHandler<void (*)(const char*, void*)> WindowImpl::OnDebugLog{};
 CallbackHandler<void (*)(float, void*)> WindowImpl::OnUpdate{};
@@ -57,7 +59,7 @@ bool WindowImpl::Create(const char* title) {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
-    io.FontGlobalScale = 2.5f;
+    io.FontGlobalScale = 1.0f;
     io.ConfigViewportsNoAutoMerge = true;
     io.ConfigViewportsNoTaskBarIcon = true;
 
@@ -202,13 +204,13 @@ void WindowImpl::_setFrameBufferConfiguration() {
     frameBufferTextureData.DataType = GraphicLib::ETextureDataType::UNSIGNED_BYTE;
     frameBufferTextureData.Width = windowWidth;
     frameBufferTextureData.Height = windowHeight;
-    const GraphicLib::TextureParam frameBufferTextureParams[] = {
+    std::vector<GraphicLib::TextureParam> frameBufferTextureParams{
         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
     };
 
     _windowFrameBuffer.GetTexture().Bind();
-    _windowFrameBuffer.GetTexture().Set(frameBufferTextureData, frameBufferTextureParams);
+    _windowFrameBuffer.GetTexture().Set(frameBufferTextureData, std::move(frameBufferTextureParams));
 
     // Frame buffer render buffer creation.
     _windowFrameBuffer.GetRenderBuffer().Bind();

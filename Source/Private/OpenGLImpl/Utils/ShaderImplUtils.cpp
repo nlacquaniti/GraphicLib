@@ -1,14 +1,14 @@
 #include "OpenGLImpl/Utils/ShaderImplUtils.h"
 
+#include "FmtFormat.h"
 #include "GraphicLib/Utilities/ShaderUtils.h"
 #include "InternalLogger.h"
-#include "FmtFormat.h"
 #include <glad/glad.h>
 #include <fstream>
 #include <string>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+
+namespace GraphicLib::OpenGLImpl {
 std::string ShaderImplUtils::LoadFromFile(const char* shaderPath) {
     std::ifstream file{shaderPath};
     if (!file.is_open()) {
@@ -50,6 +50,4 @@ bool ShaderImplUtils::ConvertShaderType(EShaderType type, unsigned int& outType)
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
-
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

@@ -1,16 +1,14 @@
 #pragma once
 
-#include "GraphicLib/Utilities/Span.h"
+#include <vector>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 class VertexBufferImpl {
 public:
     void Initialise(unsigned int& id) const;
     void Bind(unsigned int id) const;
     void Unbind(unsigned int id) const;
-    void Set(unsigned int id, const Span<float>& data, const Span<int>& attributes) const;
+    void Set(unsigned int id, const std::vector<float>& data, const std::vector<int>& attributes) const;
     void Delete(unsigned int& id) const;
 };
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

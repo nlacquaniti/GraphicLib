@@ -1,13 +1,13 @@
 #include "OpenGLImpl/Utils/RenderBufferImplUtils.h"
 
+#include "FmtFormat.h"
 #include "GraphicLib/Utilities/RenderBufferUtils.h"
 #include "InternalLogger.h"
-#include "FmtFormat.h"
 #include <glad/glad.h>
 #include <string>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+
+namespace GraphicLib::OpenGLImpl {
 bool RenderBufferImplUtils::ConvertRenderBufferFormatToFrameBufferAttachment(ERenderBufferFormat format, unsigned int& outFrameBufferAttachment) {
     switch (format) {
         case ERenderBufferFormat::DEPTH16:
@@ -29,5 +29,4 @@ bool RenderBufferImplUtils::ConvertRenderBufferFormatToFrameBufferAttachment(ERe
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

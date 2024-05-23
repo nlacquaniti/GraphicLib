@@ -22,8 +22,8 @@ public:
     RenderBuffer& GetRenderBuffer();
 
 private:
-    unsigned int _id{};
-    Texture _texture{};
     RenderBuffer _renderBuffer{};
+    Texture _texture{};
+    unsigned int _id{};
 };
 } // namespace GraphicLib

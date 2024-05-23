@@ -25,9 +25,9 @@ void InternalLogger::SetSeverity(Logger::Severity severity) {
 }
 
 void InternalLogger::LogMessage(const Message& message) {
-    // Check if the message can be logged.
     if (message.severity <= _severity) {
         Logger::Message debuggerMessage{
+            message.category,
             _severity,
             message.source,
             message.text,
@@ -38,12 +38,11 @@ void InternalLogger::LogMessage(const Message& message) {
 }
 
 void InternalLogger::LogInternalNotification(const char* source, const char* text) {
-    LogMessage({Logger::Severity::NOTIFICATION, source, text});
+    LogMessage(Message{Logger::Category::INTERNAL, Logger::Severity::NOTIFICATION, source, text});
 }
 
 void InternalLogger::LogInternalError(const char* source, const char* text) {
-
-    LogMessage({Logger::Severity::HIGH, source, text});
+    LogMessage(Message{Logger::Category::INTERNAL, Logger::Severity::HIGH, source, text});
 }
 
 std::size_t InternalLogger::AttachExternalLogSystem(std::unique_ptr<IExternalLogSystem> externalLogSystem) {

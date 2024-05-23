@@ -1,8 +1,7 @@
 #pragma once
 
 #include "DLL_API.h"
-#include "GraphicLib/Utilities/Array.h"
-#include "GraphicLib/Utilities/Span.h"
+#include <vector>
 
 namespace GraphicLib {
 class DLL_API VertexBuffer {
@@ -14,14 +13,14 @@ public:
     void Initialise();
     void Bind();
     void Unbind();
-    void Set(const Span<float>& vertexData, const Span<int>& vertexAttributes);
+    void Set(std::vector<float>&& vertexData, std::vector<int>&& vertexAttributes);
     void Delete();
-    Span<float> GetVertexData() const;
-    Span<int> GetVertexAttributes() const;
+    const std::vector<float>& GetVertexData() const;
+    const std::vector<int>& GetVertexAttributes() const;
 
 private:
-    Array<float> _vertexData{};
-    Array<int> _vertexAttributes{};
+    std::vector<float> _vertexData{};
+    std::vector<int> _vertexAttributes{};
     unsigned int _id{};
 };
 } // namespace GraphicLib

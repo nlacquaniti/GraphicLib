@@ -1,13 +1,13 @@
 #include "OpenGLImpl/Utils/TextureImplUtils.h"
 
+#include "FmtFormat.h"
 #include "GraphicLib/Utilities/TextureUtils.h"
 #include "InternalLogger.h"
-#include "FmtFormat.h"
 #include <glad/glad.h>
 #include <string>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+
+namespace GraphicLib::OpenGLImpl {
 bool TextureImplUtils::ConvertTextureType(ETextureType type, unsigned int& outType) {
     switch (type) {
         case ETextureType::TEXTURE_2D:
@@ -230,6 +230,4 @@ bool TextureImplUtils::ConvertTextureFormatToFrameBufferAttachment(ETextureForma
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
-
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

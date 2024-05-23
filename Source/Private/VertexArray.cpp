@@ -37,8 +37,8 @@ void VertexArray::Unbind() {
 }
 
 void VertexArray::Draw() {
-    if (_indexBuffer.Get().Size() > 0) {
-        const unsigned long long trianglesCount = _indexBuffer.Get().Size() * 3;
+    if (_indexBuffer.Get().size() > 0) {
+        const unsigned long long trianglesCount = _indexBuffer.Get().size() * 3;
         if (static_cast<long long>(trianglesCount) > std::numeric_limits<int>::max()) {
             LOG_INTERNAL_ERROR("Triangles count exceeded the max number");
             return;
@@ -47,11 +47,11 @@ void VertexArray::Draw() {
     }
     else {
         unsigned long long attributesCount{};
-        for (unsigned long long i{}; i < _vertexBuffer.GetVertexAttributes().Size(); ++i) {
+        for (unsigned long long i{}; i < _vertexBuffer.GetVertexAttributes().size(); ++i) {
             attributesCount += static_cast<unsigned long long>(_vertexBuffer.GetVertexAttributes()[i]);
         }
 
-        const unsigned long long verticesCount = _vertexBuffer.GetVertexData().Size() / attributesCount;
+        const unsigned long long verticesCount = _vertexBuffer.GetVertexData().size() / attributesCount;
         if (static_cast<long long>(verticesCount) > std::numeric_limits<int>::max()) {
             LOG_INTERNAL_ERROR("Vertices count exceeded the max number");
             return;

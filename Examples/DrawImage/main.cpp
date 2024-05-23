@@ -1,4 +1,3 @@
-#include "Utils/InputUtils.h"
 #include "Window/Input.h"
 #include "Window/Window.h"
 
@@ -8,16 +7,15 @@
 #include <GraphicLib/Logger.h>
 #include <GraphicLib/Shader.h>
 #include <GraphicLib/Texture.h>
-#include <GraphicLib/Utilities/Span.h>
 #include <GraphicLib/VertexArray.h>
 #include <GraphicLib/VertexBuffer.h>
-#include <imgui/backends/imgui_impl_glfw.h>
-#include <imgui/imgui.h>
+#include <backends/imgui_impl_glfw.h>
+#include <imgui.h>
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
+
+#include <windows.h>
 #include <iostream>
-#include <memory>
-#include <string>
 
 struct Transform {
     glm::vec3 Position{};
@@ -25,14 +23,20 @@ struct Transform {
     glm::vec3 Scale{1, 1, 1};
     glm::mat4 Matrix() const {
         glm::mat4 model{1.0f};
-        model = glm::scale(model, Scale);
+        model = glm::translate(model, Position);
         model = glm::rotate(model, glm::radians(Rotation.x), {1, 0, 0});
         model = glm::rotate(model, glm::radians(Rotation.y), {0, 1, 0});
         model = glm::rotate(model, glm::radians(Rotation.z), {0, 0, 1});
-        model = glm::translate(model, Position);
+        model = glm::scale(model, Scale);
         return model;
     }
 };
+
+static std::string GetResourceFullPath(const char* resourcePath) {
+    std::string output{EXEC_PATH};
+    output.append(resourcePath);
+    return output;
+}
 
 class Application {
 public:
@@ -58,16 +62,13 @@ private:
     GraphicLib::Shader _gridShader{};
 
     // Box 1
-    Transform _box{};
-
-    // Box 2
-    Transform _box1{{1.2, 0, 0}};
+    Transform _box{glm::vec3{0.f, 0.5f, 4.f}, glm::vec3{0.f, 22.f, 0.f}};
 
     // Camera data
-    glm::vec3 _cameraPos{0, 0, 0};
+    glm::vec3 _cameraPos{0.f, 2.f, 0.f};
     glm::vec3 _cameraDir{};
     glm::vec3 _cameraDirRight{};
-    glm::vec3 _cameraRot{0, 0, 0};
+    glm::vec3 _cameraRot{-20.f, 90.f, 0};
     float _cameraMovementSpeed{5.0f};
     float _cameraRotSpeed{100.0f};
     float _cameraFOV{45.0f};
@@ -83,7 +84,7 @@ private:
 };
 
 void Application::Initialise() {
-    GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::MEDIUM);
+    GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::NOTIFICATION);
     GraphicLib::Logger::SetCallback(
         [](const GraphicLib::Logger::Message& message) {
             std::cout << "[" << message.source << "]";
@@ -128,7 +129,7 @@ void Application::Initialise() {
 
     _shouldUpdate = true;
 
-    const float vertices[] = {
+    std::vector<float> vertices{
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, //
         0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  //
         0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
@@ -166,20 +167,12 @@ void Application::Initialise() {
         -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,   //
         -0.5f, 0.5f, -0.5f, 0.0f, 1.0f   //
     };
-    const int vertexAttributes[] = {3, 2};
-
-    const GraphicLib::IndexBufferDataElement indices[] = {
-        // note that we start from 0!
-        {0, 1, 3}, // first triangle
-        {1, 2, 3}, // second triangle
-    };
+    std::vector<int> vertexAttributes{3, 2};
 
     _boxVA.Initialise();
     _boxVA.Bind();
-    _boxVA.GetVertexBuffer().Set({vertices}, {vertexAttributes});
-    //_boxVA.GetIndexBuffer().Set({indices});
-
-    const GraphicLib::TextureParam textureParams[] = {
+    _boxVA.GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
+    std::vector<GraphicLib::TextureParam> textureParams{
         {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
         {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
@@ -187,19 +180,18 @@ void Application::Initialise() {
     };
     _boxTexture.Initialise(GraphicLib::ETextureType::TEXTURE_2D);
     _boxTexture.Bind();
-    _boxTexture.Set("Resources/TextureTest.png", {textureParams});
-
-    const GraphicLib::ShaderParam boxShaderParams[] = {
-        {GraphicLib::Span<char>("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
-        {GraphicLib::Span<char>("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
+    _boxTexture.Set(GetResourceFullPath("Resources/TextureTest.png"), std::move(textureParams));
+    std::vector<GraphicLib::ShaderData> boxShaderParams{
+        {GetResourceFullPath("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
+        {GetResourceFullPath("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
     _boxShader.Initialise();
-    _boxShader.Set(boxShaderParams);
+    _boxShader.Set(std::move(boxShaderParams));
     _boxShader.Bind();
     _boxShader.SetUniformIntValue("uTexture", 0);
     _boxShader.Unbind();
 
-    const float gridVertices[] = {
+    std::vector<float> gridVertices{
         1, 1, 0,   //
         -1, -1, 0, //
         -1, 1, 0,  //
@@ -207,17 +199,16 @@ void Application::Initialise() {
         1, 1, 0,   //
         1, -1, 0,  //
     };
-    const int gridVertexAttributes[] = {3};
+    std::vector<int> gridVertexAttributes{3};
     _gridVA.Initialise();
     _gridVA.Bind();
-    _gridVA.GetVertexBuffer().Set({gridVertices}, {gridVertexAttributes});
-
-    const GraphicLib::ShaderParam gridShaderParams[] = {
-        {GraphicLib::Span<char>("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
-        {GraphicLib::Span<char>("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
+    _gridVA.GetVertexBuffer().Set(std::move(gridVertices), std::move(gridVertexAttributes));
+    std::vector<GraphicLib::ShaderData> gridShaderParams{
+        {GetResourceFullPath("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
+        {GetResourceFullPath("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
     _gridShader.Initialise();
-    _gridShader.Set(gridShaderParams);
+    _gridShader.Set(std::move(gridShaderParams));
 }
 
 void Application::Start() {
@@ -239,7 +230,7 @@ void Application::Update(float deltaTime) {
     _cameraDir.x = yawCos * pitchCos;
     _cameraDir.y = pitchSin;
     _cameraDir.z = yawSin * pitchCos;
-    glm::normalize(_cameraDir);
+    _cameraDir = glm::normalize(_cameraDir);
     _cameraDirRight = glm::normalize(glm::cross(_cameraDir, {0, 1, 0}));
 
     if (_input.IsKeyPressed(EInputKey::W)) {
@@ -327,6 +318,7 @@ void Application::Render() {
     _boxVA.Bind();
     _boxTexture.Draw(0);
     _boxVA.Draw();
+
     // MVP = PV * _box1.Matrix();
     //_boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
     //_boxVA.Draw();
@@ -336,10 +328,10 @@ void Application::RenderDebug() {
     static bool show_demo_window = true;
 
     const ImGuiViewport* mainViewport = ImGui::GetMainViewport();
-    ImGui::DockSpaceOverViewport(mainViewport, ImGuiDockNodeFlags_PassthruCentralNode);
+    ImGui::DockSpaceOverViewport(mainViewport->ID, mainViewport, ImGuiDockNodeFlags_PassthruCentralNode);
 
     if (show_demo_window) {
-         //ImGui::ShowDemoWindow(&show_demo_window);
+        // ImGui::ShowDemoWindow(&show_demo_window);
     }
 
     ImGui::Begin("Scene");
@@ -355,7 +347,6 @@ void Application::RenderDebug() {
         );
     }
     ImGui::End();
-
 
     ImGui::Begin("Transforms");
     {

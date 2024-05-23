@@ -2,8 +2,7 @@
 
 #include "GraphicLib/Texture.h"
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+namespace GraphicLib::OpenGLImpl {
 class TextureImplUtils {
 public:
     static bool ConvertTextureType(ETextureType type, unsigned int& outType);
@@ -14,5 +13,4 @@ public:
     static bool ConvertTextureDataType(ETextureDataType dataType, unsigned int& outDataType);
     static bool ConvertTextureFormatToFrameBufferAttachment(ETextureFormat textureFormat, unsigned int& outFrameBufferAttachment);
 };
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

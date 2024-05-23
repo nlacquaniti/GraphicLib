@@ -1,14 +1,14 @@
 #include "OpenGLImpl/FrameBufferImpl.h"
 
-#include "GraphicLib/Texture.h"
 #include "GraphicLib/RenderBuffer.h"
-#include "Utils/TextureImplUtils.h"
-#include "Utils/RenderBufferImplUtils.h"
+#include "GraphicLib/Texture.h"
 #include "InternalLogger.h"
+#include "Utils/RenderBufferImplUtils.h"
+#include "Utils/TextureImplUtils.h"
 #include <glad/glad.h>
 
-namespace GraphicLib {
-namespace OpenGLImpl {
+
+namespace GraphicLib::OpenGLImpl {
 void FrameBufferImpl::Initialise(unsigned int& id) const {
     glGenFramebuffers(1, &id);
 }
@@ -50,6 +50,4 @@ void FrameBufferImpl::Set(unsigned int, const Texture& frameBufferTexture, const
 void FrameBufferImpl::Delete(unsigned int& id) const {
     glDeleteFramebuffers(1, &id);
 }
-
-} // namespace OpenGLImpl
-} // namespace GraphicLib
+} // namespace GraphicLib::OpenGLImpl

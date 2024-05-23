@@ -1,7 +1,7 @@
 #include "GraphicLib/Shader.h"
 
-#include "InternalLogger.h"
 #include "FmtFormat.h"
+#include "InternalLogger.h"
 #include <string>
 
 #ifdef OPENGL_IMPL
@@ -28,29 +28,22 @@ void Shader::Unbind() const {
     GraphicAPI::Get().GetShaderImpl().Unbind(_id);
 }
 
-void Shader::Set(const Span<ShaderParam>& params) {
-    _data.Reserve(params.Size());
-    for (Span<ShaderParam>::SizeType i = 0; i < params.Size(); ++i) {
-        const ShaderParam& shader = params[i];
+void Shader::Set(std::vector<ShaderData>&& data) {
+    _data = std::move(data);
+    for (size_t i = 0; i < _data.size(); ++i) {
+        const ShaderData& shader = _data[i];
         if (shader.Type == EShaderType::NONE) {
             const std::string& logText = fmt::format("Shader.Type is NONE at index {}", i);
             LOG_INTERNAL_ERROR(logText.c_str());
-            continue;
         }
 
-        if (shader.FilePath.IsEmpty()) {
+        if (shader.FilePath.empty()) {
             const std::string& logText = fmt::format("Shader.FilePath is empty at index {}", i);
             LOG_INTERNAL_ERROR(logText.c_str());
-            continue;
         }
-
-        ShaderData shaderData{};
-        shaderData.Type = shader.Type;
-        shaderData.FilePath.SetData(shader.FilePath);
-        _data.Add(shaderData);
     }
 
-    GraphicAPI::Get().GetShaderImpl().Set(_id, GetData());
+    GraphicAPI::Get().GetShaderImpl().Set(_id, _data);
 }
 
 void Shader::SetUniformBoolValue(const char* name, bool value) const {
@@ -77,8 +70,8 @@ void Shader::Delete() {
     GraphicAPI::Get().GetShaderImpl().Delete(_id);
 }
 
-Span<ShaderData> Shader::GetData() const {
-    return { _data.Data(), _data.Size() };
+const std::vector<ShaderData>& Shader::GetData() const {
+    return _data;
 }
 
 unsigned int Shader::GetID() const {

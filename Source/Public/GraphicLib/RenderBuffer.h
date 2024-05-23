@@ -33,7 +33,7 @@ public:
     const RenderBufferData& GetData() const;
 
 private:
+    RenderBufferData _data{};
     unsigned int _id{};
-    RenderBufferData _data;
 };
 } // namespace GraphicLib
