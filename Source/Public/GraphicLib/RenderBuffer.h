@@ -21,16 +21,18 @@ struct RenderBufferData {
 class DLL_API RenderBuffer {
 public:
     RenderBuffer() = default;
+    RenderBuffer(RenderBuffer&&) = default;
+    RenderBuffer& operator=(RenderBuffer&&) = default;
+    RenderBuffer(const RenderBuffer&) = delete;
+    RenderBuffer& operator=(const RenderBuffer&) = delete;
     ~RenderBuffer();
-    RenderBuffer(const RenderBuffer&) = default;
-    RenderBuffer& operator=(const RenderBuffer&) = default;
     void Initialise();
-    void Bind();
-    void Unbind();
+    void Bind() const;
+    void Unbind() const;
     void Set(const RenderBufferData& data);
     void Delete();
-    unsigned int GetID() const;
-    const RenderBufferData& GetData() const;
+    [[nodiscard]] unsigned int GetID() const;
+    [[nodiscard]] const RenderBufferData& GetData() const;
 
 private:
     RenderBufferData _data{};

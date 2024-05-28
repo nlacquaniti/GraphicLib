@@ -16,15 +16,17 @@ enum class EShaderType : unsigned char {
 };
 
 struct ShaderData {
-    std::string FilePath{};
+    std::string FilePath;
     EShaderType Type{};
 };
 
 class DLL_API Shader {
 public:
     Shader() = default;
-    Shader(const Shader& other) = default;
-    Shader& operator=(const Shader& other) = default;
+    Shader(Shader&&) = default;
+    Shader& operator=(Shader&&) = default;
+    Shader(const Shader&) = delete;
+    Shader& operator=(const Shader&) = delete;
     ~Shader();
     void Initialise();
     void Bind() const;
@@ -35,11 +37,11 @@ public:
     void SetUniformFloatValue(const char* name, float value) const;
     void SetUniformMat4Value(const char* name, float* value) const;
     void Delete();
-    const std::vector<ShaderData>& GetData() const;
-    unsigned int GetID() const;
+    [[nodiscard]] const std::vector<ShaderData>& GetData() const;
+    [[nodiscard]] unsigned int GetID() const;
 
 private:
-    std::vector<ShaderData> _data{};
+    std::vector<ShaderData> _data;
     unsigned int _id{};
 };
 } // namespace GraphicLib

@@ -9,10 +9,10 @@
 namespace GraphicLib::OpenGLImpl {
 unsigned int TextureImpl::_maxTextureSlots{0};
 
-void TextureImpl::Initialise(unsigned int& id) const {
+void TextureImpl::Initialise(unsigned int& id) {
     static bool _isMaxTextureSlotsInitialised = false;
     if (!_isMaxTextureSlotsInitialised) {
-        int maxTextureSlots;
+        int maxTextureSlots{};
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureSlots);
         _maxTextureSlots = static_cast<unsigned int>(maxTextureSlots);
         const std::string& logText = fmt::format("Max number of texture slots {}", _maxTextureSlots);
@@ -22,7 +22,7 @@ void TextureImpl::Initialise(unsigned int& id) const {
     _isMaxTextureSlotsInitialised = true;
 }
 
-void TextureImpl::Bind(unsigned int id, ETextureType type) const {
+void TextureImpl::Bind(unsigned int id, ETextureType type) {
     unsigned int target{};
     if (!TextureImplUtils::ConvertTextureType(type, target)) {
         return;
@@ -30,7 +30,7 @@ void TextureImpl::Bind(unsigned int id, ETextureType type) const {
     glBindTexture(target, id);
 }
 
-void TextureImpl::Unbind(unsigned int, ETextureType type) const {
+void TextureImpl::Unbind(unsigned int /*unused*/, ETextureType type) {
     unsigned int target{};
     if (!TextureImplUtils::ConvertTextureType(type, target)) {
         return;
@@ -38,7 +38,7 @@ void TextureImpl::Unbind(unsigned int, ETextureType type) const {
     glBindTexture(target, 0);
 }
 
-void TextureImpl::Draw(unsigned int, ETextureType, unsigned int slot) const {
+void TextureImpl::ActivateUnit(unsigned int /*unused*/, ETextureType /*unused*/, unsigned int slot) {
     if (slot > _maxTextureSlots) {
         const std::string& logText = fmt::format("Provided texture slot {} exceeded the max number of texture slots {}", slot, _maxTextureSlots);
         LOG_INTERNAL_ERROR(logText.c_str());
@@ -47,7 +47,7 @@ void TextureImpl::Draw(unsigned int, ETextureType, unsigned int slot) const {
     glActiveTexture(GL_TEXTURE0 + slot);
 }
 
-void TextureImpl::Set(unsigned int, const TextureData& textureData) const {
+void TextureImpl::Set(unsigned int /*unused*/, const TextureData& textureData) {
     unsigned int target{};
     if (!TextureImplUtils::ConvertTextureType(textureData.Type, target)) {
         return;
@@ -85,11 +85,11 @@ void TextureImpl::Set(unsigned int, const TextureData& textureData) const {
         glTexParameteri(target, paramName, paramValue);
     }
 
-    glTexImage2D(target, 0, internalFormat, textureData.Width, textureData.Height, 0, textureFormat, textureDataType, textureData.PixelData);
+    glTexImage2D(target, 0, internalFormat, textureData.Width, textureData.Height, 0, textureFormat, textureDataType, textureData.PixelData.get());
     glGenerateMipmap(target);
 }
 
-void TextureImpl::Delete(unsigned int& id, ETextureType) const {
+void TextureImpl::Delete(unsigned int& id, ETextureType /*unused*/) {
     glDeleteTextures(1, &id);
 }
 } // namespace GraphicLib::OpenGLImpl

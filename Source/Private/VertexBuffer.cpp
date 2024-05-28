@@ -16,15 +16,15 @@ void VertexBuffer::Initialise() {
     GraphicAPI::Get().GetVertexBufferImpl().Initialise(_id);
 }
 
-void VertexBuffer::Bind() {
+void VertexBuffer::Bind() const {
     GraphicAPI::Get().GetVertexBufferImpl().Bind(_id);
 }
 
-void VertexBuffer::Unbind() {
+void VertexBuffer::Unbind() const {
     GraphicAPI::Get().GetVertexBufferImpl().Unbind(_id);
 }
 
-void VertexBuffer::Set(std::vector<float>&& vertexData, std::vector<int>&& vertexAttributes) {
+void VertexBuffer::Set(std::vector<float>&& vertexData, std::vector<VertexAttribute>&& vertexAttributes) {
     _vertexData = std::move(vertexData);
     _vertexAttributes = std::move(vertexAttributes);
     Bind();
@@ -39,7 +39,7 @@ const std::vector<float>& VertexBuffer::GetVertexData() const {
     return _vertexData;
 }
 
-const std::vector<int>& VertexBuffer::GetVertexAttributes() const {
+const std::vector<VertexAttribute>& VertexBuffer::GetVertexAttributes() const {
     return _vertexAttributes;
 }
 } // namespace GraphicLib

@@ -16,11 +16,11 @@ void RenderBuffer::Initialise() {
     GraphicAPI::Get().GetRenderBufferImpl().Initialise(_id);
 }
 
-void RenderBuffer::Bind() {
+void RenderBuffer::Bind() const {
     GraphicAPI::Get().GetRenderBufferImpl().Bind(_id);
 }
 
-void RenderBuffer::Unbind() {
+void RenderBuffer::Unbind() const {
     GraphicAPI::Get().GetRenderBufferImpl().Unbind(_id);
 }
 

@@ -4,27 +4,23 @@
 #include <vector>
 
 namespace GraphicLib {
-struct IndexBufferDataElement {
-    unsigned int E1{};
-    unsigned int E2{};
-    unsigned int E3{};
-};
-
 class DLL_API IndexBuffer {
 public:
     IndexBuffer() = default;
+    IndexBuffer(IndexBuffer&&) = default;
+    IndexBuffer& operator=(IndexBuffer&&) = default;
+    IndexBuffer(const IndexBuffer&) = delete;
+    IndexBuffer& operator=(const IndexBuffer&) = delete;
     ~IndexBuffer();
-    IndexBuffer(const IndexBuffer&) = default;
-    IndexBuffer& operator=(const IndexBuffer&) = default;
     void Initialise();
-    void Bind();
-    void Unbind();
-    void Set(std::vector<IndexBufferDataElement>&& indices);
+    void Bind() const;
+    void Unbind() const;
+    void Set(std::vector<int>&& indices);
     void Delete();
-    const std::vector<IndexBufferDataElement>& Get() const;
+    [[nodiscard]] const std::vector<int>& Get() const;
 
 private:
-    std::vector<IndexBufferDataElement> _indices{};
+    std::vector<int> _indices;
     unsigned int _id{};
 };
 } // namespace GraphicLib

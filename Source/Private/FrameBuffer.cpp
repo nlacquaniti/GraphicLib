@@ -16,11 +16,11 @@ void FrameBuffer::Initialise() {
     GraphicAPI::Get().GetFrameBufferImpl().Initialise(_id);
 }
 
-void FrameBuffer::Bind() {
+void FrameBuffer::Bind() const {
     GraphicAPI::Get().GetFrameBufferImpl().Bind(_id);
 }
 
-void FrameBuffer::Unbind() {
+void FrameBuffer::Unbind() const {
     GraphicAPI::Get().GetFrameBufferImpl().Unbind(_id);
 }
 

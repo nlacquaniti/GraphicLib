@@ -4,24 +4,24 @@
 #include <glad/glad.h>
 
 namespace GraphicLib::OpenGLImpl {
-void IndexBufferImpl::Initialise(unsigned int& id) const {
+void IndexBufferImpl::Initialise(unsigned int& id) {
     glGenBuffers(1, &id);
 }
 
-void IndexBufferImpl::Bind(unsigned int id) const {
+void IndexBufferImpl::Bind(unsigned int id) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, id);
 }
 
-void IndexBufferImpl::Unbind(unsigned int) const {
+void IndexBufferImpl::Unbind(unsigned int /*unused*/) {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void IndexBufferImpl::Set(unsigned int id, const std::vector<IndexBufferDataElement>& data) const {
+void IndexBufferImpl::Set(unsigned int id, const std::vector<int>& data) {
     Bind(id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<long long>(data.size() * sizeof(IndexBufferDataElement)), data.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<long long>(data.size() * sizeof(int)), data.data(), GL_STATIC_DRAW);
 }
 
-void IndexBufferImpl::Delete(unsigned int& id) const {
+void IndexBufferImpl::Delete(unsigned int& id) {
     Bind(id);
     glDeleteBuffers(1, &id);
 }

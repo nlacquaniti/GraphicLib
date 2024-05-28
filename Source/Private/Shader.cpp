@@ -48,7 +48,7 @@ void Shader::Set(std::vector<ShaderData>&& data) {
 
 void Shader::SetUniformBoolValue(const char* name, bool value) const {
     Bind();
-    GraphicAPI::Get().GetShaderImpl().SetUniformIntValue(_id, name, value);
+    GraphicAPI::Get().GetShaderImpl().SetUniformIntValue(_id, name, static_cast<int>(value));
 }
 
 void Shader::SetUniformIntValue(const char* name, int value) const {

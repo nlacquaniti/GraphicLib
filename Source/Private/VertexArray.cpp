@@ -44,11 +44,10 @@ void VertexArray::Draw() {
             return;
         }
         GraphicAPI::Get().GetVertexArrayImpl().DrawTriangles(_id, static_cast<int>(trianglesCount));
-    }
-    else {
+    } else {
         unsigned long long attributesCount{};
         for (unsigned long long i{}; i < _vertexBuffer.GetVertexAttributes().size(); ++i) {
-            attributesCount += static_cast<unsigned long long>(_vertexBuffer.GetVertexAttributes()[i]);
+            attributesCount += static_cast<unsigned long long>(_vertexBuffer.GetVertexAttributes()[i].Size);
         }
 
         const unsigned long long verticesCount = _vertexBuffer.GetVertexData().size() / attributesCount;

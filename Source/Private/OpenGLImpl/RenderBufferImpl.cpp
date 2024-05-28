@@ -6,7 +6,6 @@
 #include <glad/glad.h>
 #include <string>
 
-
 namespace GraphicLib::OpenGLImpl {
 namespace {
 bool ConvertRenderBufferFormat(ERenderBufferFormat format, unsigned int& outFormat) {
@@ -35,19 +34,19 @@ bool ConvertRenderBufferFormat(ERenderBufferFormat format, unsigned int& outForm
 }
 } // namespace
 
-void RenderBufferImpl::Initialise(unsigned int& id) const {
+void RenderBufferImpl::Initialise(unsigned int& id) {
     glGenRenderbuffers(1, &id);
 }
 
-void RenderBufferImpl::Bind(unsigned int id) const {
+void RenderBufferImpl::Bind(unsigned int id) {
     glBindRenderbuffer(GL_RENDERBUFFER, id);
 }
 
-void RenderBufferImpl::Unbind(unsigned int) const {
+void RenderBufferImpl::Unbind(unsigned int /*unused*/) {
     glBindRenderbuffer(GL_RENDERBUFFER, 0);
 }
 
-void RenderBufferImpl::Set(unsigned, const RenderBufferData& data) const {
+void RenderBufferImpl::Set(unsigned /*unused*/, const RenderBufferData& data) {
     unsigned int format{};
     if (!ConvertRenderBufferFormat(data.Format, format)) {
         return;
@@ -56,7 +55,7 @@ void RenderBufferImpl::Set(unsigned, const RenderBufferData& data) const {
     glRenderbufferStorage(GL_RENDERBUFFER, format, data.Width, data.Height);
 }
 
-void RenderBufferImpl::Delete(unsigned int& id) const {
+void RenderBufferImpl::Delete(unsigned int& id) {
     glDeleteRenderbuffers(1, &id);
 }
 } // namespace GraphicLib::OpenGLImpl

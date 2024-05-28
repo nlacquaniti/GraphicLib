@@ -6,11 +6,11 @@ class RenderBuffer;
 namespace OpenGLImpl {
 class FrameBufferImpl {
 public:
-    void Initialise(unsigned int& id) const;
-    void Bind(unsigned int id) const;
-    void Unbind(unsigned int id) const;
-    void Set(unsigned int id, const Texture& frameBufferTexture, const RenderBuffer& renderBuffer) const;
-    void Delete(unsigned int& id) const;
+    static void Initialise(unsigned int& id);
+    static void Bind(unsigned int id);
+    static void Unbind(unsigned int id);
+    static void Set(unsigned int id, const Texture& frameBufferTexture, const RenderBuffer& renderBuffer);
+    static void Delete(unsigned int& id);
 };
 } // namespace OpenGLImpl
 } // namespace GraphicLib

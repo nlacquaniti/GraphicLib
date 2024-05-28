@@ -14,9 +14,39 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
+namespace {
+std::string extractTextureName(const std::string& texturePath) {
+    const size_t nameEndPos = texturePath.rfind('.');
+    if (nameEndPos == std::string::npos) {
+        const std::string& logText = fmt::format("Can't extract texture name for file \"{}\"", texturePath);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return {};
+    }
+
+    size_t nameStartPos = texturePath.rfind('/');
+    if (nameStartPos == std::string::npos) {
+        nameStartPos = 0;
+    } else {
+        ++nameStartPos;
+    }
+
+    size_t nameSize = nameEndPos - nameStartPos;
+
+    std::string textureName = texturePath.substr(nameStartPos, nameSize);
+    if (textureName.empty()) {
+        const std::string& logText = fmt::format("Texture name is empty for file \"{}\"", texturePath);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return {};
+    }
+
+    return textureName;
+}
+} // namespace
+
 Texture::~Texture() {
-    stbi_image_free(_data.PixelData);
-    _data.PixelData = nullptr;
+    if (_data.PixelData != nullptr) {
+        stbi_image_free(_data.PixelData.get());
+    }
     Delete();
 }
 
@@ -24,23 +54,22 @@ void Texture::Initialise(ETextureType type) {
     static bool stbiFlippedVertically{};
     if (!stbiFlippedVertically) {
         stbiFlippedVertically = true;
-        stbi_set_flip_vertically_on_load(true);
+        stbi_set_flip_vertically_on_load(1);
     }
     _data.Type = type;
     GraphicAPI::Get().GetTextureImpl().Initialise(_id);
 }
 
-void Texture::Bind() {
+void Texture::Bind() const {
     GraphicAPI::Get().GetTextureImpl().Bind(_id, _data.Type);
 }
 
-void Texture::Unbind() {
+void Texture::Unbind() const {
     GraphicAPI::Get().GetTextureImpl().Unbind(_id, _data.Type);
 }
 
-void Texture::Draw(unsigned int slot) {
-    GraphicAPI::Get().GetTextureImpl().Draw(_id, _data.Type, slot);
-    Bind();
+void Texture::ActivateUnit(unsigned int slot) const {
+    GraphicAPI::Get().GetTextureImpl().ActivateUnit(_id, _data.Type, slot);
 }
 
 void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params) {
@@ -51,31 +80,53 @@ void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params)
         return;
     }
 
-    unsigned char* pixelData =
-        stbi_load(std::filesystem::absolute(filePath).string().c_str(), &_data.Width, &_data.Height, reinterpret_cast<int*>(&_data.Channel), 0);
+    std::string textureName = extractTextureName(texturePath);
+    if (textureName.empty()) {
+        return;
+    }
+
+    int textureWidth{};
+    int textureHeight{};
+    int textureChannel{};
+    unsigned char* pixelData = stbi_load(std::filesystem::absolute(filePath).string().c_str(), &textureWidth, &textureHeight, &textureChannel, 0);
     if (pixelData == nullptr) {
         const std::string& logText = fmt::format("Can't read pixel data for \"{}\"", texturePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
-    _data.PixelData = pixelData;
     _data.FilePath = std::move(texturePath);
+    _data.Name = std::move(textureName);
+    _data.Parameters = std::move(params);
+    _data.PixelData.reset(pixelData);
+    _data.Width = textureWidth;
+    _data.Height = textureHeight;
+    _data.Type = _data.Type;
+    _data.Channel = static_cast<ETextureChannel>(textureChannel);
     _data.Format = ETextureFormat::RGBA32F;
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
-    _data.Parameters = std::move(params);
 
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
 }
 
 void Texture::Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params) {
+    if (setParams.Name.empty()) {
+        const std::string& logText{"Texture name is empty"};
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return;
+    }
+
+    _data.FilePath = {};
+    _data.Name = setParams.Name;
+    _data.Parameters = std::move(params);
+    _data.PixelData = {};
     _data.Width = setParams.Width;
     _data.Height = setParams.Height;
+    _data.Type = _data.Type;
     _data.Channel = setParams.Channel;
     _data.Format = setParams.Format;
     _data.DataType = setParams.DataType;
-    _data.Parameters = std::move(params);
 
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id, _data);

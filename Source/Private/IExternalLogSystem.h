@@ -5,11 +5,16 @@
 namespace GraphicLib {
 class IExternalLogSystem {
 public:
-    using MessageLogCallback = void (*)(const InternalLogger::Message&);
+    IExternalLogSystem() = default;
+    IExternalLogSystem(IExternalLogSystem&&) = default;
+    IExternalLogSystem& operator=(IExternalLogSystem&&) = default;
+    IExternalLogSystem(const IExternalLogSystem&) = delete;
+    IExternalLogSystem& operator=(const IExternalLogSystem&) = delete;
     virtual ~IExternalLogSystem() = default;
+    using MessageLogCallback = void (*)(const InternalLogger::Message&);
     void OnAttach();
     void OnDetach();
-    MessageLogCallback GetMessageLogCallback() const;
+    [[nodiscard]] MessageLogCallback GetMessageLogCallback() const;
 
 private:
     friend class InternalLogger;
