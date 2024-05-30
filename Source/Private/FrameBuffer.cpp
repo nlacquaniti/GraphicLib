@@ -8,12 +8,12 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-FrameBuffer::~FrameBuffer() {
-    Delete();
+FrameBuffer::FrameBuffer() noexcept {
+    GraphicAPI::Get().GetFrameBufferImpl().Initialise(_id);
 }
 
-void FrameBuffer::Initialise() {
-    GraphicAPI::Get().GetFrameBufferImpl().Initialise(_id);
+FrameBuffer::~FrameBuffer() noexcept {
+    Delete();
 }
 
 void FrameBuffer::Bind() const {

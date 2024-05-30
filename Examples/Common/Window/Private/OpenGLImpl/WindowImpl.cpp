@@ -78,12 +78,9 @@ bool WindowImpl::Create(const char* title) {
     ImGui_ImplOpenGL3_Init("#version 130");
 
     // FrameBuffer creation.
-    _windowFrameBuffer.Initialise();
     _windowFrameBuffer.Bind();
 
     // Framebuffer config.
-    _windowFrameBuffer.GetTexture().Initialise(GraphicLib::ETextureType::TEXTURE_2D);
-    _windowFrameBuffer.GetRenderBuffer().Initialise();
     _setFrameBufferConfiguration();
 
     // Finalise FrameBuffer.
@@ -94,7 +91,7 @@ bool WindowImpl::Create(const char* title) {
 }
 
 void WindowImpl::Update() {
-    if (glfwWindowShouldClose(_window)) {
+    if (glfwWindowShouldClose(_window) != 0) {
         OnWindowClosed.Invoke();
         _clear();
         return;
@@ -211,7 +208,7 @@ void WindowImpl::_setFrameBufferConfiguration() {
     };
 
     _windowFrameBuffer.GetTexture().Bind();
-    _windowFrameBuffer.GetTexture().Set(frameBufferTextureData, std::move(frameBufferTextureParams));
+    _windowFrameBuffer.GetTexture().Set(GraphicLib::ETextureType::TEXTURE_2D, frameBufferTextureData, std::move(frameBufferTextureParams));
 
     // Frame buffer render buffer creation.
     _windowFrameBuffer.GetRenderBuffer().Bind();

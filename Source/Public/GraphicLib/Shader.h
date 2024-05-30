@@ -22,13 +22,12 @@ struct ShaderData {
 
 class DLL_API Shader {
 public:
-    Shader() = default;
-    Shader(Shader&&) = default;
-    Shader& operator=(Shader&&) = default;
+    Shader() noexcept;
+    Shader(Shader&&) = delete;
+    Shader& operator=(Shader&&) = delete;
     Shader(const Shader&) = delete;
     Shader& operator=(const Shader&) = delete;
-    ~Shader();
-    void Initialise();
+    ~Shader() noexcept;
     void Bind() const;
     void Unbind() const;
     void Set(std::vector<ShaderData>&& data);

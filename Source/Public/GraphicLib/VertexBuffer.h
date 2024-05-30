@@ -11,13 +11,12 @@ struct VertexAttribute {
 
 class DLL_API VertexBuffer {
 public:
-    VertexBuffer() = default;
-    VertexBuffer(VertexBuffer&&) = default;
-    VertexBuffer& operator=(VertexBuffer&&) = default;
+    VertexBuffer() noexcept;
+    VertexBuffer(VertexBuffer&&) = delete;
+    VertexBuffer& operator=(VertexBuffer&&) = delete;
     VertexBuffer(const VertexBuffer&) = delete;
     VertexBuffer& operator=(const VertexBuffer&) = delete;
-    ~VertexBuffer();
-    void Initialise();
+    ~VertexBuffer() noexcept;
     void Bind() const;
     void Unbind() const;
     void Set(std::vector<float>&& vertexData, std::vector<VertexAttribute>&& vertexAttributes);

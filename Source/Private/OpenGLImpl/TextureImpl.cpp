@@ -47,7 +47,7 @@ void TextureImpl::ActivateUnit(unsigned int /*unused*/, ETextureType /*unused*/,
     glActiveTexture(GL_TEXTURE0 + slot);
 }
 
-void TextureImpl::Set(unsigned int /*unused*/, const TextureData& textureData) {
+void TextureImpl::Set(unsigned int /*unused*/, const TextureData& textureData, unsigned char* pixelData) {
     unsigned int target{};
     if (!TextureImplUtils::ConvertTextureType(textureData.Type, target)) {
         return;
@@ -85,7 +85,7 @@ void TextureImpl::Set(unsigned int /*unused*/, const TextureData& textureData) {
         glTexParameteri(target, paramName, paramValue);
     }
 
-    glTexImage2D(target, 0, internalFormat, textureData.Width, textureData.Height, 0, textureFormat, textureDataType, textureData.PixelData.get());
+    glTexImage2D(target, 0, internalFormat, textureData.Width, textureData.Height, 0, textureFormat, textureDataType, pixelData);
     glGenerateMipmap(target);
 }
 

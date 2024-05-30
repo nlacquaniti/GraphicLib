@@ -8,12 +8,12 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-RenderBuffer::~RenderBuffer() {
-    Delete();
+RenderBuffer::RenderBuffer() noexcept {
+    GraphicAPI::Get().GetRenderBufferImpl().Initialise(_id);
 }
 
-void RenderBuffer::Initialise() {
-    GraphicAPI::Get().GetRenderBufferImpl().Initialise(_id);
+RenderBuffer::~RenderBuffer() noexcept {
+    Delete();
 }
 
 void RenderBuffer::Bind() const {

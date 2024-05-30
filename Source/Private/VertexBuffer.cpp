@@ -8,12 +8,12 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-VertexBuffer::~VertexBuffer() {
-    Delete();
+VertexBuffer::VertexBuffer() noexcept{
+    GraphicAPI::Get().GetVertexBufferImpl().Initialise(_id);
 }
 
-void VertexBuffer::Initialise() {
-    GraphicAPI::Get().GetVertexBufferImpl().Initialise(_id);
+VertexBuffer::~VertexBuffer() noexcept{
+    Delete();
 }
 
 void VertexBuffer::Bind() const {

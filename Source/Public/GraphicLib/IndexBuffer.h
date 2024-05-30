@@ -6,13 +6,12 @@
 namespace GraphicLib {
 class DLL_API IndexBuffer {
 public:
-    IndexBuffer() = default;
-    IndexBuffer(IndexBuffer&&) = default;
-    IndexBuffer& operator=(IndexBuffer&&) = default;
+    IndexBuffer() noexcept;
+    IndexBuffer(IndexBuffer&&) = delete;
+    IndexBuffer& operator=(IndexBuffer&&) = delete;
     IndexBuffer(const IndexBuffer&) = delete;
     IndexBuffer& operator=(const IndexBuffer&) = delete;
-    ~IndexBuffer();
-    void Initialise();
+    ~IndexBuffer() noexcept;
     void Bind() const;
     void Unbind() const;
     void Set(std::vector<int>&& indices);

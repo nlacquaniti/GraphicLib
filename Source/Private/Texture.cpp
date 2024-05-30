@@ -43,21 +43,18 @@ std::string extractTextureName(const std::string& texturePath) {
 }
 } // namespace
 
-Texture::~Texture() {
-    if (_data.PixelData != nullptr) {
-        stbi_image_free(_data.PixelData.get());
-    }
-    Delete();
-}
-
-void Texture::Initialise(ETextureType type) {
+Texture::Texture() noexcept {
     static bool stbiFlippedVertically{};
     if (!stbiFlippedVertically) {
         stbiFlippedVertically = true;
         stbi_set_flip_vertically_on_load(1);
     }
-    _data.Type = type;
+
     GraphicAPI::Get().GetTextureImpl().Initialise(_id);
+}
+
+Texture::~Texture() noexcept {
+    Delete();
 }
 
 void Texture::Bind() const {
@@ -72,7 +69,7 @@ void Texture::ActivateUnit(unsigned int slot) const {
     GraphicAPI::Get().GetTextureImpl().ActivateUnit(_id, _data.Type, slot);
 }
 
-void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params) {
+void Texture::Set(ETextureType type, std::string&& texturePath, std::vector<TextureParam>&& params) {
     const std::filesystem::path filePath{texturePath};
     if (!std::filesystem::exists(filePath)) {
         const std::string& logText = fmt::format("File \"{}\" doesn't exist", texturePath);
@@ -98,19 +95,19 @@ void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params)
     _data.FilePath = std::move(texturePath);
     _data.Name = std::move(textureName);
     _data.Parameters = std::move(params);
-    _data.PixelData.reset(pixelData);
     _data.Width = textureWidth;
     _data.Height = textureHeight;
-    _data.Type = _data.Type;
+    _data.Type = type;
     _data.Channel = static_cast<ETextureChannel>(textureChannel);
     _data.Format = ETextureFormat::RGBA32F;
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
 
     Bind();
-    GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
+    GraphicAPI::Get().GetTextureImpl().Set(_id, _data, pixelData);
+    stbi_image_free(pixelData);
 }
 
-void Texture::Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params) {
+void Texture::Set(ETextureType type, const SetTextureParams& setParams, std::vector<TextureParam>&& params) {
     if (setParams.Name.empty()) {
         const std::string& logText{"Texture name is empty"};
         LOG_INTERNAL_ERROR(logText.c_str());
@@ -120,16 +117,15 @@ void Texture::Set(const SetTextureParams& setParams, std::vector<TextureParam>&&
     _data.FilePath = {};
     _data.Name = setParams.Name;
     _data.Parameters = std::move(params);
-    _data.PixelData = {};
     _data.Width = setParams.Width;
     _data.Height = setParams.Height;
-    _data.Type = _data.Type;
+    _data.Type = type;
     _data.Channel = setParams.Channel;
     _data.Format = setParams.Format;
     _data.DataType = setParams.DataType;
 
     Bind();
-    GraphicAPI::Get().GetTextureImpl().Set(_id, _data);
+    GraphicAPI::Get().GetTextureImpl().Set(_id, _data, nullptr);
 }
 
 void Texture::Delete() {

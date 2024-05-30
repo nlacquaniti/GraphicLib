@@ -13,15 +13,12 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-
-VertexArray::~VertexArray() {
-    Delete();
+VertexArray::VertexArray() noexcept {
+    GraphicAPI::Get().GetVertexArrayImpl().Initialise(_id);
 }
 
-void VertexArray::Initialise() {
-    GraphicAPI::Get().GetVertexArrayImpl().Initialise(_id);
-    _vertexBuffer.Initialise();
-    _indexBuffer.Initialise();
+VertexArray::~VertexArray() noexcept {
+    Delete();
 }
 
 void VertexArray::Bind() {

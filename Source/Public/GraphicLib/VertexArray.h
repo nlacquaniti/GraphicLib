@@ -7,13 +7,12 @@
 namespace GraphicLib {
 class DLL_API VertexArray {
 public:
-    VertexArray() = default;
-    VertexArray(VertexArray&&) = default;
-    VertexArray& operator=(VertexArray&&) = default;
+    VertexArray() noexcept;
+    VertexArray(VertexArray&&) = delete;
+    VertexArray& operator=(VertexArray&&) = delete;
     VertexArray(const VertexArray&) = delete;
     VertexArray& operator=(const VertexArray&) = delete;
-    ~VertexArray();
-    void Initialise();
+    ~VertexArray() noexcept;
     void Bind();
     void Unbind();
     void Draw();

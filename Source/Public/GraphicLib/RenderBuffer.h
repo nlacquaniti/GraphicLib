@@ -20,13 +20,12 @@ struct RenderBufferData {
 
 class DLL_API RenderBuffer {
 public:
-    RenderBuffer() = default;
-    RenderBuffer(RenderBuffer&&) = default;
-    RenderBuffer& operator=(RenderBuffer&&) = default;
+    RenderBuffer() noexcept;
+    RenderBuffer(RenderBuffer&&) = delete;
+    RenderBuffer& operator=(RenderBuffer&&) = delete;
     RenderBuffer(const RenderBuffer&) = delete;
     RenderBuffer& operator=(const RenderBuffer&) = delete;
-    ~RenderBuffer();
-    void Initialise();
+    ~RenderBuffer() noexcept;
     void Bind() const;
     void Unbind() const;
     void Set(const RenderBufferData& data);

@@ -12,12 +12,12 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-Shader::~Shader() {
-    Delete();
+Shader::Shader() noexcept {
+    GraphicAPI::Get().GetShaderImpl().Initialise(_id);
 }
 
-void Shader::Initialise() {
-    GraphicAPI::Get().GetShaderImpl().Initialise(_id);
+Shader::~Shader() noexcept {
+    Delete();
 }
 
 void Shader::Bind() const {

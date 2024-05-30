@@ -175,28 +175,22 @@ void Application::Initialise() {
 
     std::vector<GraphicLib::VertexAttribute> vertexAttributes{{VertexAttributes::VERTEX, 3}, {VertexAttributes::TEX_COORD, 2}};
 
-    GraphicLib::Texture boxTexture{};
-    boxTexture.Initialise(GraphicLib::ETextureType::TEXTURE_2D);
-    boxTexture.Set(GetResourceFullPath("Resources/TextureTest.png"), //
-        std::vector<GraphicLib::TextureParam>{
-            {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
-            {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
-            {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-            {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-        });
-    std::vector<GraphicLib::Texture> boxTextures{};
-    boxTextures.emplace_back(std::move(boxTexture));
+    _boxMesh.GetVertexArray().GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
+    _boxMesh.GetTextures().emplace_back();
+    // boxTexture.Set(GraphicLib::ETextureType::TEXTURE_2D, GetResourceFullPath("Resources/TextureTest.png"), //
+    //     std::vector<GraphicLib::TextureParam>{
+    //         {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
+    //         {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
+    //         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+    //         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+    //     });
 
-    _boxMesh.Initialise();
-    _boxMesh.Set(std::move(vertices), std::move(vertexAttributes), {}, std::move(boxTextures));
     std::vector<GraphicLib::ShaderData> boxShaderParams{
         {GetResourceFullPath("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
-    _boxShader.Initialise();
     _boxShader.Set(std::move(boxShaderParams));
     _boxShader.Bind();
-    _boxShader.SetUniformIntValue("uTexture", 0);
     _boxShader.Unbind();
 
     std::vector<float> gridVertices{
@@ -208,14 +202,11 @@ void Application::Initialise() {
         1, -1, 0,  //
     };
     std::vector<GraphicLib::VertexAttribute> gridVertexAttributes{{VertexAttributes::TEX_COORD, 3}};
-    _gridVA.Initialise();
-    _gridVA.Bind();
     _gridVA.GetVertexBuffer().Set(std::move(gridVertices), std::move(gridVertexAttributes));
     std::vector<GraphicLib::ShaderData> gridShaderParams{
         {GetResourceFullPath("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
-    _gridShader.Initialise();
     _gridShader.Set(std::move(gridShaderParams));
 }
 

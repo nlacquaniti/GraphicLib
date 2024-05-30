@@ -7,13 +7,12 @@
 namespace GraphicLib {
 class DLL_API FrameBuffer {
 public:
-    FrameBuffer() = default;
-    FrameBuffer(FrameBuffer&&) = default;
-    FrameBuffer& operator=(FrameBuffer&&) = default;
+    FrameBuffer() noexcept;
+    FrameBuffer(FrameBuffer&&) = delete;
+    FrameBuffer& operator=(FrameBuffer&&) = delete;
     FrameBuffer(const FrameBuffer&) = delete;
     FrameBuffer& operator=(const FrameBuffer&) = delete;
-    ~FrameBuffer();
-    void Initialise();
+    ~FrameBuffer() noexcept;
     void Bind() const;
     void Unbind() const;
     void Set();

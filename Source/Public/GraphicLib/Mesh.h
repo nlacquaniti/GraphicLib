@@ -4,23 +4,21 @@
 #include "GraphicLib/Shader.h"
 #include "GraphicLib/Texture.h"
 #include "GraphicLib/VertexArray.h"
-#include "GraphicLib/VertexBuffer.h"
 
 namespace GraphicLib {
 class DLL_API Mesh {
 public:
-    Mesh() = default;
-    Mesh(Mesh&& other) = default;
-    Mesh& operator=(Mesh&& other) = default;
+    Mesh() noexcept = default;
+    Mesh(Mesh&& other) = delete;
+    Mesh& operator=(Mesh&& other) = delete;
     Mesh(const Mesh& other) = delete;
     Mesh& operator=(const Mesh& other) = delete;
-    ~Mesh() = default;
-    void Initialise();
-    void Set(std::vector<float>&& vertexData, std::vector<VertexAttribute>&& vertexAttributes, std::vector<int>&& indices, std::vector<Texture>&& textures);
+    ~Mesh() noexcept = default;
     void Draw(const Shader& shader);
-    VertexArray& GetVertexArray();
     [[nodiscard]] const VertexArray& GetVertexArray() const;
+    VertexArray& GetVertexArray();
     [[nodiscard]] const std::vector<Texture>& GetTextures() const;
+    std::vector<Texture>& GetTextures();
 
 private:
     VertexArray _vertexArray;

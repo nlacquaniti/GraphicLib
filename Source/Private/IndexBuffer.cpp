@@ -8,12 +8,12 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-IndexBuffer::~IndexBuffer() {
-    Delete();
+IndexBuffer::IndexBuffer() noexcept {
+    GraphicAPI::Get().GetIndexBufferImpl().Initialise(_id);
 }
 
-void IndexBuffer::Initialise() {
-    GraphicAPI::Get().GetIndexBufferImpl().Initialise(_id);
+IndexBuffer::~IndexBuffer() noexcept {
+    Delete();
 }
 
 void IndexBuffer::Bind() const {

@@ -91,7 +91,6 @@ struct TextureData {
     std::string FilePath;
     std::string Name;
     std::vector<TextureParam> Parameters;
-    std::unique_ptr<unsigned char> PixelData;
     int Width{};
     int Height{};
     ETextureType Type{};
@@ -102,24 +101,22 @@ struct TextureData {
 
 class DLL_API Texture {
 public:
-    Texture() noexcept = default;
-    Texture(Texture&&) = default;
-    Texture& operator=(Texture&&) noexcept = default;
+    Texture() noexcept;
+    Texture(Texture&&) = delete;
+    Texture& operator=(Texture&&) = delete;
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
-    ~Texture();
-    void Initialise(ETextureType type);
+    ~Texture() noexcept;
     void Bind() const;
     void Unbind() const;
     void ActivateUnit(unsigned int slot) const;
-    void Set(std::string&& texturePath, std::vector<TextureParam>&& params);
-    void Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params);
+    void Set(ETextureType type, std::string&& texturePath, std::vector<TextureParam>&& params);
+    void Set(ETextureType type, const SetTextureParams& setParams, std::vector<TextureParam>&& params);
     void Delete();
     [[nodiscard]] const TextureData& GetData() const;
     [[nodiscard]] unsigned int GetID() const;
 
 private:
-    void _setTextureFromFile();
     TextureData _data{};
     unsigned int _id{};
 };
