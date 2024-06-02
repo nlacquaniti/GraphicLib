@@ -1,6 +1,6 @@
 #pragma once
 
-#include "DLL_API.h"
+#include "GraphicLib/DLL_API.h"
 
 namespace GraphicLib {
 class DLL_API Logger {

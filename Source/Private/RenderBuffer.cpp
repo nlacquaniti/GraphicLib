@@ -1,5 +1,7 @@
 #include "GraphicLib/RenderBuffer.h"
 
+#include "InternalLogger.h"
+
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
 using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
@@ -8,37 +10,60 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-RenderBuffer::RenderBuffer() noexcept {
-    GraphicAPI::Get().GetRenderBufferImpl().Initialise(_id);
+RenderBuffer::~RenderBuffer() noexcept {
+    if (!_id.IsInitialised) {
+        return;
+    }
+    GraphicAPI::Get().GetRenderBufferImpl().Delete(_id.Value);
 }
 
-RenderBuffer::~RenderBuffer() noexcept {
-    Delete();
+void RenderBuffer::Initialise() {
+    if (_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Already Initialised");
+        return;
+    }
+    GraphicAPI::Get().GetRenderBufferImpl().Initialise(_id.Value);
+    _id.IsInitialised = true;
 }
 
 void RenderBuffer::Bind() const {
-    GraphicAPI::Get().GetRenderBufferImpl().Bind(_id);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetRenderBufferImpl().Bind(_id.Value);
 }
 
 void RenderBuffer::Unbind() const {
-    GraphicAPI::Get().GetRenderBufferImpl().Unbind(_id);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetRenderBufferImpl().Unbind(_id.Value);
 }
 
 void RenderBuffer::Set(const RenderBufferData& data) {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     _data = data;
     Bind();
-    GraphicAPI::Get().GetRenderBufferImpl().Set(_id, data);
-}
-
-void RenderBuffer::Delete() {
-    GraphicAPI::Get().GetRenderBufferImpl().Delete(_id);
+    GraphicAPI::Get().GetRenderBufferImpl().Set(_id.Value, data);
 }
 
 unsigned int RenderBuffer::GetID() const {
-    return _id;
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
+    return _id.Value;
 }
 
 const RenderBufferData& RenderBuffer::GetData() const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
     return _data;
 }
 

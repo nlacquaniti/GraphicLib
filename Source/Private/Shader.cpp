@@ -12,23 +12,44 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-Shader::Shader() noexcept {
-    GraphicAPI::Get().GetShaderImpl().Initialise(_id);
+Shader::~Shader() noexcept {
+    if (!_id.IsInitialised) {
+        return;
+    }
+    GraphicAPI::Get().GetShaderImpl().Delete(_id.Value);
 }
 
-Shader::~Shader() noexcept {
-    Delete();
+void Shader::Initialise() {
+    if (_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Already Initialised");
+        return;
+    }
+    GraphicAPI::Get().GetShaderImpl().Initialise(_id.Value);
+    _id.IsInitialised = true;
 }
 
 void Shader::Bind() const {
-    GraphicAPI::Get().GetShaderImpl().Bind(_id);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetShaderImpl().Bind(_id.Value);
 }
 
 void Shader::Unbind() const {
-    GraphicAPI::Get().GetShaderImpl().Unbind(_id);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetShaderImpl().Unbind(_id.Value);
 }
 
 void Shader::Set(std::vector<ShaderData>&& data) {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     _data = std::move(data);
     for (size_t i = 0; i < _data.size(); ++i) {
         const ShaderData& shader = _data[i];
@@ -43,39 +64,60 @@ void Shader::Set(std::vector<ShaderData>&& data) {
         }
     }
 
-    GraphicAPI::Get().GetShaderImpl().Set(_id, _data);
+    GraphicAPI::Get().GetShaderImpl().Set(_id.Value, _data);
 }
 
 void Shader::SetUniformBoolValue(const char* name, bool value) const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     Bind();
-    GraphicAPI::Get().GetShaderImpl().SetUniformIntValue(_id, name, static_cast<int>(value));
+    GraphicAPI::Get().GetShaderImpl().SetUniformIntValue(_id.Value, name, static_cast<int>(value));
 }
 
 void Shader::SetUniformIntValue(const char* name, int value) const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     Bind();
-    GraphicAPI::Get().GetShaderImpl().SetUniformIntValue(_id, name, value);
+    GraphicAPI::Get().GetShaderImpl().SetUniformIntValue(_id.Value, name, value);
 }
 
 void Shader::SetUniformFloatValue(const char* name, float value) const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     Bind();
-    GraphicAPI::Get().GetShaderImpl().SetUniformFloatValue(_id, name, value);
+    GraphicAPI::Get().GetShaderImpl().SetUniformFloatValue(_id.Value, name, value);
 }
 
 void Shader::SetUniformMat4Value(const char* name, float* value) const {
-    Bind();
-    GraphicAPI::Get().GetShaderImpl().SetUniformMat4Value(_id, name, value);
-}
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
 
-void Shader::Delete() {
-    GraphicAPI::Get().GetShaderImpl().Delete(_id);
+    Bind();
+    GraphicAPI::Get().GetShaderImpl().SetUniformMat4Value(_id.Value, name, value);
 }
 
 const std::vector<ShaderData>& Shader::GetData() const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
     return _data;
 }
 
 unsigned int Shader::GetID() const {
-    return _id;
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
+    return _id.Value;
 }
-
 } // namespace GraphicLib

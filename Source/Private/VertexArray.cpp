@@ -13,34 +13,59 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-VertexArray::VertexArray() noexcept {
-    GraphicAPI::Get().GetVertexArrayImpl().Initialise(_id);
+VertexArray::~VertexArray() noexcept {
+    if (!_id.IsInitialised) {
+        return;
+    }
+    GraphicAPI::Get().GetVertexArrayImpl().Delete(_id.Value);
 }
 
-VertexArray::~VertexArray() noexcept {
-    Delete();
+void VertexArray::Initialise() {
+    if (_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Already initialised");
+        return;
+    }
+    _vertexBuffer.Initialise();
+    _indexBuffer.Initialise();
+    GraphicAPI::Get().GetVertexArrayImpl().Initialise(_id.Value);
+    _id.IsInitialised = true;
 }
 
 void VertexArray::Bind() {
-    GraphicAPI::Get().GetVertexArrayImpl().Bind(_id);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
+    GraphicAPI::Get().GetVertexArrayImpl().Bind(_id.Value);
     _vertexBuffer.Bind();
     _indexBuffer.Bind();
 }
 
 void VertexArray::Unbind() {
-    GraphicAPI::Get().GetVertexArrayImpl().Unbind(_id);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
+    GraphicAPI::Get().GetVertexArrayImpl().Unbind(_id.Value);
     _vertexBuffer.Unbind();
     _indexBuffer.Unbind();
 }
 
 void VertexArray::Draw() {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     if (_indexBuffer.Get().size() > 0) {
         const unsigned long long trianglesCount = _indexBuffer.Get().size() * 3;
         if (static_cast<long long>(trianglesCount) > std::numeric_limits<int>::max()) {
             LOG_INTERNAL_ERROR("Triangles count exceeded the max number");
             return;
         }
-        GraphicAPI::Get().GetVertexArrayImpl().DrawTriangles(_id, static_cast<int>(trianglesCount));
+        GraphicAPI::Get().GetVertexArrayImpl().DrawTriangles(_id.Value, static_cast<int>(trianglesCount));
     } else {
         unsigned long long attributesCount{};
         for (unsigned long long i{}; i < _vertexBuffer.GetVertexAttributes().size(); ++i) {
@@ -52,27 +77,35 @@ void VertexArray::Draw() {
             LOG_INTERNAL_ERROR("Vertices count exceeded the max number");
             return;
         }
-        GraphicAPI::Get().GetVertexArrayImpl().DrawVertices(_id, static_cast<int>(verticesCount));
+        GraphicAPI::Get().GetVertexArrayImpl().DrawVertices(_id.Value, static_cast<int>(verticesCount));
     }
 }
 
-void VertexArray::Delete() {
-    GraphicAPI::Get().GetVertexArrayImpl().Delete(_id);
-}
-
 const VertexBuffer& VertexArray::GetVertexBuffer() const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
     return _vertexBuffer;
 }
 
 VertexBuffer& VertexArray::GetVertexBuffer() {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
     return _vertexBuffer;
 }
 
 const IndexBuffer& VertexArray::GetIndexBuffer() const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
     return _indexBuffer;
 }
 
 IndexBuffer& VertexArray::GetIndexBuffer() {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
     return _indexBuffer;
 }
 } // namespace GraphicLib

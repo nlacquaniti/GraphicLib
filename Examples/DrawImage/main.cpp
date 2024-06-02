@@ -55,10 +55,10 @@ public:
     void Stop();
 
 private:
-    glm::mat4 _createProjectionViewMat() const;
+    [[nodiscard]] glm::mat4 _createProjectionViewMat() const;
 
     Window _window;
-    Input _input{};
+    Input _input;
 
     GraphicLib::Mesh _boxMesh;
     GraphicLib::Shader _boxShader;
@@ -175,20 +175,24 @@ void Application::Initialise() {
 
     std::vector<GraphicLib::VertexAttribute> vertexAttributes{{VertexAttributes::VERTEX, 3}, {VertexAttributes::TEX_COORD, 2}};
 
+    _boxMesh.Initialise();
     _boxMesh.GetVertexArray().GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
-    _boxMesh.GetTextures().emplace_back();
-    // boxTexture.Set(GraphicLib::ETextureType::TEXTURE_2D, GetResourceFullPath("Resources/TextureTest.png"), //
-    //     std::vector<GraphicLib::TextureParam>{
-    //         {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
-    //         {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
-    //         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-    //         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-    //     });
+    GraphicLib::Texture boxTexture;
+    boxTexture.Initialise();
+    boxTexture.Set(GraphicLib::ETextureType::TEXTURE_2D, GetResourceFullPath("Resources/Diffuse.png"), //
+        std::vector<GraphicLib::TextureParam>{
+            {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
+            {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
+            {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+            {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+        });
+    _boxMesh.GetTextures().push_back(std::move(boxTexture));
 
     std::vector<GraphicLib::ShaderData> boxShaderParams{
         {GetResourceFullPath("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
+    _boxShader.Initialise();
     _boxShader.Set(std::move(boxShaderParams));
     _boxShader.Bind();
     _boxShader.Unbind();
@@ -202,11 +206,13 @@ void Application::Initialise() {
         1, -1, 0,  //
     };
     std::vector<GraphicLib::VertexAttribute> gridVertexAttributes{{VertexAttributes::TEX_COORD, 3}};
+    _gridVA.Initialise();
     _gridVA.GetVertexBuffer().Set(std::move(gridVertices), std::move(gridVertexAttributes));
     std::vector<GraphicLib::ShaderData> gridShaderParams{
         {GetResourceFullPath("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
+    _gridShader.Initialise();
     _gridShader.Set(std::move(gridShaderParams));
 }
 

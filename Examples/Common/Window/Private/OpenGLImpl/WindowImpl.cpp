@@ -1,4 +1,5 @@
 #include "WindowImpl.h"
+#include "GraphicLib/FrameBuffer.h"
 
 #include <glad/glad.h>
 #define GLFW_INCLUDE_NONE
@@ -26,7 +27,7 @@ bool WindowImpl::Create(const char* title) {
         return false;
     }
 
-    if (!glfwInit()) {
+    if (glfwInit() == 0) {
         _clear();
         return false;
     }
@@ -46,7 +47,7 @@ bool WindowImpl::Create(const char* title) {
     glfwMakeContextCurrent(_window);
     glfwSwapInterval(1);
     gladLoadGL();
-    glClearColor(0.1f, 0.1f, 0.1f, 1.0f);
+    glClearColor(0.1F, 0.1F, 0.1F, 1.0F);
     glEnable(GL_DEPTH_TEST);
     glEnable(GL_BLEND);
     glBlendFunc(GL_SRC_ALPHA, GL_ONE_MINUS_SRC_ALPHA);
@@ -69,8 +70,8 @@ bool WindowImpl::Create(const char* title) {
     // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
     ImGuiStyle& style = ImGui::GetStyle();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
-        style.WindowRounding = 0.0f;
-        style.Colors[ImGuiCol_WindowBg].w = 1.0f;
+        style.WindowRounding = 0.0F;
+        style.Colors[ImGuiCol_WindowBg].w = 1.0F;
     }
 
     // Setup Platform/Renderer backends
@@ -78,6 +79,7 @@ bool WindowImpl::Create(const char* title) {
     ImGui_ImplOpenGL3_Init("#version 130");
 
     // FrameBuffer creation.
+    _windowFrameBuffer.Initialise();
     _windowFrameBuffer.Bind();
 
     // Framebuffer config.
@@ -191,7 +193,8 @@ void WindowImpl::_invokeLogCallback(const char* message) {
 }
 
 void WindowImpl::_setFrameBufferConfiguration() {
-    int windowWidth, windowHeight;
+    int windowWidth;
+    int windowHeight;
     GetSize(windowWidth, windowHeight);
 
     // FrameBuffer texture.
@@ -207,7 +210,6 @@ void WindowImpl::_setFrameBufferConfiguration() {
         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
     };
 
-    _windowFrameBuffer.GetTexture().Bind();
     _windowFrameBuffer.GetTexture().Set(GraphicLib::ETextureType::TEXTURE_2D, frameBufferTextureData, std::move(frameBufferTextureParams));
 
     // Frame buffer render buffer creation.

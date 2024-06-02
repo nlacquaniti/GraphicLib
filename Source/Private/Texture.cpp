@@ -43,33 +43,61 @@ std::string extractTextureName(const std::string& texturePath) {
 }
 } // namespace
 
-Texture::Texture() noexcept {
+Texture::~Texture() noexcept {
+    if (!_id.IsInitialised) {
+        return;
+    }
+
+    Bind();
+    GraphicAPI::Get().GetTextureImpl().Delete(_id.Value, _data.Type);
+}
+
+void Texture::Initialise() {
+    if (_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("");
+        return;
+    }
+
     static bool stbiFlippedVertically{};
     if (!stbiFlippedVertically) {
         stbiFlippedVertically = true;
         stbi_set_flip_vertically_on_load(1);
     }
 
-    GraphicAPI::Get().GetTextureImpl().Initialise(_id);
-}
-
-Texture::~Texture() noexcept {
-    Delete();
+    GraphicAPI::Get().GetTextureImpl().Initialise(_id.Value);
+    _id.IsInitialised = true;
 }
 
 void Texture::Bind() const {
-    GraphicAPI::Get().GetTextureImpl().Bind(_id, _data.Type);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetTextureImpl().Bind(_id.Value, _data.Type);
 }
 
 void Texture::Unbind() const {
-    GraphicAPI::Get().GetTextureImpl().Unbind(_id, _data.Type);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetTextureImpl().Unbind(_id.Value, _data.Type);
 }
 
 void Texture::ActivateUnit(unsigned int slot) const {
-    GraphicAPI::Get().GetTextureImpl().ActivateUnit(_id, _data.Type, slot);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetTextureImpl().ActivateUnit(_id.Value, _data.Type, slot);
 }
 
 void Texture::Set(ETextureType type, std::string&& texturePath, std::vector<TextureParam>&& params) {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     const std::filesystem::path filePath{texturePath};
     if (!std::filesystem::exists(filePath)) {
         const std::string& logText = fmt::format("File \"{}\" doesn't exist", texturePath);
@@ -103,11 +131,16 @@ void Texture::Set(ETextureType type, std::string&& texturePath, std::vector<Text
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
 
     Bind();
-    GraphicAPI::Get().GetTextureImpl().Set(_id, _data, pixelData);
+    GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data, pixelData);
     stbi_image_free(pixelData);
 }
 
 void Texture::Set(ETextureType type, const SetTextureParams& setParams, std::vector<TextureParam>&& params) {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     if (setParams.Name.empty()) {
         const std::string& logText{"Texture name is empty"};
         LOG_INTERNAL_ERROR(logText.c_str());
@@ -125,19 +158,20 @@ void Texture::Set(ETextureType type, const SetTextureParams& setParams, std::vec
     _data.DataType = setParams.DataType;
 
     Bind();
-    GraphicAPI::Get().GetTextureImpl().Set(_id, _data, nullptr);
-}
-
-void Texture::Delete() {
-    Bind();
-    GraphicAPI::Get().GetTextureImpl().Delete(_id, _data.Type);
+    GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data, nullptr);
 }
 
 const TextureData& Texture::GetData() const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
     return _data;
 }
 
 unsigned int Texture::GetID() const {
-    return _id;
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
+    return _id.Value;
 }
 }; // namespace GraphicLib

@@ -25,6 +25,7 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Public/${PROJECT_NAME}/Utilities/TextureUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/RenderBufferUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/ShaderUtils.h
+	Source/Public/${PROJECT_NAME}/Utilities/UniqueIdentifier.h
 
 	Source/Private/IExternalLogSystem.h
 	Source/Private/IExternalLogSystem.cpp
@@ -44,6 +45,7 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Private/Utilities/TextureUtils.cpp
 	Source/Private/Utilities/RenderBufferUtils.cpp
 	Source/Private/Utilities/ShaderUtils.cpp
+	Source/Private/Utilities/UniqueIdentifier.cpp
 
 	Source/Private/Vendors/stb/stb_image.h
 )
@@ -130,7 +132,7 @@ endif()
 target_link_libraries(
 	${PROJECT_NAME} PRIVATE 
 	fmt::fmt
-	assimp
+	# assimp
 )
 
 if(GL_ENABLE_EXAMPLES)

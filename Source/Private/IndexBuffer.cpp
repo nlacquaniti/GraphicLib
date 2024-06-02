@@ -1,5 +1,7 @@
 #include "GraphicLib/IndexBuffer.h"
 
+#include "InternalLogger.h"
+
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
 using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
@@ -8,33 +10,53 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-IndexBuffer::IndexBuffer() noexcept {
-    GraphicAPI::Get().GetIndexBufferImpl().Initialise(_id);
+IndexBuffer::~IndexBuffer() noexcept {
+    if (!_id.IsInitialised) {
+        return;
+    }
+    GraphicAPI::Get().GetIndexBufferImpl().Delete(_id.Value);
 }
 
-IndexBuffer::~IndexBuffer() noexcept {
-    Delete();
+void IndexBuffer::Initialise() {
+    if (_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Already Initialised");
+        return;
+    }
+    GraphicAPI::Get().GetIndexBufferImpl().Initialise(_id.Value);
+    _id.IsInitialised = true;
 }
 
 void IndexBuffer::Bind() const {
-    GraphicAPI::Get().GetIndexBufferImpl().Bind(_id);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetIndexBufferImpl().Bind(_id.Value);
 }
 
 void IndexBuffer::Unbind() const {
-    GraphicAPI::Get().GetIndexBufferImpl().Unbind(_id);
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    GraphicAPI::Get().GetIndexBufferImpl().Unbind(_id.Value);
 }
 
 void IndexBuffer::Set(std::vector<int>&& indices) {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+
     _indices = std::move(indices);
     Bind();
-    GraphicAPI::Get().GetIndexBufferImpl().Set(_id, _indices);
-}
-
-void IndexBuffer::Delete() {
-    GraphicAPI::Get().GetIndexBufferImpl().Delete(_id);
+    GraphicAPI::Get().GetIndexBufferImpl().Set(_id.Value, _indices);
 }
 
 const std::vector<int>& IndexBuffer::Get() const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
     return _indices;
 }
 } // namespace GraphicLib

@@ -1,7 +1,7 @@
 #pragma once
 
 #include "GraphicLib/DLL_API.h"
-#include <memory>
+#include "GraphicLib/Utilities/UniqueIdentifier.h"
 #include <string>
 #include <vector>
 
@@ -101,23 +101,23 @@ struct TextureData {
 
 class DLL_API Texture {
 public:
-    Texture() noexcept;
-    Texture(Texture&&) = delete;
-    Texture& operator=(Texture&&) = delete;
+    Texture() noexcept = default;
+    Texture(Texture&&) noexcept = default;
+    Texture& operator=(Texture&&) noexcept = default;
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
     ~Texture() noexcept;
+    void Initialise();
     void Bind() const;
     void Unbind() const;
     void ActivateUnit(unsigned int slot) const;
     void Set(ETextureType type, std::string&& texturePath, std::vector<TextureParam>&& params);
     void Set(ETextureType type, const SetTextureParams& setParams, std::vector<TextureParam>&& params);
-    void Delete();
     [[nodiscard]] const TextureData& GetData() const;
     [[nodiscard]] unsigned int GetID() const;
 
 private:
     TextureData _data{};
-    unsigned int _id{};
+    UniqueIdentifier _id;
 };
 } // namespace GraphicLib
