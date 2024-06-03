@@ -1,7 +1,6 @@
 #pragma once
 
-#include "GraphicLib/DLL_API.h"
-#include "GraphicLib/Utilities/UniqueIdentifier.h"
+#include "DLL_API.h"
 
 namespace GraphicLib {
 enum class ERenderBufferFormat : unsigned char {
@@ -21,21 +20,20 @@ struct RenderBufferData {
 
 class DLL_API RenderBuffer {
 public:
-    RenderBuffer() noexcept = default;
-    RenderBuffer(RenderBuffer&&) noexcept = default;
-    RenderBuffer& operator=(RenderBuffer&&) noexcept = default;
-    RenderBuffer(const RenderBuffer&) = delete;
-    RenderBuffer& operator=(const RenderBuffer&) = delete;
-    ~RenderBuffer() noexcept;
+    RenderBuffer() = default;
+    ~RenderBuffer();
+    RenderBuffer(const RenderBuffer&) = default;
+    RenderBuffer& operator=(const RenderBuffer&) = default;
     void Initialise();
-    void Bind() const;
-    void Unbind() const;
+    void Bind();
+    void Unbind();
     void Set(const RenderBufferData& data);
-    [[nodiscard]] unsigned int GetID() const;
-    [[nodiscard]] const RenderBufferData& GetData() const;
+    void Delete();
+    unsigned int GetID() const;
+    const RenderBufferData& GetData() const;
 
 private:
     RenderBufferData _data{};
-    UniqueIdentifier _id;
+    unsigned int _id{};
 };
 } // namespace GraphicLib

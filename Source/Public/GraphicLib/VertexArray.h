@@ -1,31 +1,29 @@
 #pragma once
 
-#include "GraphicLib/DLL_API.h"
+#include "DLL_API.h"
 #include "GraphicLib/IndexBuffer.h"
-#include "GraphicLib/Utilities/UniqueIdentifier.h"
 #include "GraphicLib/VertexBuffer.h"
 
 namespace GraphicLib {
 class DLL_API VertexArray {
 public:
-    VertexArray() noexcept = default;
-    VertexArray(VertexArray&&) noexcept = default;
-    VertexArray& operator=(VertexArray&&) noexcept = default;
-    VertexArray(const VertexArray&) = delete;
-    VertexArray& operator=(const VertexArray&) = delete;
-    ~VertexArray() noexcept;
+    VertexArray() = default;
+    ~VertexArray();
+    VertexArray(const VertexArray&) = default;
+    VertexArray& operator=(const VertexArray&) = default;
     void Initialise();
     void Bind();
     void Unbind();
     void Draw();
-    [[nodiscard]] const VertexBuffer& GetVertexBuffer() const;
+    void Delete();
+    const VertexBuffer& GetVertexBuffer() const;
     VertexBuffer& GetVertexBuffer();
-    [[nodiscard]] const IndexBuffer& GetIndexBuffer() const;
+    const IndexBuffer& GetIndexBuffer() const;
     IndexBuffer& GetIndexBuffer();
 
 private:
-    VertexBuffer _vertexBuffer;
-    IndexBuffer _indexBuffer;
-    UniqueIdentifier _id;
+    VertexBuffer _vertexBuffer{};
+    IndexBuffer _indexBuffer{};
+    unsigned int _id{};
 };
 } // namespace GraphicLib

@@ -31,10 +31,10 @@ public:
     void SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback);
     void SetOnRenderWindowDebugCallback(RenderWindowDebugCallback renderWindowDebugCallback);
     void SetOnCloseCallback(CloseWindowCallback closeWindowCallback);
-    [[nodiscard]] WindowSize GetSize() const;
-    [[nodiscard]] void* GetWindowImplPtr() const;
-    [[nodiscard]] void* GetUserData() const;
-    [[nodiscard]] const GraphicLib::FrameBuffer& GetWindowFrameBuffer() const;
+    WindowSize GetSize() const;
+    void* GetWindowImplPtr() const;
+    void* GetUserData() const;
+    const GraphicLib::FrameBuffer& GetWindowFrameBuffer() const;
 
 private:
     void _clear();

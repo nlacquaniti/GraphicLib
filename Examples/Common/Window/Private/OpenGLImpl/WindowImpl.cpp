@@ -60,7 +60,7 @@ bool WindowImpl::Create(const char* title) {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
     io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
-    io.FontGlobalScale = 1.5f;
+    io.FontGlobalScale = 1.0f;
     io.ConfigViewportsNoAutoMerge = true;
     io.ConfigViewportsNoTaskBarIcon = true;
 
@@ -199,12 +199,11 @@ void WindowImpl::_setFrameBufferConfiguration() {
 
     // FrameBuffer texture.
     GraphicLib::SetTextureParams frameBufferTextureData{};
-    frameBufferTextureData.Name = "FramebufferTexture";
-    frameBufferTextureData.Width = windowWidth;
-    frameBufferTextureData.Height = windowHeight;
     frameBufferTextureData.Channel = GraphicLib::ETextureChannel::RGBA;
     frameBufferTextureData.Format = GraphicLib::ETextureFormat::RGBA;
     frameBufferTextureData.DataType = GraphicLib::ETextureDataType::UNSIGNED_BYTE;
+    frameBufferTextureData.Width = windowWidth;
+    frameBufferTextureData.Height = windowHeight;
     std::vector<GraphicLib::TextureParam> frameBufferTextureParams{
         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},

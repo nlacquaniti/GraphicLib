@@ -1,4 +1,3 @@
-#include "GraphicLib/Mesh.h"
 #include "Window/Input.h"
 #include "Window/Window.h"
 
@@ -18,17 +17,12 @@
 #include <windows.h>
 #include <iostream>
 
-enum VertexAttributes {
-    VERTEX,
-    TEX_COORD,
-};
-
 struct Transform {
     glm::vec3 Position{};
     glm::vec3 Rotation{};
     glm::vec3 Scale{1, 1, 1};
     glm::mat4 Matrix() const {
-        glm::mat4 model{1.0F};
+        glm::mat4 model{1.0f};
         model = glm::translate(model, Position);
         model = glm::rotate(model, glm::radians(Rotation.x), {1, 0, 0});
         model = glm::rotate(model, glm::radians(Rotation.y), {0, 1, 0});
@@ -55,30 +49,31 @@ public:
     void Stop();
 
 private:
-    [[nodiscard]] glm::mat4 _createProjectionViewMat() const;
+    glm::mat4 _createProjectionViewMat() const;
 
-    Window _window;
-    Input _input;
+    Window _window{};
+    Input _input{};
 
-    GraphicLib::Mesh _boxMesh;
-    GraphicLib::Shader _boxShader;
+    GraphicLib::VertexArray _boxVA{};
+    GraphicLib::Shader _boxShader{};
+    GraphicLib::Texture _boxTexture{};
 
-    GraphicLib::VertexArray _gridVA;
-    GraphicLib::Shader _gridShader;
+    GraphicLib::VertexArray _gridVA{};
+    GraphicLib::Shader _gridShader{};
 
     // Box 1
-    Transform _box{glm::vec3{0.F, 0.5F, 4.F}, glm::vec3{0.F, 22.F, 0.F}};
+    Transform _box{glm::vec3{0.f, 0.5f, 4.f}, glm::vec3{0.f, 22.f, 0.f}};
 
     // Camera data
-    glm::vec3 _cameraPos{0.F, 2.F, 0.F};
+    glm::vec3 _cameraPos{0.f, 2.f, 0.f};
     glm::vec3 _cameraDir{};
     glm::vec3 _cameraDirRight{};
-    glm::vec3 _cameraRot{-20.F, 90.F, 0};
-    float _cameraMovementSpeed{5.0F};
-    float _cameraRotSpeed{100.0F};
-    float _cameraFOV{45.0F};
-    float _cameraNear{0.1F};
-    float _cameraFar{100.0F};
+    glm::vec3 _cameraRot{-20.f, 90.f, 0};
+    float _cameraMovementSpeed{5.0f};
+    float _cameraRotSpeed{100.0f};
+    float _cameraFOV{45.0f};
+    float _cameraNear{0.1f};
+    float _cameraFar{100.0f};
 
     // Mouse
     bool _isMouseBeingDragged{};
@@ -89,7 +84,7 @@ private:
 };
 
 void Application::Initialise() {
-    GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::HIGH);
+    GraphicLib::Logger::SetSeverity(GraphicLib::Logger::Severity::NOTIFICATION);
     GraphicLib::Logger::SetCallback(
         [](const GraphicLib::Logger::Message& message) {
             std::cout << "[" << message.source << "]";
@@ -135,59 +130,57 @@ void Application::Initialise() {
     _shouldUpdate = true;
 
     std::vector<float> vertices{
-        -0.5F, -0.5F, -0.5F, 0.0F, 0.0F, //
-        0.5F, -0.5F, -0.5F, 1.0F, 0.0F,  //
-        0.5F, 0.5F, -0.5F, 1.0F, 1.0F,   //
-        0.5F, 0.5F, -0.5F, 1.0F, 1.0F,   //
-        -0.5F, 0.5F, -0.5F, 0.0F, 1.0F,  //
-        -0.5F, -0.5F, -0.5F, 0.0F, 0.0F, //
-        -0.5F, -0.5F, 0.5F, 0.0F, 0.0F,  //
-        0.5F, -0.5F, 0.5F, 1.0F, 0.0F,   //
-        0.5F, 0.5F, 0.5F, 1.0F, 1.0F,    //
-        0.5F, 0.5F, 0.5F, 1.0F, 1.0F,    //
-        -0.5F, 0.5F, 0.5F, 0.0F, 1.0F,   //
-        -0.5F, -0.5F, 0.5F, 0.0F, 0.0F,  //
-        -0.5F, 0.5F, 0.5F, 1.0F, 0.0F,   //
-        -0.5F, 0.5F, -0.5F, 1.0F, 1.0F,  //
-        -0.5F, -0.5F, -0.5F, 0.0F, 1.0F, //
-        -0.5F, -0.5F, -0.5F, 0.0F, 1.0F, //
-        -0.5F, -0.5F, 0.5F, 0.0F, 0.0F,  //
-        -0.5F, 0.5F, 0.5F, 1.0F, 0.0F,   //
-        0.5F, 0.5F, 0.5F, 1.0F, 0.0F,    //
-        0.5F, 0.5F, -0.5F, 1.0F, 1.0F,   //
-        0.5F, -0.5F, -0.5F, 0.0F, 1.0F,  //
-        0.5F, -0.5F, -0.5F, 0.0F, 1.0F,  //
-        0.5F, -0.5F, 0.5F, 0.0F, 0.0F,   //
-        0.5F, 0.5F, 0.5F, 1.0F, 0.0F,    //
-        -0.5F, -0.5F, -0.5F, 0.0F, 1.0F, //
-        0.5F, -0.5F, -0.5F, 1.0F, 1.0F,  //
-        0.5F, -0.5F, 0.5F, 1.0F, 0.0F,   //
-        0.5F, -0.5F, 0.5F, 1.0F, 0.0F,   //
-        -0.5F, -0.5F, 0.5F, 0.0F, 0.0F,  //
-        -0.5F, -0.5F, -0.5F, 0.0F, 1.0F, //
-        -0.5F, 0.5F, -0.5F, 0.0F, 1.0F,  //
-        0.5F, 0.5F, -0.5F, 1.0F, 1.0F,   //
-        0.5F, 0.5F, 0.5F, 1.0F, 0.0F,    //
-        0.5F, 0.5F, 0.5F, 1.0F, 0.0F,    //
-        -0.5F, 0.5F, 0.5F, 0.0F, 0.0F,   //
-        -0.5F, 0.5F, -0.5F, 0.0F, 1.0F   //
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, //
+        0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  //
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  //
+        -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, //
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  //
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   //
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    //
+        0.5f, 0.5f, 0.5f, 1.0f, 1.0f,    //
+        -0.5f, 0.5f, 0.5f, 0.0f, 1.0f,   //
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  //
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,   //
+        -0.5f, 0.5f, -0.5f, 1.0f, 1.0f,  //
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, //
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  //
+        -0.5f, 0.5f, 0.5f, 1.0f, 0.0f,   //
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    //
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  //
+        0.5f, -0.5f, -0.5f, 0.0f, 1.0f,  //
+        0.5f, -0.5f, 0.5f, 0.0f, 0.0f,   //
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    //
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, //
+        0.5f, -0.5f, -0.5f, 1.0f, 1.0f,  //
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   //
+        0.5f, -0.5f, 0.5f, 1.0f, 0.0f,   //
+        -0.5f, -0.5f, 0.5f, 0.0f, 0.0f,  //
+        -0.5f, -0.5f, -0.5f, 0.0f, 1.0f, //
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f,  //
+        0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    //
+        0.5f, 0.5f, 0.5f, 1.0f, 0.0f,    //
+        -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,   //
+        -0.5f, 0.5f, -0.5f, 0.0f, 1.0f   //
     };
+    std::vector<int> vertexAttributes{3, 2};
 
-    std::vector<GraphicLib::VertexAttribute> vertexAttributes{{VertexAttributes::VERTEX, 3}, {VertexAttributes::TEX_COORD, 2}};
-
-    _boxMesh.Initialise();
-    _boxMesh.GetVertexArray().GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
-    GraphicLib::Texture boxTexture;
-    boxTexture.Initialise();
-    boxTexture.Set(GraphicLib::ETextureType::TEXTURE_2D, GetResourceFullPath("Resources/Diffuse.png"), //
-        std::vector<GraphicLib::TextureParam>{
-            {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
-            {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
-            {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-            {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-        });
-    _boxMesh.GetTextures().push_back(std::move(boxTexture));
-
+    _boxVA.Initialise();
+    _boxVA.Bind();
+    _boxVA.GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
+    std::vector<GraphicLib::TextureParam> textureParams{
+        {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
+        {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
+        {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+        {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
+    };
+    _boxTexture.Initialise(GraphicLib::ETextureType::TEXTURE_2D);
+    _boxTexture.Bind();
+    _boxTexture.Set(GetResourceFullPath("Resources/TextureTest.png"), std::move(textureParams));
     std::vector<GraphicLib::ShaderData> boxShaderParams{
         {GetResourceFullPath("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
@@ -195,6 +188,7 @@ void Application::Initialise() {
     _boxShader.Initialise();
     _boxShader.Set(std::move(boxShaderParams));
     _boxShader.Bind();
+    _boxShader.SetUniformIntValue("uTexture", 0);
     _boxShader.Unbind();
 
     std::vector<float> gridVertices{
@@ -205,8 +199,9 @@ void Application::Initialise() {
         1, 1, 0,   //
         1, -1, 0,  //
     };
-    std::vector<GraphicLib::VertexAttribute> gridVertexAttributes{{VertexAttributes::TEX_COORD, 3}};
+    std::vector<int> gridVertexAttributes{3};
     _gridVA.Initialise();
+    _gridVA.Bind();
     _gridVA.GetVertexBuffer().Set(std::move(gridVertices), std::move(gridVertexAttributes));
     std::vector<GraphicLib::ShaderData> gridShaderParams{
         {GetResourceFullPath("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
@@ -228,10 +223,10 @@ void Application::ProcessInput(EInputKey key, EInputAction action) {
 void Application::Update(float deltaTime) {
     _deltaTime = deltaTime;
 
-    const float yawCos = glm::cos(glm::radians(_cameraRot.y));
-    const float yawSin = glm::sin(glm::radians(_cameraRot.y));
-    const float pitchCos = glm::cos(glm::radians(_cameraRot.x));
-    const float pitchSin = glm::sin(glm::radians(_cameraRot.x));
+    const double yawCos = glm::cos(glm::radians(_cameraRot.y));
+    const double yawSin = glm::sin(glm::radians(_cameraRot.y));
+    const double pitchCos = glm::cos(glm::radians(_cameraRot.x));
+    const double pitchSin = glm::sin(glm::radians(_cameraRot.x));
     _cameraDir.x = yawCos * pitchCos;
     _cameraDir.y = pitchSin;
     _cameraDir.z = yawSin * pitchCos;
@@ -283,14 +278,14 @@ void Application::Update(float deltaTime) {
         }
         if (mousePosition.X > _mouseDraggedStartingPosition.X + _deadZone) {
             _cameraRot.y += _cameraRotSpeed * deltaTime;
-            if (_cameraRot.y > 360.0F) {
-                _cameraRot.y = 0.0F;
+            if (_cameraRot.y > 360.0f) {
+                _cameraRot.y = 0.0f;
             }
         }
         if (mousePosition.X < _mouseDraggedStartingPosition.X - _deadZone) {
             _cameraRot.y -= _cameraRotSpeed * deltaTime;
             if (_cameraRot.y < 0.0f) {
-                _cameraRot.y = 360.0F;
+                _cameraRot.y = 360.0f;
             }
         }
 
@@ -320,7 +315,13 @@ void Application::Render() {
     glm::mat4 PV = _createProjectionViewMat();
     glm::mat4 MVP = PV * _box.Matrix();
     _boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
-    _boxMesh.Draw(_boxShader);
+    _boxVA.Bind();
+    _boxTexture.Draw(0);
+    _boxVA.Draw();
+
+    // MVP = PV * _box1.Matrix();
+    //_boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
+    //_boxVA.Draw();
 }
 
 void Application::RenderDebug() {
@@ -340,7 +341,7 @@ void Application::RenderDebug() {
         ImGui::GetWindowDrawList()->AddImage(                                                                              //
             reinterpret_cast<void*>(static_cast<unsigned long long>(_window.GetWindowFrameBuffer().GetTexture().GetID())), //
             pos,                                                                                                           //
-            {pos.x + static_cast<float>(windowSize.Width), pos.y + static_cast<float>(windowSize.Height)},                 //
+            {pos.x + windowSize.Width, pos.y + windowSize.Height},                                                         //
             {0, 1},                                                                                                        //
             {1, 0}                                                                                                         //
         );
@@ -359,6 +360,9 @@ void Application::RenderDebug() {
         ImGui::InputFloat("_cameraSpeed", &_cameraMovementSpeed);
         ImGui::InputFloat("_cameraRotSpeed", &_cameraRotSpeed);
         ImGui::DragFloat("_cameraFOV", &_cameraFOV);
+        ImGui::Text("_cameraDir [%.2f,%.2f,%.2f]", _cameraDir.x, _cameraDir.y, _cameraDir.z);
+        ImGui::Text("_cameraDirRight [%.2f,%.2f,%.2f]", _cameraDirRight.x, _cameraDirRight.y, _cameraDirRight.z);
+        ImGui::Text("_cameraDirLeft [%.2f,%.2f,%.2f]", -_cameraDirRight.x, -_cameraDirRight.y, -_cameraDirRight.z);
     }
     ImGui::End();
 
@@ -369,6 +373,11 @@ void Application::RenderDebug() {
         ImGui::Text("FPS: %.0f", 1 / _deltaTime);
         const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
         ImGui::Text("Resolution %dx%d", mode->width, mode->height);
+
+        ImGui::SeparatorText("Input");
+        ImGui::Text("Mouse pos: [%.0f, %.0f]", _input.GetMousePosition().X, _input.GetMousePosition().Y);
+        ImGui::Text("Dragging: %s", _isMouseBeingDragged ? "on" : "off");
+        ImGui::Text("Dragging start mouse pos: [%.0f, %.0f]", _mouseDraggedStartingPosition.X, _mouseDraggedStartingPosition.Y);
     }
     ImGui::End();
 }
@@ -381,8 +390,8 @@ glm::mat4 Application::_createProjectionViewMat() const {
     const WindowSize& windowSize{_window.GetSize()};
     const glm::mat4 projection{glm::perspective(glm::radians(_cameraFOV),             //
         static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height), //
-        0.1F,                                                                         //
-        100.0F                                                                        //
+        0.1f,                                                                         //
+        100.0f                                                                        //
         )};
 
     const glm::mat4 view = glm::lookAt(_cameraPos, _cameraPos + _cameraDir, {0, 1, 0});

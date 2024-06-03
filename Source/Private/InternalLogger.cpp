@@ -43,7 +43,6 @@ void InternalLogger::LogInternalNotification(const char* source, const char* tex
 
 void InternalLogger::LogInternalError(const char* source, const char* text) {
     LogMessage(Message{Logger::Category::INTERNAL, Logger::Severity::HIGH, source, text});
-    assert(false);
 }
 
 std::size_t InternalLogger::AttachExternalLogSystem(std::unique_ptr<IExternalLogSystem> externalLogSystem) {

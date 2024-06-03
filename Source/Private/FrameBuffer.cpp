@@ -1,7 +1,5 @@
 #include "GraphicLib/FrameBuffer.h"
 
-#include "InternalLogger.h"
-
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
 using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
@@ -10,73 +8,43 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-FrameBuffer::~FrameBuffer() noexcept {
-    if (!_id.IsInitialised) {
-        return;
-    }
-    GraphicAPI::Get().GetFrameBufferImpl().Delete(_id.Value);
+FrameBuffer::~FrameBuffer() {
+    Delete();
 }
 
 void FrameBuffer::Initialise() {
-    if (_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Already Initialised");
-        return;
-    }
-    _texture.Initialise();
-    _renderBuffer.Initialise();
-    GraphicAPI::Get().GetFrameBufferImpl().Initialise(_id.Value);
-    _id.IsInitialised = true;
+    GraphicAPI::Get().GetFrameBufferImpl().Initialise(_id);
 }
 
-void FrameBuffer::Bind() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-    GraphicAPI::Get().GetFrameBufferImpl().Bind(_id.Value);
+void FrameBuffer::Bind() {
+    GraphicAPI::Get().GetFrameBufferImpl().Bind(_id);
 }
 
-void FrameBuffer::Unbind() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-    GraphicAPI::Get().GetFrameBufferImpl().Unbind(_id.Value);
+void FrameBuffer::Unbind() {
+    GraphicAPI::Get().GetFrameBufferImpl().Unbind(_id);
 }
 
 void FrameBuffer::Set() {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-    GraphicAPI::Get().GetFrameBufferImpl().Set(_id.Value, _texture, _renderBuffer);
+    GraphicAPI::Get().GetFrameBufferImpl().Set(_id, _texture, _renderBuffer);
+}
+
+void FrameBuffer::Delete() {
+    GraphicAPI::Get().GetFrameBufferImpl().Delete(_id);
 }
 
 const Texture& FrameBuffer::GetTexture() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
     return _texture;
 }
 
 Texture& FrameBuffer::GetTexture() {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
     return _texture;
 }
 
 const RenderBuffer& FrameBuffer::GetRenderBuffer() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
     return _renderBuffer;
 }
 
 RenderBuffer& FrameBuffer::GetRenderBuffer() {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
     return _renderBuffer;
 }
 } // namespace GraphicLib

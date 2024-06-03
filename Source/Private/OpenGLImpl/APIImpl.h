@@ -12,16 +12,15 @@ namespace GraphicLib::OpenGLImpl {
 class APIImpl {
 public:
     static const APIImpl& Get();
-    [[nodiscard]] const VertexArrayImpl& GetVertexArrayImpl() const;
-    [[nodiscard]] const VertexBufferImpl& GetVertexBufferImpl() const;
-    [[nodiscard]] const IndexBufferImpl& GetIndexBufferImpl() const;
-    [[nodiscard]] const TextureImpl& GetTextureImpl() const;
-    [[nodiscard]] const ShaderImpl& GetShaderImpl() const;
-    [[nodiscard]] const FrameBufferImpl& GetFrameBufferImpl() const;
-    [[nodiscard]] const RenderBufferImpl& GetRenderBufferImpl() const;
+    const VertexArrayImpl& GetVertexArrayImpl() const;
+    const VertexBufferImpl& GetVertexBufferImpl() const;
+    const IndexBufferImpl& GetIndexBufferImpl() const;
+    const TextureImpl& GetTextureImpl() const;
+    const ShaderImpl& GetShaderImpl() const;
+    const FrameBufferImpl& GetFrameBufferImpl() const;
+    const RenderBufferImpl& GetRenderBufferImpl() const;
 
 private:
-    explicit APIImpl() = default;
     static APIImpl* _instance;
     VertexArrayImpl _vertexArrayImpl{};
     VertexBufferImpl _vertexBufferImpl{};

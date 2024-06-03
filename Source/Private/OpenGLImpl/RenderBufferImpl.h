@@ -5,10 +5,10 @@
 namespace GraphicLib::OpenGLImpl {
 class RenderBufferImpl {
 public:
-    static void Initialise(unsigned int& id);
-    static void Bind(unsigned int id);
-    static void Unbind(unsigned int id);
-    static void Set(unsigned id, const RenderBufferData& data);
-    static void Delete(unsigned int& id);
+    void Initialise(unsigned int& id) const;
+    void Bind(unsigned int id) const;
+    void Unbind(unsigned int id) const;
+    void Set(unsigned id, const RenderBufferData& data) const;
+    void Delete(unsigned int& id) const;
 };
 } // namespace GraphicLib::OpenGLImpl

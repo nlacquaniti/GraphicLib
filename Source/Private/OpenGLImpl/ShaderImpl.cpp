@@ -9,8 +9,74 @@
 #include <vector>
 
 namespace GraphicLib::OpenGLImpl {
-namespace {
-bool _createShader(const ShaderData& shaderData, unsigned int& id) {
+void ShaderImpl::Initialise(unsigned int& id) const {
+    id = glCreateProgram();
+}
+
+void ShaderImpl::Bind(unsigned int id) const {
+    glUseProgram(id);
+}
+
+void ShaderImpl::Unbind(unsigned int) const {
+    glUseProgram(0);
+}
+
+bool ShaderImpl::Set(unsigned int id, const std::vector<ShaderData>& shadersData) const {
+    std::vector<unsigned int> shaderIDs{};
+    shaderIDs.reserve(shadersData.size());
+
+    for (size_t i = 0; i < shadersData.size(); ++i) {
+        const ShaderData& shaderData = shadersData[i];
+        unsigned int shaderID{};
+        if (!_createShader(shaderData, shaderID)) {
+            return false;
+        }
+
+        shaderIDs.push_back(shaderID);
+        glAttachShader(id, shaderID);
+    }
+
+    glLinkProgram(id);
+    int successfullyCompiled{};
+    glGetProgramiv(id, GL_LINK_STATUS, &successfullyCompiled);
+    if (!successfullyCompiled) {
+        int infoLogLength{};
+        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLength);
+        std::vector<char> logText{};
+        logText.reserve(static_cast<size_t>(infoLogLength));
+        glGetShaderInfoLog(id, infoLogLength, &infoLogLength, logText.data());
+        LOG_INTERNAL_ERROR(logText.data());
+    }
+
+    for (unsigned int shaderID : shaderIDs) {
+        glDeleteShader(shaderID);
+    }
+
+    return successfullyCompiled == 1;
+}
+
+void ShaderImpl::SetUniformBoolValue(unsigned int id, const char* name, bool value) const {
+    glUniform1i(glGetUniformLocation(id, name), static_cast<int>(value));
+}
+
+void ShaderImpl::SetUniformIntValue(unsigned int id, const char* name, int value) const {
+    glUniform1i(glGetUniformLocation(id, name), value);
+}
+
+void ShaderImpl::SetUniformFloatValue(unsigned int id, const char* name, float value) const {
+    glUniform1f(glGetUniformLocation(id, name), value);
+}
+
+void ShaderImpl::SetUniformMat4Value(unsigned int id, const char* name, const float* value) const {
+    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_FALSE, value);
+}
+
+void ShaderImpl::Delete(unsigned int& id) const {
+    glDeleteProgram(id);
+    id = 0;
+}
+
+bool ShaderImpl::_createShader(const ShaderData& shaderData, unsigned int& id) const {
     unsigned int shaderType{};
     if (!ShaderImplUtils::ConvertShaderType(shaderData.Type, shaderType)) {
         const std::string& logText = fmt::format("Can't EShaderType {} to OpenGL shader type", ShaderUtils::ShaderTypeToString(shaderData.Type));
@@ -32,7 +98,7 @@ bool _createShader(const ShaderData& shaderData, unsigned int& id) {
 
     int successfullyCompiled{};
     glGetShaderiv(id, GL_COMPILE_STATUS, &successfullyCompiled);
-    if (successfullyCompiled == 0) {
+    if (!successfullyCompiled) {
         int infoLogLength{};
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLength);
 
@@ -46,70 +112,5 @@ bool _createShader(const ShaderData& shaderData, unsigned int& id) {
     }
 
     return true;
-}
-} // namespace
-
-void ShaderImpl::Initialise(unsigned int& id) {
-    id = glCreateProgram();
-}
-
-void ShaderImpl::Bind(unsigned int id) {
-    glUseProgram(id);
-}
-
-void ShaderImpl::Unbind(unsigned int /*unused*/) {
-    glUseProgram(0);
-}
-
-void ShaderImpl::Set(unsigned int id, const std::vector<ShaderData>& shadersData) {
-    std::vector<unsigned int> shaderIDs{};
-    shaderIDs.reserve(shadersData.size());
-
-    for (const ShaderData& shaderData : shadersData) {
-        unsigned int shaderID{};
-        if (!_createShader(shaderData, shaderID)) {
-            return;
-        }
-
-        shaderIDs.push_back(shaderID);
-        glAttachShader(id, shaderID);
-    }
-
-    glLinkProgram(id);
-    int successfullyCompiled{};
-    glGetProgramiv(id, GL_LINK_STATUS, &successfullyCompiled);
-    if (successfullyCompiled == 0) {
-        int infoLogLength{};
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLength);
-        std::vector<char> logText{};
-        logText.reserve(static_cast<size_t>(infoLogLength));
-        glGetShaderInfoLog(id, infoLogLength, &infoLogLength, logText.data());
-        LOG_INTERNAL_ERROR(logText.data());
-    }
-
-    for (unsigned int shaderID : shaderIDs) {
-        glDeleteShader(shaderID);
-    }
-}
-
-void ShaderImpl::SetUniformBoolValue(unsigned int id, const char* name, bool value) {
-    glUniform1i(glGetUniformLocation(id, name), static_cast<int>(value));
-}
-
-void ShaderImpl::SetUniformIntValue(unsigned int id, const char* name, int value) {
-    glUniform1i(glGetUniformLocation(id, name), value);
-}
-
-void ShaderImpl::SetUniformFloatValue(unsigned int id, const char* name, float value) {
-    glUniform1f(glGetUniformLocation(id, name), value);
-}
-
-void ShaderImpl::SetUniformMat4Value(unsigned int id, const char* name, const float* value) {
-    glUniformMatrix4fv(glGetUniformLocation(id, name), 1, GL_FALSE, value);
-}
-
-void ShaderImpl::Delete(unsigned int& id) {
-    glDeleteProgram(id);
-    id = 0;
 }
 } // namespace GraphicLib::OpenGLImpl

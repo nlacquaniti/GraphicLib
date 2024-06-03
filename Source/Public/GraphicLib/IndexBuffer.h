@@ -1,26 +1,30 @@
 #pragma once
 
-#include "GraphicLib/DLL_API.h"
-#include "GraphicLib/Utilities/UniqueIdentifier.h"
+#include "DLL_API.h"
 #include <vector>
 
 namespace GraphicLib {
+struct IndexBufferDataElement {
+    unsigned int E1{};
+    unsigned int E2{};
+    unsigned int E3{};
+};
+
 class DLL_API IndexBuffer {
 public:
-    IndexBuffer() noexcept = default;
-    IndexBuffer(IndexBuffer&&) noexcept = default;
-    IndexBuffer& operator=(IndexBuffer&&) noexcept = default;
-    IndexBuffer(const IndexBuffer&) = delete;
-    IndexBuffer& operator=(const IndexBuffer&) = delete;
-    ~IndexBuffer() noexcept;
+    IndexBuffer() = default;
+    ~IndexBuffer();
+    IndexBuffer(const IndexBuffer&) = default;
+    IndexBuffer& operator=(const IndexBuffer&) = default;
     void Initialise();
-    void Bind() const;
-    void Unbind() const;
-    void Set(std::vector<int>&& indices);
-    [[nodiscard]] const std::vector<int>& Get() const;
+    void Bind();
+    void Unbind();
+    void Set(std::vector<IndexBufferDataElement>&& indices);
+    void Delete();
+    const std::vector<IndexBufferDataElement>& Get() const;
 
 private:
-    std::vector<int> _indices;
-    UniqueIdentifier _id;
+    std::vector<IndexBufferDataElement> _indices{};
+    unsigned int _id{};
 };
 } // namespace GraphicLib

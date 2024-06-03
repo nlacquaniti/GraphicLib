@@ -1,7 +1,5 @@
 #include "GraphicLib/IndexBuffer.h"
 
-#include "InternalLogger.h"
-
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
 using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
@@ -10,53 +8,33 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-IndexBuffer::~IndexBuffer() noexcept {
-    if (!_id.IsInitialised) {
-        return;
-    }
-    GraphicAPI::Get().GetIndexBufferImpl().Delete(_id.Value);
+IndexBuffer::~IndexBuffer() {
+    Delete();
 }
 
 void IndexBuffer::Initialise() {
-    if (_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Already Initialised");
-        return;
-    }
-    GraphicAPI::Get().GetIndexBufferImpl().Initialise(_id.Value);
-    _id.IsInitialised = true;
+    GraphicAPI::Get().GetIndexBufferImpl().Initialise(_id);
 }
 
-void IndexBuffer::Bind() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-    GraphicAPI::Get().GetIndexBufferImpl().Bind(_id.Value);
+void IndexBuffer::Bind() {
+    GraphicAPI::Get().GetIndexBufferImpl().Bind(_id);
 }
 
-void IndexBuffer::Unbind() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-    GraphicAPI::Get().GetIndexBufferImpl().Unbind(_id.Value);
+void IndexBuffer::Unbind() {
+    GraphicAPI::Get().GetIndexBufferImpl().Unbind(_id);
 }
 
-void IndexBuffer::Set(std::vector<int>&& indices) {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-
+void IndexBuffer::Set(std::vector<IndexBufferDataElement>&& indices) {
     _indices = std::move(indices);
     Bind();
-    GraphicAPI::Get().GetIndexBufferImpl().Set(_id.Value, _indices);
+    GraphicAPI::Get().GetIndexBufferImpl().Set(_id, _indices);
 }
 
-const std::vector<int>& IndexBuffer::Get() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
+void IndexBuffer::Delete() {
+    GraphicAPI::Get().GetIndexBufferImpl().Delete(_id);
+}
+
+const std::vector<IndexBufferDataElement>& IndexBuffer::Get() const {
     return _indices;
 }
 } // namespace GraphicLib

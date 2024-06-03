@@ -7,20 +7,21 @@
 #include "Utils/TextureImplUtils.h"
 #include <glad/glad.h>
 
+
 namespace GraphicLib::OpenGLImpl {
-void FrameBufferImpl::Initialise(unsigned int& id) {
+void FrameBufferImpl::Initialise(unsigned int& id) const {
     glGenFramebuffers(1, &id);
 }
 
-void FrameBufferImpl::Bind(unsigned int id) {
+void FrameBufferImpl::Bind(unsigned int id) const {
     glBindFramebuffer(GL_FRAMEBUFFER, id);
 }
 
-void FrameBufferImpl::Unbind(unsigned int /*unused*/) {
+void FrameBufferImpl::Unbind(unsigned int) const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBufferImpl::Set(unsigned int /*unused*/, const Texture& frameBufferTexture, const RenderBuffer& renderBuffer) {
+void FrameBufferImpl::Set(unsigned int, const Texture& frameBufferTexture, const RenderBuffer& renderBuffer) const {
     // Set FrameBuffer Texture.
     unsigned int frameBufferAttachment{};
     if (!TextureImplUtils::ConvertTextureFormatToFrameBufferAttachment(frameBufferTexture.GetData().Format, frameBufferAttachment)) {
@@ -46,7 +47,7 @@ void FrameBufferImpl::Set(unsigned int /*unused*/, const Texture& frameBufferTex
     }
 }
 
-void FrameBufferImpl::Delete(unsigned int& id) {
+void FrameBufferImpl::Delete(unsigned int& id) const {
     glDeleteFramebuffers(1, &id);
 }
 } // namespace GraphicLib::OpenGLImpl

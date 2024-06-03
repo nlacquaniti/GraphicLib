@@ -21,7 +21,6 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Public/${PROJECT_NAME}/Texture.h
 	Source/Public/${PROJECT_NAME}/FrameBuffer.h
 	Source/Public/${PROJECT_NAME}/RenderBuffer.h
-	Source/Public/${PROJECT_NAME}/Mesh.h
 	Source/Public/${PROJECT_NAME}/Utilities/TextureUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/RenderBufferUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/ShaderUtils.h
@@ -36,7 +35,6 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Private/Texture.cpp
 	Source/Private/FrameBuffer.cpp
 	Source/Private/RenderBuffer.cpp
-	Source/Private/Mesh.cpp
 	Source/Private/Logger.cpp
 	Source/Private/InternalLogger.h
 	Source/Private/InternalLogger.cpp

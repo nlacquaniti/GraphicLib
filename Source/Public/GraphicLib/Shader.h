@@ -1,7 +1,6 @@
 #pragma once
 
-#include "GraphicLib/DLL_API.h"
-#include "GraphicLib/Utilities/UniqueIdentifier.h"
+#include "DLL_API.h"
 #include <string>
 #include <vector>
 
@@ -17,18 +16,16 @@ enum class EShaderType : unsigned char {
 };
 
 struct ShaderData {
-    std::string FilePath;
+    std::string FilePath{};
     EShaderType Type{};
 };
 
 class DLL_API Shader {
 public:
-    Shader() noexcept = default;
-    Shader(Shader&&) noexcept = default;
-    Shader& operator=(Shader&&) noexcept = default;
-    Shader(const Shader&) = delete;
-    Shader& operator=(const Shader&) = delete;
-    ~Shader() noexcept;
+    Shader() = default;
+    Shader(const Shader& other) = default;
+    Shader& operator=(const Shader& other) = default;
+    ~Shader();
     void Initialise();
     void Bind() const;
     void Unbind() const;
@@ -37,11 +34,12 @@ public:
     void SetUniformIntValue(const char* name, int value) const;
     void SetUniformFloatValue(const char* name, float value) const;
     void SetUniformMat4Value(const char* name, float* value) const;
-    [[nodiscard]] const std::vector<ShaderData>& GetData() const;
-    [[nodiscard]] unsigned int GetID() const;
+    void Delete();
+    const std::vector<ShaderData>& GetData() const;
+    unsigned int GetID() const;
 
 private:
-    std::vector<ShaderData> _data;
-    UniqueIdentifier _id;
+    std::vector<ShaderData> _data{};
+    unsigned int _id{};
 };
 } // namespace GraphicLib

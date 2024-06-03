@@ -34,7 +34,7 @@ public:
 private:
     InternalLogger() = default;
     static InternalLogger* _instance;
-    std::unordered_map<std::size_t, std::unique_ptr<IExternalLogSystem>> _externalLogSystems;
+    std::unordered_map<std::size_t, std::unique_ptr<IExternalLogSystem>> _externalLogSystems{};
     Logger::Severity _severity{};
     Logger::MessageCallback _callback{};
     const void* _userData{};

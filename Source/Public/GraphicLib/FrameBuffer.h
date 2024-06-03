@@ -1,31 +1,29 @@
 #pragma once
 
 #include "GraphicLib/DLL_API.h"
-#include "GraphicLib/RenderBuffer.h"
 #include "GraphicLib/Texture.h"
-#include "GraphicLib/Utilities/UniqueIdentifier.h"
+#include "GraphicLib/RenderBuffer.h"
 
 namespace GraphicLib {
 class DLL_API FrameBuffer {
 public:
-    FrameBuffer() noexcept = default;
-    FrameBuffer(FrameBuffer&&) noexcept = default;
-    FrameBuffer& operator=(FrameBuffer&&) noexcept = default;
-    FrameBuffer(const FrameBuffer&) = delete;
-    FrameBuffer& operator=(const FrameBuffer&) = delete;
-    ~FrameBuffer() noexcept;
+    FrameBuffer() = default;
+    ~FrameBuffer();
+    FrameBuffer(const FrameBuffer&) = default;
+    FrameBuffer& operator=(const FrameBuffer&) = default;
     void Initialise();
-    void Bind() const;
-    void Unbind() const;
+    void Bind();
+    void Unbind();
     void Set();
-    [[nodiscard]] const Texture& GetTexture() const;
+    void Delete();
+    const Texture& GetTexture() const;
     Texture& GetTexture();
-    [[nodiscard]] const RenderBuffer& GetRenderBuffer() const;
+    const RenderBuffer& GetRenderBuffer() const;
     RenderBuffer& GetRenderBuffer();
 
 private:
-    RenderBuffer _renderBuffer;
-    Texture _texture;
-    UniqueIdentifier _id;
+    RenderBuffer _renderBuffer{};
+    Texture _texture{};
+    unsigned int _id{};
 };
 } // namespace GraphicLib

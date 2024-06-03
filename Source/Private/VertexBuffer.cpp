@@ -1,6 +1,4 @@
 #include "GraphicLib/VertexBuffer.h"
-#include "GraphicLib/Utilities/UniqueIdentifier.h"
-#include "InternalLogger.h"
 
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
@@ -10,61 +8,38 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
-VertexBuffer::~VertexBuffer() noexcept {
-    if (!_id.IsInitialised) {
-        return;
-    }
-    GraphicAPI::Get().GetVertexBufferImpl().Delete(_id.Value);
+VertexBuffer::~VertexBuffer() {
+    Delete();
 }
 
 void VertexBuffer::Initialise() {
-    if (_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Already initialised");
-        return;
-    }
-    GraphicAPI::Get().GetVertexBufferImpl().Initialise(_id.Value);
-    _id.IsInitialised = true;
+    GraphicAPI::Get().GetVertexBufferImpl().Initialise(_id);
 }
 
-void VertexBuffer::Bind() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-    GraphicAPI::Get().GetVertexBufferImpl().Bind(_id.Value);
+void VertexBuffer::Bind() {
+    GraphicAPI::Get().GetVertexBufferImpl().Bind(_id);
 }
 
-void VertexBuffer::Unbind() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-    GraphicAPI::Get().GetVertexBufferImpl().Unbind(_id.Value);
+void VertexBuffer::Unbind() {
+    GraphicAPI::Get().GetVertexBufferImpl().Unbind(_id);
 }
 
-void VertexBuffer::Set(std::vector<float>&& vertexData, std::vector<VertexAttribute>&& vertexAttributes) {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-        return;
-    }
-
+void VertexBuffer::Set(std::vector<float>&& vertexData, std::vector<int>&& vertexAttributes) {
     _vertexData = std::move(vertexData);
     _vertexAttributes = std::move(vertexAttributes);
     Bind();
-    GraphicAPI::Get().GetVertexBufferImpl().Set(_id.Value, _vertexData, _vertexAttributes);
+    GraphicAPI::Get().GetVertexBufferImpl().Set(_id, _vertexData, _vertexAttributes);
+}
+
+void VertexBuffer::Delete() {
+    GraphicAPI::Get().GetVertexBufferImpl().Delete(_id);
 }
 
 const std::vector<float>& VertexBuffer::GetVertexData() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
     return _vertexData;
 }
 
-const std::vector<VertexAttribute>& VertexBuffer::GetVertexAttributes() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
+const std::vector<int>& VertexBuffer::GetVertexAttributes() const {
     return _vertexAttributes;
 }
 } // namespace GraphicLib
