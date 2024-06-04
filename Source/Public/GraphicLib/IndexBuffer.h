@@ -1,6 +1,7 @@
 #pragma once
 
-#include "DLL_API.h"
+#include "GraphicLib/DLL_API.h"
+#include "GraphicLib/Utilities/UniqueIdentifier.h"
 #include <vector>
 
 namespace GraphicLib {
@@ -12,19 +13,20 @@ struct IndexBufferDataElement {
 
 class DLL_API IndexBuffer {
 public:
-    IndexBuffer() = default;
-    ~IndexBuffer();
-    IndexBuffer(const IndexBuffer&) = default;
-    IndexBuffer& operator=(const IndexBuffer&) = default;
+    IndexBuffer() noexcept = default;
+    IndexBuffer(IndexBuffer&&) noexcept = default;
+    IndexBuffer& operator=(IndexBuffer&&) noexcept = default;
+    IndexBuffer(const IndexBuffer&) = delete;
+    IndexBuffer& operator=(const IndexBuffer&) = delete;
+    ~IndexBuffer() noexcept;
     void Initialise();
-    void Bind();
-    void Unbind();
+    void Bind() const;
+    void Unbind() const;
     void Set(std::vector<IndexBufferDataElement>&& indices);
-    void Delete();
-    const std::vector<IndexBufferDataElement>& Get() const;
+    [[nodiscard]] const std::vector<IndexBufferDataElement>& Get() const;
 
 private:
-    std::vector<IndexBufferDataElement> _indices{};
-    unsigned int _id{};
+    std::vector<IndexBufferDataElement> _indices;
+    UniqueIdentifier _id;
 };
 } // namespace GraphicLib

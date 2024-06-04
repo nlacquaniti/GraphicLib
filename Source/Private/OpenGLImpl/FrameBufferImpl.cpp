@@ -7,7 +7,6 @@
 #include "Utils/TextureImplUtils.h"
 #include <glad/glad.h>
 
-
 namespace GraphicLib::OpenGLImpl {
 void FrameBufferImpl::Initialise(unsigned int& id) const {
     glGenFramebuffers(1, &id);

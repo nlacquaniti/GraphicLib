@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicLib/DLL_API.h"
+#include "GraphicLib/Utilities/UniqueIdentifier.h"
 #include <string>
 #include <vector>
 
@@ -86,8 +87,8 @@ struct SetTextureParams {
 };
 
 struct TextureData {
-    std::string FilePath{};
-    std::vector<TextureParam> Parameters{};
+    std::string FilePath;
+    std::vector<TextureParam> Parameters;
     unsigned char* PixelData{};
     int Width{};
     int Height{};
@@ -99,23 +100,24 @@ struct TextureData {
 
 class DLL_API Texture {
 public:
-    Texture() = default;
-    Texture(const Texture& other) = default;
-    Texture& operator=(const Texture& other) = default;
-    ~Texture();
+    Texture() noexcept = default;
+    Texture(Texture&&) noexcept = default;
+    Texture& operator=(Texture&&) noexcept = default;
+    Texture(const Texture&) = delete;
+    Texture& operator=(const Texture&) = delete;
+    ~Texture() noexcept;
     void Initialise(ETextureType type);
-    void Bind();
-    void Unbind();
-    void Draw(unsigned int slot);
+    void Bind() const;
+    void Unbind() const;
+    void Draw(unsigned int slot) const;
     void Set(std::string&& texturePath, std::vector<TextureParam>&& params);
     void Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params);
-    void Delete();
-    const TextureData& GetData() const;
-    unsigned int GetID() const;
+    [[nodiscard]] const TextureData& GetData() const;
+    [[nodiscard]] unsigned int GetID() const;
 
 private:
     void _setTextureFromFile();
     TextureData _data{};
-    unsigned int _id;
+    UniqueIdentifier _id;
 };
 } // namespace GraphicLib

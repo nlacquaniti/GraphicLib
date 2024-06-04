@@ -1,26 +1,28 @@
 #pragma once
 
-#include "DLL_API.h"
+#include "GraphicLib/DLL_API.h"
+#include "GraphicLib/Utilities/UniqueIdentifier.h"
 #include <vector>
 
 namespace GraphicLib {
 class DLL_API VertexBuffer {
 public:
-    VertexBuffer() = default;
-    ~VertexBuffer();
-    VertexBuffer(const VertexBuffer&) = default;
-    VertexBuffer& operator=(const VertexBuffer&) = default;
+    VertexBuffer() noexcept = default;
+    VertexBuffer(VertexBuffer&&) noexcept = default;
+    VertexBuffer& operator=(VertexBuffer&&) noexcept = default;
+    VertexBuffer(const VertexBuffer&) = delete;
+    VertexBuffer& operator=(const VertexBuffer&) = delete;
+    ~VertexBuffer() noexcept;
     void Initialise();
-    void Bind();
-    void Unbind();
+    void Bind() const;
+    void Unbind() const;
     void Set(std::vector<float>&& vertexData, std::vector<int>&& vertexAttributes);
-    void Delete();
-    const std::vector<float>& GetVertexData() const;
-    const std::vector<int>& GetVertexAttributes() const;
+    [[nodiscard]] const std::vector<float>& GetVertexData() const;
+    [[nodiscard]] const std::vector<int>& GetVertexAttributes() const;
 
 private:
-    std::vector<float> _vertexData{};
-    std::vector<int> _vertexAttributes{};
-    unsigned int _id{};
+    std::vector<float> _vertexData;
+    std::vector<int> _vertexAttributes;
+    UniqueIdentifier _id;
 };
 } // namespace GraphicLib
