@@ -6,9 +6,13 @@
 
 namespace GraphicLib {
 struct IndexBufferDataElement {
-    unsigned int E1{};
-    unsigned int E2{};
-    unsigned int E3{};
+    unsigned int FirstVertex{};
+    unsigned int SecondVertex{};
+    unsigned int ThirdVertex{};
+};
+
+struct IndexBufferData {
+    std::vector<IndexBufferDataElement> Indicies;
 };
 
 class DLL_API IndexBuffer {
@@ -22,11 +26,11 @@ public:
     void Initialise();
     void Bind() const;
     void Unbind() const;
-    void Set(std::vector<IndexBufferDataElement>&& indices);
-    [[nodiscard]] const std::vector<IndexBufferDataElement>& Get() const;
+    void Set(IndexBufferData&& data);
+    [[nodiscard]] const IndexBufferData& GetData() const;
 
 private:
-    std::vector<IndexBufferDataElement> _indices;
+    IndexBufferData _data;
     UniqueIdentifier _id;
 };
 } // namespace GraphicLib

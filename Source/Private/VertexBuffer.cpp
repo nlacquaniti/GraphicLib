@@ -42,28 +42,31 @@ void VertexBuffer::Unbind() const {
     GraphicAPI::Get().GetVertexBufferImpl().Unbind(_id.Value);
 }
 
-void VertexBuffer::Set(std::vector<float>&& vertexData, std::vector<int>&& vertexAttributes) {
+void VertexBuffer::Set(VertexBufferData&& data) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    _vertexData = std::move(vertexData);
-    _vertexAttributes = std::move(vertexAttributes);
+
+    if (data.VertexData.empty()) {
+        LOG_INTERNAL_ERROR("Vertex data is empty");
+        return;
+    }
+
+    if (data.vertexAttributes.empty()) {
+        LOG_INTERNAL_ERROR("Vertex attributes are Empty");
+        return;
+    }
+
+    _data = std::move(data);
     Bind();
-    GraphicAPI::Get().GetVertexBufferImpl().Set(_id.Value, _vertexData, _vertexAttributes);
+    GraphicAPI::Get().GetVertexBufferImpl().Set(_id.Value, _data);
+    Unbind();
 }
-
-const std::vector<float>& VertexBuffer::GetVertexData() const {
+const VertexBufferData& VertexBuffer::GetData() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
-    return _vertexData;
-}
-
-const std::vector<int>& VertexBuffer::GetVertexAttributes() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
-    return _vertexAttributes;
+    return _data;
 }
 } // namespace GraphicLib

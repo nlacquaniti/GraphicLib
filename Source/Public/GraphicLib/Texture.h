@@ -111,14 +111,13 @@ public:
     void Initialise(ETextureType type);
     void Bind() const;
     void Unbind() const;
-    void Draw(unsigned int slot) const;
+    void SetTextureSlot(unsigned int slot) const;
     void Set(std::string&& texturePath, std::vector<TextureParam>&& params);
     void Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params);
     [[nodiscard]] const TextureData& GetData() const;
     [[nodiscard]] unsigned int GetID() const;
 
 private:
-    void _setTextureFromFile();
     TextureData _data{};
     UniqueIdentifier _id;
 };

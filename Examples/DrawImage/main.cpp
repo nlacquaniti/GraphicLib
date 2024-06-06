@@ -1,3 +1,4 @@
+#include "GraphicLib/Mesh.h"
 #include "Window/Input.h"
 #include "Window/Window.h"
 
@@ -15,6 +16,7 @@
 #include <glm/gtc/type_ptr.hpp>
 
 #include <windows.h>
+#include <wingdi.h>
 #include <iostream>
 
 struct Transform {
@@ -55,7 +57,8 @@ private:
     Input _input{};
 
     GraphicLib::VertexArray _boxVA{};
-    GraphicLib::Shader _boxShader{};
+    GraphicLib::Mesh _boxMesh;
+    GraphicLib::Shader _boxShader;
     GraphicLib::Texture _boxTexture{};
 
     GraphicLib::VertexArray _gridVA{};
@@ -129,7 +132,7 @@ void Application::Initialise() {
 
     _shouldUpdate = true;
 
-    std::vector<float> vertices{
+    std::vector<float> boxVertices{
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, //
         0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  //
         0.5f, 0.5f, -0.5f, 1.0f, 1.0f,   //
@@ -167,11 +170,12 @@ void Application::Initialise() {
         -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,   //
         -0.5f, 0.5f, -0.5f, 0.0f, 1.0f   //
     };
-    std::vector<int> vertexAttributes{3, 2};
-
+    std::vector<GraphicLib::VertexAttribute> boxVertexAttributes{{"Position", 3}, {"TexCoord", 2}};
+    GraphicLib::VertexBufferData boxVertexBufferData{std::move(boxVertices), std::move(boxVertexAttributes)};
+    // _boxMesh.Initialise();
+    // _boxMesh._boxMesh.GetVertexArray().GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
     _boxVA.Initialise();
-    _boxVA.Bind();
-    _boxVA.GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
+    _boxVA.Set(std::move(boxVertexBufferData));
     std::vector<GraphicLib::TextureParam> textureParams{//
         {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
         {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
@@ -198,10 +202,10 @@ void Application::Initialise() {
         1, 1, 0,   //
         1, -1, 0,  //
     };
-    std::vector<int> gridVertexAttributes{3};
+    std::vector<GraphicLib::VertexAttribute> gridVertexAttributes{{"Position", 3}};
+    GraphicLib::VertexBufferData gridVertexBufferData{std::move(gridVertices), std::move(gridVertexAttributes)};
     _gridVA.Initialise();
-    _gridVA.Bind();
-    _gridVA.GetVertexBuffer().Set(std::move(gridVertices), std::move(gridVertexAttributes));
+    _gridVA.Set(std::move(gridVertexBufferData));
     std::vector<GraphicLib::ShaderData> gridShaderParams{
         {GetResourceFullPath("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
@@ -315,7 +319,8 @@ void Application::Render() {
     glm::mat4 MVP = PV * _box.Matrix();
     _boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
     _boxVA.Bind();
-    _boxTexture.Draw(0);
+    _boxTexture.SetTextureSlot(0);
+    _boxTexture.Bind();
     _boxVA.Draw();
 
     // MVP = PV * _box1.Matrix();

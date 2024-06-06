@@ -81,13 +81,12 @@ void Texture::Unbind() const {
     GraphicAPI::Get().GetTextureImpl().Unbind(_id.Value, _data.Type);
 }
 
-void Texture::Draw(unsigned int slot) const {
+void Texture::SetTextureSlot(unsigned int slot) const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetTextureImpl().Draw(_id.Value, _data.Type, slot);
-    Bind();
+    GraphicAPI::Get().GetTextureImpl().SetTextureSlot(_id.Value, _data.Type, slot);
 }
 
 void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params) {

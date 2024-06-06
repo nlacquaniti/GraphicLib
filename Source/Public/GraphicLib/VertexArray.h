@@ -17,11 +17,11 @@ public:
     void Initialise();
     void Bind() const;
     void Unbind() const;
+    void Set(VertexBufferData&& vertexBufferData);
+    void Set(VertexBufferData&& vertexBufferData, IndexBufferData&& indexBufferData);
     void Draw();
     [[nodiscard]] const VertexBuffer& GetVertexBuffer() const;
-    VertexBuffer& GetVertexBuffer();
     [[nodiscard]] const IndexBuffer& GetIndexBuffer() const;
-    IndexBuffer& GetIndexBuffer();
 
 private:
     VertexBuffer _vertexBuffer;

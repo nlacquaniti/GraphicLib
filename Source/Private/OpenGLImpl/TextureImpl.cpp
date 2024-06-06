@@ -38,7 +38,7 @@ void TextureImpl::Unbind(unsigned int, ETextureType type) const {
     glBindTexture(target, 0);
 }
 
-void TextureImpl::Draw(unsigned int, ETextureType, unsigned int slot) const {
+void TextureImpl::SetTextureSlot(unsigned int /*unused*/, ETextureType /*unused*/, unsigned int slot) const {
     if (slot > _maxTextureSlots) {
         const std::string& logText = fmt::format("Provided texture slot {} exceeded the max number of texture slots {}", slot, _maxTextureSlots);
         LOG_INTERNAL_ERROR(logText.c_str());

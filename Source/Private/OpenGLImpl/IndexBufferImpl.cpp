@@ -16,9 +16,9 @@ void IndexBufferImpl::Unbind(unsigned int) const {
     glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
 
-void IndexBufferImpl::Set(unsigned int id, const std::vector<IndexBufferDataElement>& data) const {
+void IndexBufferImpl::Set(unsigned int id, const IndexBufferData& data) const {
     Bind(id);
-    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<long long>(data.size() * sizeof(IndexBufferDataElement)), data.data(), GL_STATIC_DRAW);
+    glBufferData(GL_ELEMENT_ARRAY_BUFFER, static_cast<long long>(data.Indicies.size() * sizeof(IndexBufferDataElement)), data.Indicies.data(), GL_STATIC_DRAW);
 }
 
 void IndexBufferImpl::Delete(unsigned int& id) const {

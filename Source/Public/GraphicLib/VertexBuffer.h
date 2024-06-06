@@ -5,6 +5,16 @@
 #include <vector>
 
 namespace GraphicLib {
+struct VertexAttribute {
+    char Name[24];
+    int Count;
+};
+
+struct VertexBufferData {
+    std::vector<float> VertexData;
+    std::vector<VertexAttribute> vertexAttributes;
+};
+
 class DLL_API VertexBuffer {
 public:
     VertexBuffer() noexcept = default;
@@ -16,13 +26,11 @@ public:
     void Initialise();
     void Bind() const;
     void Unbind() const;
-    void Set(std::vector<float>&& vertexData, std::vector<int>&& vertexAttributes);
-    [[nodiscard]] const std::vector<float>& GetVertexData() const;
-    [[nodiscard]] const std::vector<int>& GetVertexAttributes() const;
+    void Set(VertexBufferData&& data);
+    [[nodiscard]] const VertexBufferData& GetData() const;
 
 private:
-    std::vector<float> _vertexData;
-    std::vector<int> _vertexAttributes;
+    VertexBufferData _data;
     UniqueIdentifier _id;
 };
 } // namespace GraphicLib
