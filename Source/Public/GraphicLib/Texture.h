@@ -79,6 +79,7 @@ struct TextureParam {
 };
 
 struct SetTextureParams {
+    std::string Name;
     int Width{};
     int Height{};
     ETextureChannel Channel{};
@@ -87,8 +88,9 @@ struct SetTextureParams {
 };
 
 struct TextureData {
-    std::string FilePath;
     std::vector<TextureParam> Parameters;
+    std::string FilePath;
+    std::string Name;
     unsigned char* PixelData{};
     int Width{};
     int Height{};

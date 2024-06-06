@@ -10,8 +10,6 @@
 
 #include <GraphicLib/Texture.h>
 
-#include <vector>
-
 CallbackHandler<void (*)(const char*, void*)> WindowImpl::OnDebugLog{};
 CallbackHandler<void (*)(float, void*)> WindowImpl::OnUpdate{};
 CallbackHandler<void (*)(void*)> WindowImpl::OnRenderDraw{};

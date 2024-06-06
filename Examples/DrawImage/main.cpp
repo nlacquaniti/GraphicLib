@@ -172,15 +172,14 @@ void Application::Initialise() {
     _boxVA.Initialise();
     _boxVA.Bind();
     _boxVA.GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
-    std::vector<GraphicLib::TextureParam> textureParams{
+    std::vector<GraphicLib::TextureParam> textureParams{//
         {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
         {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-        {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-    };
+        {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR}};
     _boxTexture.Initialise(GraphicLib::ETextureType::TEXTURE_2D);
     _boxTexture.Bind();
-    _boxTexture.Set(GetResourceFullPath("Resources/TextureTest.png"), std::move(textureParams));
+    _boxTexture.Set(GetResourceFullPath("Resources/Diffuse.png"), std::move(textureParams));
     std::vector<GraphicLib::ShaderData> boxShaderParams{
         {GetResourceFullPath("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
@@ -188,7 +187,7 @@ void Application::Initialise() {
     _boxShader.Initialise();
     _boxShader.Set(std::move(boxShaderParams));
     _boxShader.Bind();
-    _boxShader.SetUniformIntValue("uTexture", 0);
+    _boxShader.SetUniformIntValue("Diffuse", 0);
     _boxShader.Unbind();
 
     std::vector<float> gridVertices{

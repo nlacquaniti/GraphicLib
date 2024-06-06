@@ -47,7 +47,7 @@ void TextureImpl::Draw(unsigned int, ETextureType, unsigned int slot) const {
     glActiveTexture(GL_TEXTURE0 + slot);
 }
 
-void TextureImpl::Set(unsigned int, const TextureData& textureData) const {
+void TextureImpl::Set(unsigned int /*unused*/, const TextureData& textureData) const {
     unsigned int target{};
     if (!TextureImplUtils::ConvertTextureType(textureData.Type, target)) {
         return;

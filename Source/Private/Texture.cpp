@@ -14,6 +14,31 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #endif
 
 namespace GraphicLib {
+namespace {
+std::string extractTextureName(const std::string& texturePath) {
+    const size_t nameEndPos = texturePath.rfind('.');
+    if (nameEndPos == std::string::npos) {
+        const std::string& logText = fmt::format("Can't extract texture name for file \"{}\"", texturePath);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return {};
+    }
+    size_t nameStartPos = texturePath.rfind('/');
+    if (nameStartPos == std::string::npos) {
+        nameStartPos = 0;
+    } else {
+        ++nameStartPos;
+    }
+    size_t nameSize = nameEndPos - nameStartPos;
+    std::string textureName = texturePath.substr(nameStartPos, nameSize);
+    if (textureName.empty()) {
+        const std::string& logText = fmt::format("Texture name is empty for file \"{}\"", texturePath);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return {};
+    }
+    return textureName;
+}
+} // namespace
+
 Texture::~Texture() noexcept {
     if (!_id.IsInitialised) {
         return;
@@ -78,19 +103,54 @@ void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params)
         return;
     }
 
-    unsigned char* pixelData =
-        stbi_load(std::filesystem::absolute(filePath).string().c_str(), &_data.Width, &_data.Height, reinterpret_cast<int*>(&_data.Channel), 0);
-    if (pixelData == nullptr) {
-        const std::string& logText = fmt::format("Can't read pixel data for \"{}\"", texturePath);
+    std::string name = extractTextureName(texturePath);
+    if (name.empty()) {
+        const std::string& logText = fmt::format("File \"{}\" resulted in an empty name", texturePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
-    _data.PixelData = pixelData;
+    int width, height, channel;
+    unsigned char* pixelData = stbi_load(texturePath.c_str(), &width, &height, &channel, 0);
+    if (stbi_failure_reason() != nullptr) {
+        const std::string& logText = fmt::format(R"(stbi_load failed with reason "{}")", stbi_failure_reason());
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return;
+    }
+
+    if (pixelData == nullptr) {
+        const std::string& logText = fmt::format(R"(Can't read pixel data for "{}")", texturePath);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return;
+    }
+
+    if (width == 0) {
+        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive width)", texturePath, name);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return;
+    }
+
+    if (height == 0) {
+        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive height)", texturePath, name);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return;
+    }
+
+    if (channel == 0) {
+        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive channel)", texturePath, name);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return;
+    }
+
+    _data.Parameters = std::move(params);
     _data.FilePath = std::move(texturePath);
+    _data.Name = std::move(name);
+    _data.PixelData = pixelData;
+    _data.Width = width;
+    _data.Height = height;
+    _data.Channel = static_cast<ETextureChannel>(channel);
     _data.Format = ETextureFormat::RGBA32F;
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
-    _data.Parameters = std::move(params);
 
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data);
@@ -101,12 +161,16 @@ void Texture::Set(const SetTextureParams& setParams, std::vector<TextureParam>&&
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
+
+    _data.Parameters = std::move(params);
+    _data.FilePath = {};
+    _data.Name = setParams.Name;
+    _data.PixelData = {};
     _data.Width = setParams.Width;
     _data.Height = setParams.Height;
     _data.Channel = setParams.Channel;
     _data.Format = setParams.Format;
     _data.DataType = setParams.DataType;
-    _data.Parameters = std::move(params);
 
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data);
