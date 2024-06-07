@@ -49,7 +49,7 @@ Texture::~Texture() noexcept {
     GraphicAPI::Get().GetTextureImpl().Delete(_id.Value, _data.Type);
 }
 
-void Texture::Initialise(ETextureType type) {
+void Texture::Initialise() {
     if (_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Already initialised");
         return;
@@ -60,7 +60,7 @@ void Texture::Initialise(ETextureType type) {
         stbiFlippedVertically = true;
         stbi_set_flip_vertically_on_load(1);
     }
-    _data.Type = type;
+
     GraphicAPI::Get().GetTextureImpl().Initialise(_id.Value);
     _id.IsInitialised = true;
 }
@@ -89,28 +89,37 @@ void Texture::SetTextureSlot(unsigned int slot) const {
     GraphicAPI::Get().GetTextureImpl().SetTextureSlot(_id.Value, _data.Type, slot);
 }
 
-void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params) {
+void Texture::SetFromFile(TextureData&& data) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
 
-    const std::filesystem::path filePath{texturePath};
-    if (!std::filesystem::exists(filePath)) {
-        const std::string& logText = fmt::format("File \"{}\" doesn't exist", texturePath);
+    if (data.Parameters.empty()) {
+        LOG_INTERNAL_ERROR("Texture parameters must be set");
+        return;
+    }
+
+    if (data.Type == ETextureType::NONE) {
+        LOG_INTERNAL_ERROR("TextureType must be set");
+        return;
+    }
+
+    if (!std::filesystem::exists(std::filesystem::path{data.FilePath})) {
+        const std::string& logText = fmt::format("File \"{}\" doesn't exist", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
-    std::string name = extractTextureName(texturePath);
+    std::string name = extractTextureName(data.FilePath);
     if (name.empty()) {
-        const std::string& logText = fmt::format("File \"{}\" resulted in an empty name", texturePath);
+        const std::string& logText = fmt::format("File \"{}\" resulted in an empty name", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     int width, height, channel;
-    unsigned char* pixelData = stbi_load(texturePath.c_str(), &width, &height, &channel, 0);
+    unsigned char* pixelData = stbi_load(data.FilePath.c_str(), &width, &height, &channel, 0);
     if (stbi_failure_reason() != nullptr) {
         const std::string& logText = fmt::format(R"(stbi_load failed with reason "{}")", stbi_failure_reason());
         LOG_INTERNAL_ERROR(logText.c_str());
@@ -118,61 +127,105 @@ void Texture::Set(std::string&& texturePath, std::vector<TextureParam>&& params)
     }
 
     if (pixelData == nullptr) {
-        const std::string& logText = fmt::format(R"(Can't read pixel data for "{}")", texturePath);
+        const std::string& logText = fmt::format(R"(Can't read pixel data for "{}")", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (width == 0) {
-        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive width)", texturePath, name);
+        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive width)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (height == 0) {
-        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive height)", texturePath, name);
+        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive height)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (channel == 0) {
-        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive channel)", texturePath, name);
+        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive channel)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
-    _data.Parameters = std::move(params);
-    _data.FilePath = std::move(texturePath);
+    _data.Parameters = std::move(data.Parameters);
+    _data.FilePath = std::move(data.FilePath);
     _data.Name = std::move(name);
     _data.PixelData = pixelData;
     _data.Width = width;
     _data.Height = height;
+    _data.Type = data.Type;
     _data.Channel = static_cast<ETextureChannel>(channel);
     _data.Format = ETextureFormat::RGBA32F;
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
 
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data);
+    Unbind();
 }
 
-void Texture::Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params) {
+void Texture::SetRaw(TextureData&& data) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
 
-    _data.Parameters = std::move(params);
+    if (data.Parameters.empty()) {
+        LOG_INTERNAL_ERROR("Texture parameters must be set");
+        return;
+    }
+
+    if (data.Name.empty()) {
+        LOG_INTERNAL_ERROR("Texture name must be set");
+        return;
+    }
+
+    if (data.Width == 0) {
+        LOG_INTERNAL_ERROR("Texture width must be set");
+        return;
+    }
+
+    if (data.Height == 0) {
+        LOG_INTERNAL_ERROR("Texture height must be set");
+        return;
+    }
+
+    if (data.Type == ETextureType::NONE) {
+        LOG_INTERNAL_ERROR("TextureType must be set");
+        return;
+    }
+
+    if (data.Channel == ETextureChannel::NONE) {
+        LOG_INTERNAL_ERROR("Texture channel must be set");
+        return;
+    }
+
+    if (data.Format == ETextureFormat::NONE) {
+        LOG_INTERNAL_ERROR("Texture format must be set");
+        return;
+    }
+
+    if (data.DataType == ETextureDataType::NONE) {
+        LOG_INTERNAL_ERROR("Texture data type must be set");
+        return;
+    }
+
+    _data.Parameters = std::move(data.Parameters);
     _data.FilePath = {};
-    _data.Name = setParams.Name;
+    _data.Name = std::move(data.Name);
     _data.PixelData = {};
-    _data.Width = setParams.Width;
-    _data.Height = setParams.Height;
-    _data.Channel = setParams.Channel;
-    _data.Format = setParams.Format;
-    _data.DataType = setParams.DataType;
+    _data.Width = data.Width;
+    _data.Height = data.Height;
+    _data.Type = data.Type;
+    _data.Channel = data.Channel;
+    _data.Format = data.Format;
+    _data.DataType = data.DataType;
 
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data);
+    Unbind();
 }
 
 const TextureData& Texture::GetData() const {

@@ -16,11 +16,11 @@ void FrameBufferImpl::Bind(unsigned int id) const {
     glBindFramebuffer(GL_FRAMEBUFFER, id);
 }
 
-void FrameBufferImpl::Unbind(unsigned int) const {
+void FrameBufferImpl::Unbind(unsigned int /*unused*/) const {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBufferImpl::Set(unsigned int, const Texture& frameBufferTexture, const RenderBuffer& renderBuffer) const {
+void FrameBufferImpl::Set(unsigned int /*unused*/, const Texture& frameBufferTexture, const RenderBuffer& renderBuffer) const {
     // Set FrameBuffer Texture.
     unsigned int frameBufferAttachment{};
     if (!TextureImplUtils::ConvertTextureFormatToFrameBufferAttachment(frameBufferTexture.GetData().Format, frameBufferAttachment)) {

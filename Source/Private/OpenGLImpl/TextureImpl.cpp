@@ -70,7 +70,7 @@ void TextureImpl::Set(unsigned int /*unused*/, const TextureData& textureData) c
 
     // Assign texture Parameters.
     for (unsigned long long i{}; i < textureData.Parameters.size(); ++i) {
-        const TextureParam& param = textureData.Parameters[i];
+        const TextureParameter& param = textureData.Parameters[i];
 
         unsigned int paramName{};
         if (!TextureImplUtils::ConvertTextureParamName(param.Name, paramName)) {

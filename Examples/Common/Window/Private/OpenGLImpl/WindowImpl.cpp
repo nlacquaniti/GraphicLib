@@ -80,7 +80,7 @@ bool WindowImpl::Create(const char* title) {
     _windowFrameBuffer.Bind();
 
     // Framebuffer config.
-    _windowFrameBuffer.GetTexture().Initialise(GraphicLib::ETextureType::TEXTURE_2D);
+    _windowFrameBuffer.GetTexture().Initialise();
     _windowFrameBuffer.GetRenderBuffer().Initialise();
     _setFrameBufferConfiguration();
 
@@ -196,19 +196,20 @@ void WindowImpl::_setFrameBufferConfiguration() {
     GetSize(windowWidth, windowHeight);
 
     // FrameBuffer texture.
-    GraphicLib::SetTextureParams frameBufferTextureData{};
-    frameBufferTextureData.Width = windowWidth;
-    frameBufferTextureData.Height = windowHeight;
-    frameBufferTextureData.Channel = GraphicLib::ETextureChannel::RGBA;
-    frameBufferTextureData.Format = GraphicLib::ETextureFormat::RGBA;
-    frameBufferTextureData.DataType = GraphicLib::ETextureDataType::UNSIGNED_BYTE;
-    std::vector<GraphicLib::TextureParam> frameBufferTextureParams{
+    GraphicLib::TextureData frameBufferTextureData{};
+    frameBufferTextureData.Parameters = {
         {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
         {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
     };
+    frameBufferTextureData.Name = "FramebufferTexture";
+    frameBufferTextureData.Width = windowWidth;
+    frameBufferTextureData.Height = windowHeight;
+    frameBufferTextureData.Type = GraphicLib::ETextureType::TEXTURE_2D;
+    frameBufferTextureData.Channel = GraphicLib::ETextureChannel::RGBA;
+    frameBufferTextureData.Format = GraphicLib::ETextureFormat::RGBA;
+    frameBufferTextureData.DataType = GraphicLib::ETextureDataType::UNSIGNED_BYTE;
 
-    _windowFrameBuffer.GetTexture().Bind();
-    _windowFrameBuffer.GetTexture().Set(frameBufferTextureData, std::move(frameBufferTextureParams));
+    _windowFrameBuffer.GetTexture().SetRaw(std::move(frameBufferTextureData));
 
     // Frame buffer render buffer creation.
     _windowFrameBuffer.GetRenderBuffer().Bind();

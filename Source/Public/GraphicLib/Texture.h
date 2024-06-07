@@ -73,22 +73,13 @@ enum class ETextureDataType : unsigned char {
     UNSIGNED_INT_24_8,
 };
 
-struct TextureParam {
+struct TextureParameter {
     ETextureParamName Name{};
     ETextureParamValue Value{};
 };
 
-struct SetTextureParams {
-    std::string Name;
-    int Width{};
-    int Height{};
-    ETextureChannel Channel{};
-    ETextureFormat Format{};
-    ETextureDataType DataType{};
-};
-
 struct TextureData {
-    std::vector<TextureParam> Parameters;
+    std::vector<TextureParameter> Parameters;
     std::string FilePath;
     std::string Name;
     unsigned char* PixelData{};
@@ -108,12 +99,12 @@ public:
     Texture(const Texture&) = delete;
     Texture& operator=(const Texture&) = delete;
     ~Texture() noexcept;
-    void Initialise(ETextureType type);
+    void Initialise();
     void Bind() const;
     void Unbind() const;
     void SetTextureSlot(unsigned int slot) const;
-    void Set(std::string&& texturePath, std::vector<TextureParam>&& params);
-    void Set(const SetTextureParams& setParams, std::vector<TextureParam>&& params);
+    void SetFromFile(TextureData&& data);
+    void SetRaw(TextureData&& data);
     [[nodiscard]] const TextureData& GetData() const;
     [[nodiscard]] unsigned int GetID() const;
 

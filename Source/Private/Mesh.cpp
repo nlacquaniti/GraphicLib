@@ -17,7 +17,6 @@ void Mesh::Set(VertexBufferData&& vertexBufferData) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    _vertexArray.Bind();
     _vertexArray.Set(std::move(vertexBufferData));
 }
 
@@ -44,13 +43,6 @@ void Mesh::Draw(const Shader& shader) {
     _vertexArray.Unbind();
 }
 
-VertexArray& Mesh::GetVertexArray() {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
-    return _vertexArray;
-}
-
 const VertexArray& Mesh::GetVertexArray() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
@@ -59,13 +51,6 @@ const VertexArray& Mesh::GetVertexArray() const {
 }
 
 const std::vector<Texture>& Mesh::GetTextures() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
-    return _textures;
-}
-
-std::vector<Texture>& Mesh::GetTextures() {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }

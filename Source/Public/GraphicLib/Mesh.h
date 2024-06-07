@@ -20,13 +20,11 @@ public:
     void Set(VertexBufferData&& vertexBufferData);
     void Draw(const Shader& shader);
     [[nodiscard]] const VertexArray& GetVertexArray() const;
-    VertexArray& GetVertexArray();
     [[nodiscard]] const std::vector<Texture>& GetTextures() const;
-    std::vector<Texture>& GetTextures();
 
 private:
     VertexArray _vertexArray;
-    UniqueIdentifier _id;
     std::vector<Texture> _textures;
+    UniqueIdentifier _id;
 };
 } // namespace GraphicLib
