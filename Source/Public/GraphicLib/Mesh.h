@@ -6,6 +6,7 @@
 #include "GraphicLib/Utilities/UniqueIdentifier.h"
 #include "GraphicLib/VertexArray.h"
 #include "GraphicLib/VertexBuffer.h"
+#include <vector>
 
 namespace GraphicLib {
 class DLL_API Mesh {
@@ -17,7 +18,7 @@ public:
     Mesh& operator=(const Mesh& other) = delete;
     ~Mesh() noexcept = default;
     void Initialise();
-    void Set(VertexBufferData&& vertexBufferData);
+    void Set(VertexBufferData&& vertexBufferData, std::vector<TextureData>&& texturesData);
     void Draw(const Shader& shader);
     [[nodiscard]] const VertexArray& GetVertexArray() const;
     [[nodiscard]] const std::vector<Texture>& GetTextures() const;

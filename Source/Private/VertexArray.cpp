@@ -77,7 +77,10 @@ void VertexArray::Draw() {
             LOG_INTERNAL_ERROR("Triangles count exceeded the max number");
             return;
         }
+
+        Bind();
         GraphicAPI::Get().GetVertexArrayImpl().DrawTriangles(_id.Value, static_cast<int>(trianglesCount));
+        Unbind();
     } else if (!_vertexBuffer.GetData().VertexData.empty() && !_vertexBuffer.GetData().vertexAttributes.empty()) {
         unsigned long long attributesCount{};
         for (const VertexAttribute& vertexAttribute : _vertexBuffer.GetData().vertexAttributes) {
@@ -89,7 +92,10 @@ void VertexArray::Draw() {
             LOG_INTERNAL_ERROR("Vertices count exceeded the max number");
             return;
         }
+
+        Bind();
         GraphicAPI::Get().GetVertexArrayImpl().DrawVertices(_id.Value, static_cast<int>(verticesCount));
+        Unbind();
     } else {
         LOG_INTERNAL_ERROR("Draw failed, both IndexBuffer and VertexBuffer are empty");
     }

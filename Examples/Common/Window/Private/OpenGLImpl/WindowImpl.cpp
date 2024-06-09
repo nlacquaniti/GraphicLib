@@ -209,7 +209,7 @@ void WindowImpl::_setFrameBufferConfiguration() {
     frameBufferTextureData.Format = GraphicLib::ETextureFormat::RGBA;
     frameBufferTextureData.DataType = GraphicLib::ETextureDataType::UNSIGNED_BYTE;
 
-    _windowFrameBuffer.GetTexture().SetRaw(std::move(frameBufferTextureData));
+    _windowFrameBuffer.GetTexture().Set(std::move(frameBufferTextureData));
 
     // Frame buffer render buffer creation.
     _windowFrameBuffer.GetRenderBuffer().Bind();

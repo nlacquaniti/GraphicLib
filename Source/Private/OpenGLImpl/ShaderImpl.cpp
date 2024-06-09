@@ -9,29 +9,17 @@
 #include <vector>
 
 namespace GraphicLib::OpenGLImpl {
-void ShaderImpl::Initialise(unsigned int& id) const {
+void ShaderImpl::Initialise(unsigned int& id, const std::vector<ShaderData>& shadersData) const {
     id = glCreateProgram();
-}
 
-void ShaderImpl::Bind(unsigned int id) const {
-    glUseProgram(id);
-}
-
-void ShaderImpl::Unbind(unsigned int) const {
-    glUseProgram(0);
-}
-
-bool ShaderImpl::Set(unsigned int id, const std::vector<ShaderData>& shadersData) const {
     std::vector<unsigned int> shaderIDs{};
     shaderIDs.reserve(shadersData.size());
 
-    for (size_t i = 0; i < shadersData.size(); ++i) {
-        const ShaderData& shaderData = shadersData[i];
+    for (const ShaderData& shaderData : shadersData) {
         unsigned int shaderID{};
         if (!_createShader(shaderData, shaderID)) {
-            return false;
+            return;
         }
-
         shaderIDs.push_back(shaderID);
         glAttachShader(id, shaderID);
     }
@@ -39,7 +27,7 @@ bool ShaderImpl::Set(unsigned int id, const std::vector<ShaderData>& shadersData
     glLinkProgram(id);
     int successfullyCompiled{};
     glGetProgramiv(id, GL_LINK_STATUS, &successfullyCompiled);
-    if (!successfullyCompiled) {
+    if (successfullyCompiled == 0) {
         int infoLogLength{};
         glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLength);
         std::vector<char> logText{};
@@ -51,8 +39,14 @@ bool ShaderImpl::Set(unsigned int id, const std::vector<ShaderData>& shadersData
     for (unsigned int shaderID : shaderIDs) {
         glDeleteShader(shaderID);
     }
+}
 
-    return successfullyCompiled == 1;
+void ShaderImpl::Bind(unsigned int id) const {
+    glUseProgram(id);
+}
+
+void ShaderImpl::Unbind(unsigned int) const {
+    glUseProgram(0);
 }
 
 void ShaderImpl::SetUniformBoolValue(unsigned int id, const char* name, bool value) const {

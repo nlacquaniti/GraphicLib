@@ -29,10 +29,9 @@ public:
     Shader(const Shader&) = delete;
     Shader& operator=(const Shader&) = delete;
     ~Shader() noexcept;
-    void Initialise();
+    void Initialise(std::vector<ShaderData>&& data);
     void Bind() const;
     void Unbind() const;
-    void Set(std::vector<ShaderData>&& data);
     void SetUniformBoolValue(const char* name, bool value) const;
     void SetUniformIntValue(const char* name, int value) const;
     void SetUniformFloatValue(const char* name, float value) const;

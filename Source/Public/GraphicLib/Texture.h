@@ -103,12 +103,13 @@ public:
     void Bind() const;
     void Unbind() const;
     void SetTextureSlot(unsigned int slot) const;
-    void SetFromFile(TextureData&& data);
-    void SetRaw(TextureData&& data);
+    void Set(TextureData&& data);
     [[nodiscard]] const TextureData& GetData() const;
     [[nodiscard]] unsigned int GetID() const;
 
 private:
+    void _setFromFile(TextureData&& data);
+    void _setRaw(TextureData&& data);
     TextureData _data{};
     UniqueIdentifier _id;
 };

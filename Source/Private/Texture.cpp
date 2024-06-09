@@ -89,7 +89,29 @@ void Texture::SetTextureSlot(unsigned int slot) const {
     GraphicAPI::Get().GetTextureImpl().SetTextureSlot(_id.Value, _data.Type, slot);
 }
 
-void Texture::SetFromFile(TextureData&& data) {
+void Texture::Set(TextureData&& data) {
+    if (!data.FilePath.empty()) {
+        _setFromFile(std::move(data));
+    } else {
+        _setRaw(std::move(data));
+    }
+}
+
+const TextureData& Texture::GetData() const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
+    return _data;
+}
+
+unsigned int Texture::GetID() const {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+    }
+    return _id.Value;
+}
+
+void Texture::_setFromFile(TextureData&& data) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
@@ -166,7 +188,7 @@ void Texture::SetFromFile(TextureData&& data) {
     Unbind();
 }
 
-void Texture::SetRaw(TextureData&& data) {
+void Texture::_setRaw(TextureData&& data) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
@@ -226,19 +248,5 @@ void Texture::SetRaw(TextureData&& data) {
     Bind();
     GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data);
     Unbind();
-}
-
-const TextureData& Texture::GetData() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
-    return _data;
-}
-
-unsigned int Texture::GetID() const {
-    if (!_id.IsInitialised) {
-        LOG_INTERNAL_ERROR("Uninitialised");
-    }
-    return _id.Value;
 }
 }; // namespace GraphicLib

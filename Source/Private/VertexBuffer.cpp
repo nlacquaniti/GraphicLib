@@ -63,6 +63,7 @@ void VertexBuffer::Set(VertexBufferData&& data) {
     GraphicAPI::Get().GetVertexBufferImpl().Set(_id.Value, _data);
     Unbind();
 }
+
 const VertexBufferData& VertexBuffer::GetData() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");

@@ -53,16 +53,14 @@ public:
 private:
     glm::mat4 _createProjectionViewMat() const;
 
-    Window _window{};
-    Input _input{};
+    Window _window;
+    Input _input;
 
-    GraphicLib::VertexArray _boxVA{};
     GraphicLib::Mesh _boxMesh;
     GraphicLib::Shader _boxShader;
-    GraphicLib::Texture _boxTexture{};
 
-    GraphicLib::VertexArray _gridVA{};
-    GraphicLib::Shader _gridShader{};
+    GraphicLib::Mesh _gridMesh;
+    GraphicLib::Shader _gridShader;
 
     // Box 1
     Transform _box{glm::vec3{0.f, 0.5f, 4.f}, glm::vec3{0.f, 22.f, 0.f}};
@@ -172,12 +170,9 @@ void Application::Initialise() {
     };
     std::vector<GraphicLib::VertexAttribute> boxVertexAttributes{{"Position", 3}, {"TexCoord", 2}};
     GraphicLib::VertexBufferData boxVertexBufferData{std::move(boxVertices), std::move(boxVertexAttributes)};
-    // _boxMesh.Initialise();
-    // _boxMesh._boxMesh.GetVertexArray().GetVertexBuffer().Set(std::move(vertices), std::move(vertexAttributes));
-    _boxVA.Initialise();
-    _boxVA.Set(std::move(boxVertexBufferData));
 
-    GraphicLib::TextureData boxTextureData{};
+    std::vector<GraphicLib::TextureData> boxTexturesData;
+    GraphicLib::TextureData& boxTextureData = boxTexturesData.emplace_back();
     boxTextureData.Parameters = {
         {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
         {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
@@ -186,14 +181,20 @@ void Application::Initialise() {
     };
     boxTextureData.FilePath = GetResourceFullPath("Resources/Diffuse.png");
     boxTextureData.Type = GraphicLib::ETextureType::TEXTURE_2D;
-    _boxTexture.Initialise();
-    _boxTexture.SetFromFile(std::move(boxTextureData));
+    // _boxTexture.Initialise();
+    // _boxTexture.Set(std::move(boxTextureData));
+
+    _boxMesh.Initialise();
+    _boxMesh.Set(std::move(boxVertexBufferData), std::move(boxTexturesData));
+
+    // _boxVA.Initialise();
+    // _boxVA.Set(std::move(boxVertexBufferData));
+
     std::vector<GraphicLib::ShaderData> boxShaderParams{
         {GetResourceFullPath("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
-    _boxShader.Initialise();
-    _boxShader.Set(std::move(boxShaderParams));
+    _boxShader.Initialise(std::move(boxShaderParams));
     _boxShader.Bind();
     _boxShader.SetUniformIntValue("Diffuse", 0);
     _boxShader.Unbind();
@@ -208,14 +209,14 @@ void Application::Initialise() {
     };
     std::vector<GraphicLib::VertexAttribute> gridVertexAttributes{{"Position", 3}};
     GraphicLib::VertexBufferData gridVertexBufferData{std::move(gridVertices), std::move(gridVertexAttributes)};
-    _gridVA.Initialise();
-    _gridVA.Set(std::move(gridVertexBufferData));
+    _gridMesh.Initialise();
+    _gridMesh.Set(std::move(gridVertexBufferData), {});
+
     std::vector<GraphicLib::ShaderData> gridShaderParams{
         {GetResourceFullPath("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
         {GetResourceFullPath("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
-    _gridShader.Initialise();
-    _gridShader.Set(std::move(gridShaderParams));
+    _gridShader.Initialise(std::move(gridShaderParams));
 }
 
 void Application::Start() {
@@ -315,17 +316,15 @@ void Application::Render() {
     _gridShader.SetUniformMat4Value("uProj", glm::value_ptr(projection));
     _gridShader.SetUniformFloatValue("uNear", _cameraNear);
     _gridShader.SetUniformFloatValue("uFar", _cameraFar);
-    _gridVA.Bind();
-    _gridVA.Draw();
+    _gridMesh.Draw(_gridShader);
+    _gridShader.Unbind();
 
     _boxShader.Bind();
     glm::mat4 PV = _createProjectionViewMat();
     glm::mat4 MVP = PV * _box.Matrix();
     _boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
-    _boxVA.Bind();
-    _boxTexture.SetTextureSlot(0);
-    _boxTexture.Bind();
-    _boxVA.Draw();
+    _boxMesh.Draw(_boxShader);
+    _boxShader.Unbind();
 
     // MVP = PV * _box1.Matrix();
     //_boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
