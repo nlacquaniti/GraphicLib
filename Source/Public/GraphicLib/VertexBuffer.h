@@ -2,11 +2,12 @@
 
 #include "GraphicLib/DLL_API.h"
 #include "GraphicLib/Utilities/UniqueIdentifier.h"
+#include <array>
 #include <vector>
 
 namespace GraphicLib {
 struct VertexAttribute {
-    char Name[24];
+    std::array<char, 24> Name;
     int Count;
 };
 

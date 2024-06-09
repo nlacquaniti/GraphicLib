@@ -4,12 +4,10 @@ project(GraphicLib)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
-# set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
 
 option(GL_ENABLE_OPENGL "Use OpenGL has a graphic library" ON)
 option(GL_ENABLE_EXAMPLES "Build example projects" OFF)
 option(GL_ENABLE_EXAMPLES_SYMLINK "Enable example projects files symlink" ON)
-
 
 add_library(${PROJECT_NAME} SHARED
 	Source/Public/${PROJECT_NAME}/DLL_API.h
@@ -129,13 +127,15 @@ if (CMAKE_BUILD_TYPE STREQUAL "Debug" OR CMAKE_BUILD_TYPE STREQUAL "RelWithDebIn
 endif()
 endif()
 
+find_package(assimp REQUIRED)
+find_package(fmt REQUIRED)
+
 target_link_libraries(
 	${PROJECT_NAME} PRIVATE 
 	fmt::fmt
-	# assimp
+	assimp::assimp
 )
 
 if(GL_ENABLE_EXAMPLES)
 	add_subdirectory(Examples)
 endif()
-add_subdirectory(Source/Private/Vendors)

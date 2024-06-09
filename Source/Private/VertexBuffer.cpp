@@ -1,6 +1,7 @@
 #include "GraphicLib/VertexBuffer.h"
 
 #include "InternalLogger.h"
+#include "fmt/format.h"
 
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
@@ -56,6 +57,13 @@ void VertexBuffer::Set(VertexBufferData&& data) {
     if (data.vertexAttributes.empty()) {
         LOG_INTERNAL_ERROR("Vertex attributes are Empty");
         return;
+    }
+
+    for (size_t i{}; i < data.vertexAttributes.size(); ++i) {
+        if (data.vertexAttributes[i].Name[0] == '\0') {
+            const std::string logText = fmt::format("VertexAttribute name at index {} is empty", i);
+            LOG_INTERNAL_ERROR(logText.c_str());
+        }
     }
 
     _data = std::move(data);

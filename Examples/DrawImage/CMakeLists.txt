@@ -1,56 +1,58 @@
-set(IMGUI_ROOT_DIR ${FETCHCONTENT_BASE_DIR}/imgui-src)
+set(GL_EXAMPLES_IMGUI_ROOT_DIR NONE CACHE STRING "Set IMGUI root directory")
+set(GL_EXAMPLES_COMMON_DIR ../Common)
+set(GL_EXAMPLES_VENDORS_DIR ../Vendors)
 
 add_executable(DrawImageExample
 	main.cpp
 
-	../Common/Window/Public/Window/Window.h
-	../Common/Window/Public/Window/Input.h
-	../Common/Window/Public/Utils/CallbackHandler.h
-	../Common/Window/Public/Utils/InputUtils.h
+	${GL_EXAMPLES_COMMON_DIR}/Window/Public/Window/Window.h
+	${GL_EXAMPLES_COMMON_DIR}/Window/Public/Window/Input.h
+	${GL_EXAMPLES_COMMON_DIR}/Window/Public/Utils/CallbackHandler.h
+	${GL_EXAMPLES_COMMON_DIR}/Window/Public/Utils/InputUtils.h
 
-	../Common/Window/Private/Window.cpp
-	../Common/Window/Private/Input.cpp
-	../Common/Window/Private/InputImpl.h
-	../Common/Window/Private/InputImpl.cpp
-	../Common/Window/Private/InputImplUtils.h
-	../Common/Window/Private/InputImplUtils.cpp
-	../Common/Window/Private/Utils/InputUtils.cpp
+	${GL_EXAMPLES_COMMON_DIR}/Window/Private/Window.cpp
+	${GL_EXAMPLES_COMMON_DIR}/Window/Private/Input.cpp
+	${GL_EXAMPLES_COMMON_DIR}/Window/Private/InputImpl.h
+	${GL_EXAMPLES_COMMON_DIR}/Window/Private/InputImpl.cpp
+	${GL_EXAMPLES_COMMON_DIR}/Window/Private/InputImplUtils.h
+	${GL_EXAMPLES_COMMON_DIR}/Window/Private/InputImplUtils.cpp
+	${GL_EXAMPLES_COMMON_DIR}/Window/Private/Utils/InputUtils.cpp
 
-  ${IMGUI_ROOT_DIR}/imgui.h
-	${IMGUI_ROOT_DIR}/imgui.cpp
-	${IMGUI_ROOT_DIR}/imgui_demo.cpp
-	${IMGUI_ROOT_DIR}/imgui_draw.cpp
-	${IMGUI_ROOT_DIR}/imgui_internal.h
-	${IMGUI_ROOT_DIR}/imgui_tables.cpp
-	${IMGUI_ROOT_DIR}/imgui_widgets.cpp
-	${IMGUI_ROOT_DIR}/imstb_rectpack.h
-	${IMGUI_ROOT_DIR}/imstb_textedit.h
-	${IMGUI_ROOT_DIR}/imstb_truetype.h
-	${IMGUI_ROOT_DIR}/backends/imgui_impl_glfw.h
-	${IMGUI_ROOT_DIR}/backends/imgui_impl_glfw.cpp
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imgui.h
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imgui.cpp
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imgui_demo.cpp
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imgui_draw.cpp
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imgui_internal.h
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imgui_tables.cpp
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imgui_widgets.cpp
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imstb_rectpack.h
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imstb_textedit.h
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/imstb_truetype.h
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/backends/imgui_impl_glfw.h
+	${GL_EXAMPLES_IMGUI_ROOT_DIR}/backends/imgui_impl_glfw.cpp
 )
 
 target_include_directories(DrawImageExample PRIVATE
-	../Common/Window/Public
-	../Common/Window/Private
-	../Vendors
-    ${IMGUI_ROOT_DIR}/
+	${GL_EXAMPLES_COMMON_DIR}/Window/Public
+	${GL_EXAMPLES_COMMON_DIR}/Window/Private
+	${GL_EXAMPLES_VENDORS_DIR}/
+    ${GL_EXAMPLES_IMGUI_ROOT_DIR}/
 )
 
 if(GL_ENABLE_OPENGL)
 	target_sources(DrawImageExample PRIVATE 
-		../Common/Window/Private/OpenGLImpl/WindowImpl.h
-		../Common/Window/Private/OpenGLImpl/WindowImpl.cpp
+		${GL_EXAMPLES_COMMON_DIR}/Window/Private/OpenGLImpl/WindowImpl.h
+		${GL_EXAMPLES_COMMON_DIR}/Window/Private/OpenGLImpl/WindowImpl.cpp
 
-		../Vendors/glad/include/glad/glad.h
-		../Vendors/glad/include/KHR/khrplatform.h
-		../Vendors/glad/src/glad.c
-		${IMGUI_ROOT_DIR}/backends/imgui_impl_opengl3.h
-		${IMGUI_ROOT_DIR}/backends/imgui_impl_opengl3.cpp
+		${GL_EXAMPLES_VENDORS_DIR}/glad/include/glad/glad.h
+		${GL_EXAMPLES_VENDORS_DIR}/glad/include/KHR/khrplatform.h
+		${GL_EXAMPLES_VENDORS_DIR}/glad/src/glad.c
+		${GL_EXAMPLES_IMGUI_ROOT_DIR}/backends/imgui_impl_opengl3.h
+		${GL_EXAMPLES_IMGUI_ROOT_DIR}/backends/imgui_impl_opengl3.cpp
 	)
 
 	target_include_directories(DrawImageExample PRIVATE
-		../Vendors/glad/include
+		${GL_EXAMPLES_VENDORS_DIR}/glad/include
 	)
 
 	target_compile_definitions(DrawImageExample PRIVATE OPENGL_IMPL)
@@ -59,10 +61,15 @@ endif()
 target_compile_definitions(DrawImageExample PRIVATE EXEC_PATH="${CMAKE_CURRENT_BINARY_DIR}/")
 
 add_dependencies(DrawImageExample ${PROJECT_NAME})
-target_link_libraries(DrawImageExample PRIVATE ${PROJECT_NAME})
 
-target_link_libraries(DrawImageExample PRIVATE glfw)
-target_link_libraries(DrawImageExample PRIVATE glm)
+find_package(GLFW3 REQUIRED)
+find_package(glm REQUIRED)
+
+target_link_libraries(DrawImageExample PRIVATE 
+	${PROJECT_NAME}
+	glfw
+	glm::glm
+)
 
 add_custom_command(
 	TARGET DrawImageExample 
