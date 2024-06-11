@@ -1,22 +1,22 @@
-#include "GraphicLib/Mesh.h"
 #include "Window/Input.h"
 #include "Window/Window.h"
 
-#include <GLFW/glfw3.h>
 #include <GraphicLib/FrameBuffer.h>
 #include <GraphicLib/IndexBuffer.h>
 #include <GraphicLib/Logger.h>
+#include <GraphicLib/Mesh.h>
 #include <GraphicLib/Shader.h>
 #include <GraphicLib/Texture.h>
 #include <GraphicLib/VertexArray.h>
 #include <GraphicLib/VertexBuffer.h>
+
 #include <backends/imgui_impl_glfw.h>
 #include <imgui.h>
+
 #include <glm/glm.hpp>
 #include <glm/gtc/type_ptr.hpp>
 
-#include <windows.h>
-#include <wingdi.h>
+#include <cstring>
 #include <iostream>
 
 struct Transform {
@@ -34,9 +34,18 @@ struct Transform {
     }
 };
 
-static std::string GetResourceFullPath(const char* resourcePath) {
+[[nodiscard]] static std::string GetResourceFullPath(const char* resourcePath) {
     std::string output{EXEC_PATH};
     output.append(resourcePath);
+    return output;
+}
+
+template<std::size_t SIZE>
+[[nodiscard]] static std::array<char, SIZE> GetResourceFullPath2(const char* localPath) {
+    static const std::size_t EXEC_PATH_SIZE = strlen(EXEC_PATH);
+    std::array<char, SIZE> output;
+    strcpy_s(output.data(), SIZE, EXEC_PATH);
+    strcpy_s(output.data() + EXEC_PATH_SIZE, SIZE - EXEC_PATH_SIZE, localPath);
     return output;
 }
 
@@ -181,20 +190,16 @@ void Application::Initialise() {
     };
     boxTextureData.FilePath = GetResourceFullPath("Resources/Diffuse.png");
     boxTextureData.Type = GraphicLib::ETextureType::TEXTURE_2D;
-    // _boxTexture.Initialise();
-    // _boxTexture.Set(std::move(boxTextureData));
 
     _boxMesh.Initialise();
     _boxMesh.Set(std::move(boxVertexBufferData), std::move(boxTexturesData));
 
-    // _boxVA.Initialise();
-    // _boxVA.Set(std::move(boxVertexBufferData));
-
-    std::vector<GraphicLib::ShaderData> boxShaderParams{
-        {GetResourceFullPath("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
-        {GetResourceFullPath("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
+    const GraphicLib::ShaderData boxShaderParams[]{
+        {GetResourceFullPath2<GraphicLib::ShaderData::MAX_FILE_PATH_SIZE>("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
+        {GetResourceFullPath2<GraphicLib::ShaderData::MAX_FILE_PATH_SIZE>("Resources/Texture.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
-    _boxShader.Initialise(std::move(boxShaderParams));
+
+    _boxShader.Initialise(std::span<const GraphicLib::ShaderData>(boxShaderParams));
     _boxShader.Bind();
     _boxShader.SetUniformIntValue("Diffuse", 0);
     _boxShader.Unbind();
@@ -212,11 +217,11 @@ void Application::Initialise() {
     _gridMesh.Initialise();
     _gridMesh.Set(std::move(gridVertexBufferData), {});
 
-    std::vector<GraphicLib::ShaderData> gridShaderParams{
-        {GetResourceFullPath("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
-        {GetResourceFullPath("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
+    const GraphicLib::ShaderData gridShaderParams[]{
+        {GetResourceFullPath2<GraphicLib::ShaderData::MAX_FILE_PATH_SIZE>("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},
+        {GetResourceFullPath2<GraphicLib::ShaderData::MAX_FILE_PATH_SIZE>("Resources/Grid.fragment"), GraphicLib::EShaderType::FRAGMENT},
     };
-    _gridShader.Initialise(std::move(gridShaderParams));
+    _gridShader.Initialise(gridShaderParams);
 }
 
 void Application::Start() {
@@ -302,7 +307,7 @@ void Application::Update(float deltaTime) {
 }
 
 void Application::Render() {
-    const WindowSize& windowSize{_window.GetSize()};
+    const Window::Size& windowSize{_window.GetSize()};
     glm::mat4 projection{glm::perspective(glm::radians(_cameraFOV),                   //
         static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height), //
         _cameraNear,                                                                  //
@@ -325,10 +330,6 @@ void Application::Render() {
     _boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
     _boxMesh.Draw(_boxShader);
     _boxShader.Unbind();
-
-    // MVP = PV * _box1.Matrix();
-    //_boxShader.SetUniformMat4Value("uMVP", glm::value_ptr(MVP));
-    //_boxVA.Draw();
 }
 
 void Application::RenderDebug() {
@@ -344,7 +345,7 @@ void Application::RenderDebug() {
     ImGui::Begin("Scene");
     {
         const ImVec2& pos = ImGui::GetCursorScreenPos();
-        const WindowSize& windowSize = _window.GetSize();
+        const Window::Size& windowSize = _window.GetSize();
         ImGui::GetWindowDrawList()->AddImage(                                                                              //
             reinterpret_cast<void*>(static_cast<unsigned long long>(_window.GetWindowFrameBuffer().GetTexture().GetID())), //
             pos,                                                                                                           //
@@ -355,36 +356,31 @@ void Application::RenderDebug() {
     }
     ImGui::End();
 
-    ImGui::Begin("Transforms");
+    ImGui::Begin("Box info");
     {
-        ImGui::SeparatorText("Box");
+        ImGui::SeparatorText("Transform");
         ImGui::DragFloat3("_boxPos", glm::value_ptr(_box.Position));
         ImGui::DragFloat3("_boxRot", glm::value_ptr(_box.Rotation));
+    }
+    ImGui::End();
 
+    ImGui::Begin("Camera info");
+    {
         ImGui::SeparatorText("Camera");
         ImGui::DragFloat3("_cameraPos", glm::value_ptr(_cameraPos));
         ImGui::DragFloat3("_cameraRot", glm::value_ptr(_cameraRot));
         ImGui::InputFloat("_cameraSpeed", &_cameraMovementSpeed);
         ImGui::InputFloat("_cameraRotSpeed", &_cameraRotSpeed);
         ImGui::DragFloat("_cameraFOV", &_cameraFOV);
-        ImGui::Text("_cameraDir [%.2f,%.2f,%.2f]", _cameraDir.x, _cameraDir.y, _cameraDir.z);
-        ImGui::Text("_cameraDirRight [%.2f,%.2f,%.2f]", _cameraDirRight.x, _cameraDirRight.y, _cameraDirRight.z);
-        ImGui::Text("_cameraDirLeft [%.2f,%.2f,%.2f]", -_cameraDirRight.x, -_cameraDirRight.y, -_cameraDirRight.z);
     }
     ImGui::End();
-
     ImGui::Begin("Info");
     {
         ImGui::SeparatorText("Performance");
         ImGui::Text("Delta time: %.0fms", _deltaTime * 1000);
         ImGui::Text("FPS: %.0f", 1 / _deltaTime);
-        const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
-        ImGui::Text("Resolution %dx%d", mode->width, mode->height);
-
-        ImGui::SeparatorText("Input");
-        ImGui::Text("Mouse pos: [%.0f, %.0f]", _input.GetMousePosition().X, _input.GetMousePosition().Y);
-        ImGui::Text("Dragging: %s", _isMouseBeingDragged ? "on" : "off");
-        ImGui::Text("Dragging start mouse pos: [%.0f, %.0f]", _mouseDraggedStartingPosition.X, _mouseDraggedStartingPosition.Y);
+        const Window::Resolution resolution = _window.GetResolution();
+        ImGui::Text("Resolution %dx%d", resolution.Width, resolution.Height);
     }
     ImGui::End();
 }
@@ -394,7 +390,7 @@ void Application::Stop() {
 }
 
 glm::mat4 Application::_createProjectionViewMat() const {
-    const WindowSize& windowSize{_window.GetSize()};
+    const Window::Size& windowSize{_window.GetSize()};
     const glm::mat4 projection{glm::perspective(glm::radians(_cameraFOV),             //
         static_cast<float>(windowSize.Width) / static_cast<float>(windowSize.Height), //
         0.1f,                                                                         //

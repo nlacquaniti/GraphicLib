@@ -1,43 +1,37 @@
 #include "OpenGLImpl/ShaderImpl.h"
 
-#include "FmtFormat.h"
 #include "GraphicLib/Utilities/ShaderUtils.h"
 #include "InternalLogger.h"
 #include "Utils/ShaderImplUtils.h"
 #include <glad/glad.h>
+#include <array>
+#include <format>
 #include <string>
-#include <vector>
+
 
 namespace GraphicLib::OpenGLImpl {
-void ShaderImpl::Initialise(unsigned int& id, const std::vector<ShaderData>& shadersData) const {
+void ShaderImpl::Initialise(unsigned int& id, const std::span<const ShaderData>& data) const {
     id = glCreateProgram();
 
-    std::vector<unsigned int> shaderIDs{};
-    shaderIDs.reserve(shadersData.size());
-
-    for (const ShaderData& shaderData : shadersData) {
-        unsigned int shaderID{};
-        if (!_createShader(shaderData, shaderID)) {
+    std::array<unsigned int, Shader::MAX_DATA_COUNT> shaderIDs;
+    for (std::size_t i{}; i < data.size(); ++i) {
+        if (!_createShader(data[i], shaderIDs.at(i))) {
             return;
         }
-        shaderIDs.push_back(shaderID);
-        glAttachShader(id, shaderID);
+        glAttachShader(id, shaderIDs.at(i));
     }
 
     glLinkProgram(id);
     int successfullyCompiled{};
     glGetProgramiv(id, GL_LINK_STATUS, &successfullyCompiled);
     if (successfullyCompiled == 0) {
-        int infoLogLength{};
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLength);
-        std::vector<char> logText{};
-        logText.reserve(static_cast<size_t>(infoLogLength));
-        glGetShaderInfoLog(id, infoLogLength, &infoLogLength, logText.data());
+        std::array<char, 1024> logText;
+        glGetShaderInfoLog(id, static_cast<int>(logText.size()), nullptr, logText.data());
         LOG_INTERNAL_ERROR(logText.data());
     }
 
-    for (unsigned int shaderID : shaderIDs) {
-        glDeleteShader(shaderID);
+    for (std::size_t i{}; i < data.size(); ++i) {
+        glDeleteShader(shaderIDs.at(i));
     }
 }
 
@@ -45,7 +39,7 @@ void ShaderImpl::Bind(unsigned int id) const {
     glUseProgram(id);
 }
 
-void ShaderImpl::Unbind(unsigned int) const {
+void ShaderImpl::Unbind(unsigned int /*unused*/) const {
     glUseProgram(0);
 }
 
@@ -73,14 +67,14 @@ void ShaderImpl::Delete(unsigned int& id) const {
 bool ShaderImpl::_createShader(const ShaderData& shaderData, unsigned int& id) const {
     unsigned int shaderType{};
     if (!ShaderImplUtils::ConvertShaderType(shaderData.Type, shaderType)) {
-        const std::string& logText = fmt::format("Can't EShaderType {} to OpenGL shader type", ShaderUtils::ShaderTypeToString(shaderData.Type));
+        const std::string logText = std::format("Can't EShaderType {} to OpenGL shader type", ShaderUtils::ShaderTypeToString(shaderData.Type));
         LOG_INTERNAL_ERROR(logText.c_str());
         return false;
     }
 
-    const std::string& shaderContent = ShaderImplUtils::LoadFromFile(shaderData.FilePath.c_str());
+    const std::string& shaderContent = ShaderImplUtils::LoadFromFile(shaderData.FilePath.data());
     if (shaderContent.empty()) {
-        const std::string& logText = fmt::format("Can't open shader at path {}", shaderData.FilePath.c_str());
+        const std::string logText = std::format("Can't open shader at path {}", shaderData.FilePath.data());
         LOG_INTERNAL_ERROR(logText.c_str());
         return false;
     }
@@ -92,13 +86,9 @@ bool ShaderImpl::_createShader(const ShaderData& shaderData, unsigned int& id) c
 
     int successfullyCompiled{};
     glGetShaderiv(id, GL_COMPILE_STATUS, &successfullyCompiled);
-    if (!successfullyCompiled) {
-        int infoLogLength{};
-        glGetShaderiv(id, GL_INFO_LOG_LENGTH, &infoLogLength);
-
-        std::vector<char> logText{};
-        logText.reserve(static_cast<size_t>(infoLogLength));
-        glGetShaderInfoLog(id, infoLogLength, &infoLogLength, logText.data());
+    if (successfullyCompiled == 0) {
+        std::array<char, 1024> logText{};
+        glGetShaderInfoLog(id, static_cast<int>(logText.size()), nullptr, logText.data());
         LOG_INTERNAL_ERROR(logText.data());
 
         glDeleteShader(id);

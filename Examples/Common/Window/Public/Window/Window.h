@@ -4,15 +4,20 @@ namespace GraphicLib {
 class FrameBuffer;
 };
 
-struct WindowSize {
-    int Width{};
-    int Height{};
-};
-
 class Window {
 public:
+    struct Size {
+        int Width{};
+        int Height{};
+    };
+
+    struct Resolution {
+        int Width{};
+        int Height{};
+    };
+
     using LogCallback = void (*)(const char*, void*);
-    using UpdateCallback = void(*)(float, void*);
+    using UpdateCallback = void (*)(float, void*);
     using RenderWindowCallback = void (*)(void*);
     using RenderWindowDebugCallback = void (*)(void*);
     using CloseWindowCallback = void (*)(void*);
@@ -31,10 +36,11 @@ public:
     void SetOnRenderWindowCallback(RenderWindowCallback renderWindowCallback);
     void SetOnRenderWindowDebugCallback(RenderWindowDebugCallback renderWindowDebugCallback);
     void SetOnCloseCallback(CloseWindowCallback closeWindowCallback);
-    WindowSize GetSize() const;
-    void* GetWindowImplPtr() const;
-    void* GetUserData() const;
-    const GraphicLib::FrameBuffer& GetWindowFrameBuffer() const;
+    [[nodiscard]] Size GetSize() const;
+    [[nodiscard]] Resolution GetResolution() const;
+    [[nodiscard]] void* GetWindowImplPtr() const;
+    [[nodiscard]] void* GetUserData() const;
+    [[nodiscard]] const GraphicLib::FrameBuffer& GetWindowFrameBuffer() const;
 
 private:
     void _clear();

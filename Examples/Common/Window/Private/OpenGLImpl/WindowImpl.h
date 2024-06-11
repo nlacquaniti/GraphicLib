@@ -11,6 +11,7 @@ public:
     static void Update();
     static void Shutdown();
     static void GetSize(int& width, int& height);
+    static void GetResolution(int& width, int& height);
     static GLFWwindow* GetWindowPtr();
     static const GraphicLib::FrameBuffer& GetFrameBuffer();
 

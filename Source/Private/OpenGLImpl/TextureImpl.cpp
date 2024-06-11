@@ -1,10 +1,11 @@
 #include "OpenGLImpl/TextureImpl.h"
 
-#include "FmtFormat.h"
 #include "InternalLogger.h"
 #include "OpenGLImpl/Utils/TextureImplUtils.h"
 #include <glad/glad.h>
+#include <format>
 #include <string>
+
 
 namespace GraphicLib::OpenGLImpl {
 unsigned int TextureImpl::_maxTextureSlots{0};
@@ -15,7 +16,7 @@ void TextureImpl::Initialise(unsigned int& id) const {
         int maxTextureSlots;
         glGetIntegerv(GL_MAX_TEXTURE_IMAGE_UNITS, &maxTextureSlots);
         _maxTextureSlots = static_cast<unsigned int>(maxTextureSlots);
-        const std::string& logText = fmt::format("Max number of texture slots {}", _maxTextureSlots);
+        const std::string& logText = std::format("Max number of texture slots {}", _maxTextureSlots);
         LOG_INTERNAL_NOTIFICATION(logText.c_str());
     }
     glGenTextures(1, &id);
@@ -40,7 +41,7 @@ void TextureImpl::Unbind(unsigned int, ETextureType type) const {
 
 void TextureImpl::SetTextureSlot(unsigned int /*unused*/, ETextureType /*unused*/, unsigned int slot) const {
     if (slot > _maxTextureSlots) {
-        const std::string& logText = fmt::format("Provided texture slot {} exceeded the max number of texture slots {}", slot, _maxTextureSlots);
+        const std::string& logText = std::format("Provided texture slot {} exceeded the max number of texture slots {}", slot, _maxTextureSlots);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }

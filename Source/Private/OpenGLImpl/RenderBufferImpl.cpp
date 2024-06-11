@@ -1,9 +1,9 @@
 #include "OpenGLImpl/RenderBufferImpl.h"
 
-#include "FmtFormat.h"
 #include "GraphicLib/Utilities/RenderBufferUtils.h"
 #include "InternalLogger.h"
 #include <glad/glad.h>
+#include <format>
 #include <string>
 
 
@@ -29,7 +29,7 @@ bool ConvertRenderBufferFormat(ERenderBufferFormat format, unsigned int& outForm
         case ERenderBufferFormat::NONE:
             break;
     }
-    const std::string& errorText = fmt::format("RenderBufferFormat {}", RenderBufferUtils::RenderBufferFormatToString(format));
+    const std::string& errorText = std::format("RenderBufferFormat {}", RenderBufferUtils::RenderBufferFormatToString(format));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }

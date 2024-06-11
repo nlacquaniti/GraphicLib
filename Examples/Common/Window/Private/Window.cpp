@@ -50,10 +50,15 @@ void Window::SetOnCloseCallback(CloseWindowCallback closeWindowCallback) {
     WindowImpl::OnWindowClosed.Set(closeWindowCallback, _userData);
 }
 
-WindowSize Window::GetSize() const {
-    WindowSize size;
+Window::Size Window::GetSize() const {
+    Size size;
     WindowImpl::GetSize(size.Width, size.Height);
     return size;
+}
+Window::Resolution Window::GetResolution() const {
+    Resolution resolution;
+    WindowImpl::GetResolution(resolution.Width, resolution.Height);
+    return resolution;
 }
 
 void* Window::GetWindowImplPtr() const {

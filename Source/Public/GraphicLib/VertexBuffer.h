@@ -7,7 +7,8 @@
 
 namespace GraphicLib {
 struct VertexAttribute {
-    std::array<char, 24> Name;
+    static constexpr std::size_t MAX_NAME_SIZE = 24;
+    std::array<char, MAX_NAME_SIZE> Name;
     int Count;
 };
 

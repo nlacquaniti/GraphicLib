@@ -2,7 +2,7 @@ cmake_minimum_required(VERSION 3.23)
 
 project(GraphicLib)
 
-set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD 20)
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(GL_ENABLE_OPENGL "Use OpenGL has a graphic library" ON)
@@ -39,7 +39,6 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Private/InternalLogger.h
 	Source/Private/InternalLogger.cpp
 	Source/Private/StbImage.h
-	Source/Private/FmtFormat.h
 	Source/Private/Utilities/TextureUtils.cpp
 	Source/Private/Utilities/RenderBufferUtils.cpp
 	Source/Private/Utilities/ShaderUtils.cpp
@@ -109,6 +108,7 @@ if (CMAKE_CXX_COMPILER_ID STREQUAL "MSVC")
 	/wd4820
 	/wd5045
 	/wd4514
+	/wd4251
 )
 elseif(CMAKE_CXX_COMPILER_ID MATCHES "Clang")
 	target_compile_options(${PROJECT_NAME} PRIVATE 
@@ -128,11 +128,9 @@ endif()
 endif()
 
 find_package(assimp REQUIRED)
-find_package(fmt REQUIRED)
 
 target_link_libraries(
 	${PROJECT_NAME} PRIVATE 
-	fmt::fmt
 	assimp::assimp
 )
 

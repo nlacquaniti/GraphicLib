@@ -5,6 +5,9 @@
 
 namespace GraphicLib::OpenGLImpl {
 void VertexBufferImpl::Initialise(unsigned int& id) const {
+    // int maxVertexAttribs;
+    // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
+    // std::cout << "GL_MAX_VERTEX_ATTRIBS" << maxVertexAttribs << std::endl;
     glGenBuffers(1, &id);
 }
 
@@ -18,7 +21,6 @@ void VertexBufferImpl::Unbind(unsigned int /*unused*/) const {
 
 void VertexBufferImpl::Set(unsigned int /*unused*/, const VertexBufferData& data) const {
     glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(data.VertexData.size() * sizeof(float)), data.VertexData.data(), GL_STATIC_DRAW);
-
     int numberOfAttributes{};
     for (const VertexAttribute& vertexAttribute : data.vertexAttributes) {
         numberOfAttributes += vertexAttribute.Count;

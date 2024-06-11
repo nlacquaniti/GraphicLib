@@ -1,9 +1,9 @@
 #include "OpenGLImpl/Utils/TextureImplUtils.h"
 
-#include "FmtFormat.h"
 #include "GraphicLib/Utilities/TextureUtils.h"
 #include "InternalLogger.h"
 #include <glad/glad.h>
+#include <format>
 #include <string>
 
 
@@ -19,7 +19,7 @@ bool TextureImplUtils::ConvertTextureType(ETextureType type, unsigned int& outTy
         case ETextureType::NONE:
             break;
     }
-    const std::string& errorText = fmt::format("TextureType {}", TextureUtils::TextureTypeToString(type));
+    const std::string& errorText = std::format("TextureType {}", TextureUtils::TextureTypeToString(type));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
@@ -41,7 +41,7 @@ bool TextureImplUtils::ConvertTextureParamName(ETextureParamName paramName, unsi
         case ETextureParamName::NONE:
             break;
     }
-    const std::string& errorText = fmt::format("TextureParamName {}", TextureUtils::TextureParamNameToString(paramName));
+    const std::string& errorText = std::format("TextureParamName {}", TextureUtils::TextureParamNameToString(paramName));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
@@ -72,7 +72,7 @@ bool TextureImplUtils::ConvertTextureParamValue(ETextureParamValue paramValue, i
         case ETextureParamValue::NONE:
             break;
     }
-    const std::string& errorText = fmt::format("TextureParamValue {}", TextureUtils::TextureParamValueToString(paramValue));
+    const std::string& errorText = std::format("TextureParamValue {}", TextureUtils::TextureParamValueToString(paramValue));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
@@ -103,7 +103,7 @@ bool TextureImplUtils::ConvertTextureChannel(ETextureChannel channel, unsigned i
         case ETextureChannel::NONE:
             break;
     }
-    const std::string& errorText = fmt::format("TextureChannel {}", TextureUtils::TextureChannelToString(channel));
+    const std::string& errorText = std::format("TextureChannel {}", TextureUtils::TextureChannelToString(channel));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
@@ -161,7 +161,7 @@ bool TextureImplUtils::ConvertTextureFormat(ETextureFormat format, int& outForma
         case ETextureFormat::NONE:
             break;
     }
-    const std::string& errorText = fmt::format("TextureFormat {}", TextureUtils::TextureFormatToString(format));
+    const std::string& errorText = std::format("TextureFormat {}", TextureUtils::TextureFormatToString(format));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
@@ -192,7 +192,7 @@ bool TextureImplUtils::ConvertTextureDataType(ETextureDataType dataType, unsigne
         case ETextureDataType::NONE:
             break;
     }
-    const std::string& errorText = fmt::format("TextureDataType {}", TextureUtils::TextureDataTypeToString(dataType));
+    const std::string& errorText = std::format("TextureDataType {}", TextureUtils::TextureDataTypeToString(dataType));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }
@@ -226,7 +226,7 @@ bool TextureImplUtils::ConvertTextureFormatToFrameBufferAttachment(ETextureForma
         case ETextureFormat::NONE:
             break;
     }
-    const std::string& errorText = fmt::format("TextureFormat {}", TextureUtils::TextureFormatToString(textureFormat));
+    const std::string& errorText = std::format("TextureFormat {}", TextureUtils::TextureFormatToString(textureFormat));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }

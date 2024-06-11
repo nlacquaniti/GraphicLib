@@ -153,6 +153,12 @@ void WindowImpl::GetSize(int& width, int& height) {
     glfwGetWindowSize(_window, &width, &height);
 }
 
+void WindowImpl::GetResolution(int& width, int& height) {
+    const GLFWvidmode* mode = glfwGetVideoMode(glfwGetPrimaryMonitor());
+    width = mode->width;
+    height = mode->height;
+}
+
 GLFWwindow* WindowImpl::GetWindowPtr() {
     return _window;
 }

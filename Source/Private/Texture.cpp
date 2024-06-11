@@ -1,10 +1,11 @@
 #include "GraphicLib/Texture.h"
 
-#include "FmtFormat.h"
 #include "InternalLogger.h"
 #include "StbImage.h"
 #include <filesystem>
+#include <format>
 #include <string>
+
 
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
@@ -18,7 +19,7 @@ namespace {
 std::string extractTextureName(const std::string& texturePath) {
     const size_t nameEndPos = texturePath.rfind('.');
     if (nameEndPos == std::string::npos) {
-        const std::string& logText = fmt::format("Can't extract texture name for file \"{}\"", texturePath);
+        const std::string& logText = std::format("Can't extract texture name for file \"{}\"", texturePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return {};
     }
@@ -31,7 +32,7 @@ std::string extractTextureName(const std::string& texturePath) {
     size_t nameSize = nameEndPos - nameStartPos;
     std::string textureName = texturePath.substr(nameStartPos, nameSize);
     if (textureName.empty()) {
-        const std::string& logText = fmt::format("Texture name is empty for file \"{}\"", texturePath);
+        const std::string& logText = std::format("Texture name is empty for file \"{}\"", texturePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return {};
     }
@@ -128,14 +129,14 @@ void Texture::_setFromFile(TextureData&& data) {
     }
 
     if (!std::filesystem::exists(std::filesystem::path{data.FilePath})) {
-        const std::string& logText = fmt::format("File \"{}\" doesn't exist", data.FilePath);
+        const std::string& logText = std::format("File \"{}\" doesn't exist", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     std::string name = extractTextureName(data.FilePath);
     if (name.empty()) {
-        const std::string& logText = fmt::format("File \"{}\" resulted in an empty name", data.FilePath);
+        const std::string& logText = std::format("File \"{}\" resulted in an empty name", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
@@ -143,31 +144,31 @@ void Texture::_setFromFile(TextureData&& data) {
     int width, height, channel;
     unsigned char* pixelData = stbi_load(data.FilePath.c_str(), &width, &height, &channel, 0);
     if (stbi_failure_reason() != nullptr) {
-        const std::string& logText = fmt::format(R"(stbi_load failed with reason "{}")", stbi_failure_reason());
+        const std::string& logText = std::format(R"(stbi_load failed with reason "{}")", stbi_failure_reason());
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (pixelData == nullptr) {
-        const std::string& logText = fmt::format(R"(Can't read pixel data for "{}")", data.FilePath);
+        const std::string& logText = std::format(R"(Can't read pixel data for "{}")", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (width == 0) {
-        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive width)", data.FilePath, name);
+        const std::string& logText = std::format(R"(File "{}" with name "{}" couldn't retrive width)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (height == 0) {
-        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive height)", data.FilePath, name);
+        const std::string& logText = std::format(R"(File "{}" with name "{}" couldn't retrive height)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (channel == 0) {
-        const std::string& logText = fmt::format(R"(File "{}" with name "{}" couldn't retrive channel)", data.FilePath, name);
+        const std::string& logText = std::format(R"(File "{}" with name "{}" couldn't retrive channel)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }

@@ -1,12 +1,12 @@
 #pragma once
 
 #include "GraphicLib/Shader.h"
-#include <vector>
+#include <span>
 
 namespace GraphicLib::OpenGLImpl {
 class ShaderImpl {
 public:
-    void Initialise(unsigned int& id, const std::vector<ShaderData>& shadersData) const;
+    void Initialise(unsigned int& id, const std::span<const ShaderData>& data) const;
     void Bind(unsigned int id) const;
     void Unbind(unsigned int id) const;
     void SetUniformBoolValue(unsigned int id, const char* name, bool value) const;

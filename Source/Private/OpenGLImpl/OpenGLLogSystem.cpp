@@ -1,7 +1,7 @@
 #include "OpenGLImpl/OpenGLLogSystem.h"
 
-#include "FmtFormat.h"
 #include <glad/glad.h>
+#include <format>
 #include <string>
 
 namespace GraphicLib::OpenGLImpl {
@@ -72,7 +72,7 @@ void OpenGLLogSystem::_onAttach() {
         [](GLenum source, GLenum type, GLuint, GLenum severity, GLsizei, const GLchar* message, const void* userParam) {
             const auto* logSystem = static_cast<const OpenGLLogSystem*>(userParam);
 
-            const std::string& logMessage = fmt::format("{}: {}", DebugTypeToString(type), message);
+            const std::string& logMessage = std::format("{}: {}", DebugTypeToString(type), message);
 
             InternalLogger::Message debugMessage{
                 Logger::Category::GRAPHIC_API,

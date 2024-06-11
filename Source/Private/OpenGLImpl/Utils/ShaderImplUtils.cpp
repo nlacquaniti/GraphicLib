@@ -1,9 +1,9 @@
 #include "OpenGLImpl/Utils/ShaderImplUtils.h"
 
-#include "FmtFormat.h"
 #include "GraphicLib/Utilities/ShaderUtils.h"
 #include "InternalLogger.h"
 #include <glad/glad.h>
+#include <format>
 #include <fstream>
 #include <string>
 
@@ -12,7 +12,7 @@ namespace GraphicLib::OpenGLImpl {
 std::string ShaderImplUtils::LoadFromFile(const char* shaderPath) {
     std::ifstream file{shaderPath};
     if (!file.is_open()) {
-        const std::string& errorText = fmt::format("shaderPath {} doesn't exist", shaderPath);
+        const std::string& errorText = std::format("shaderPath {} doesn't exist", shaderPath);
         LOG_INTERNAL_ERROR(errorText.c_str());
         return {};
     }
@@ -46,7 +46,7 @@ bool ShaderImplUtils::ConvertShaderType(EShaderType type, unsigned int& outType)
             break;
     }
 
-    const std::string& errorText = fmt::format("ShaderType {}", ShaderUtils::ShaderTypeToString(type));
+    const std::string& errorText = std::format("ShaderType {}", ShaderUtils::ShaderTypeToString(type));
     LOG_INTERNAL_ERROR(errorText.c_str());
     return false;
 }

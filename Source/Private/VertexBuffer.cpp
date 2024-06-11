@@ -1,7 +1,6 @@
 #include "GraphicLib/VertexBuffer.h"
 
 #include "InternalLogger.h"
-#include "fmt/format.h"
 
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
@@ -9,6 +8,8 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #else
 #error "No GraphicAPI has been detected."
 #endif
+
+#include <format>
 
 namespace GraphicLib {
 VertexBuffer::~VertexBuffer() noexcept {
@@ -61,7 +62,7 @@ void VertexBuffer::Set(VertexBufferData&& data) {
 
     for (size_t i{}; i < data.vertexAttributes.size(); ++i) {
         if (data.vertexAttributes[i].Name[0] == '\0') {
-            const std::string logText = fmt::format("VertexAttribute name at index {} is empty", i);
+            const std::string logText = std::format("VertexAttribute name at index {} is empty", i);
             LOG_INTERNAL_ERROR(logText.c_str());
         }
     }

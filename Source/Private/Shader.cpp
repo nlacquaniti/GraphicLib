@@ -1,7 +1,8 @@
 #include "GraphicLib/Shader.h"
 
-#include "FmtFormat.h"
+#include "GraphicLib/Utilities/ShaderUtils.h"
 #include "InternalLogger.h"
+#include <format>
 
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
@@ -18,29 +19,43 @@ Shader::~Shader() noexcept {
     GraphicAPI::Get().GetShaderImpl().Delete(_id.Value);
 }
 
-void Shader::Initialise(std::vector<ShaderData>&& data) {
+void Shader::Initialise(const std::span<const ShaderData>& data) {
     if (_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Already initialised");
         return;
     }
 
-    _data = std::move(data);
-    for (size_t i = 0; i < _data.size(); ++i) {
-        const ShaderData& shader = _data[i];
-        if (shader.Type == EShaderType::NONE) {
-            const std::string& logText = fmt::format("Shader.Type is NONE at index {}", i);
-            LOG_INTERNAL_ERROR(logText.c_str());
-            return;
-        }
-
-        if (shader.FilePath.empty()) {
-            const std::string& logText = fmt::format("Shader.FilePath is empty at index {}", i);
-            LOG_INTERNAL_ERROR(logText.c_str());
-            return;
-        }
+    if (data.empty()) {
+        LOG_INTERNAL_ERROR("Data is empty");
+        return;
     }
 
-    GraphicAPI::Get().GetShaderImpl().Initialise(_id.Value, _data);
+    if (data.size() > _data.size()) {
+        const std::string logText = std::format("data.size() is greater then MAX_DATA_COUNT: {}", MAX_DATA_COUNT);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return;
+    }
+
+    for (std::size_t i = 0; i < data.size(); ++i) {
+        const ShaderData& shader = data[i];
+        if (data[i].Type == EShaderType::NONE) {
+            const std::string logText = std::format("data Shader.type::NONE at index {} ", i);
+            LOG_INTERNAL_ERROR(logText.c_str());
+            return;
+        }
+
+        if (shader.FilePath[0] == '\0') {
+            const std::string logText =
+                std::format("Shader.type {} at index {} has empty file path Shader.FilePath", ShaderUtils::ShaderTypeToString(shader.Type), i);
+            LOG_INTERNAL_ERROR(logText.c_str());
+            return;
+        }
+
+        _data.at(i).Type = shader.Type;
+        strcpy_s(_data.at(i).FilePath.data(), ShaderData::MAX_FILE_PATH_SIZE, shader.FilePath.data());
+    }
+
+    GraphicAPI::Get().GetShaderImpl().Initialise(_id.Value, data);
     _id.IsInitialised = true;
 }
 
@@ -92,11 +107,11 @@ void Shader::SetUniformMat4Value(const char* name, float* value) const {
     GraphicAPI::Get().GetShaderImpl().SetUniformMat4Value(_id.Value, name, value);
 }
 
-const std::vector<ShaderData>& Shader::GetData() const {
+std::span<const ShaderData> Shader::GetData() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
-    return _data;
+    return std::span<const ShaderData>(_data);
 }
 
 unsigned int Shader::GetID() const {
