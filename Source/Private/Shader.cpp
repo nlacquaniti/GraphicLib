@@ -2,7 +2,6 @@
 
 #include "GraphicLib/Utilities/ShaderUtils.h"
 #include "InternalLogger.h"
-#include <format>
 
 #ifdef OPENGL_IMPL
 #include "OpenGLImpl/APIImpl.h"
@@ -10,6 +9,8 @@ using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
 #else
 #error "No GraphicAPI has been detected."
 #endif
+
+#include <format>
 
 namespace GraphicLib {
 Shader::~Shader() noexcept {
@@ -30,7 +31,7 @@ void Shader::Initialise(const std::span<const ShaderData>& data) {
         return;
     }
 
-    if (data.size() > _data.size()) {
+    if (data.size() > MAX_DATA_COUNT) {
         const std::string logText = std::format("data.size() is greater then MAX_DATA_COUNT: {}", MAX_DATA_COUNT);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
@@ -38,7 +39,7 @@ void Shader::Initialise(const std::span<const ShaderData>& data) {
 
     for (std::size_t i = 0; i < data.size(); ++i) {
         const ShaderData& shader = data[i];
-        if (data[i].Type == EShaderType::NONE) {
+        if (shader.Type == EShaderType::NONE) {
             const std::string logText = std::format("data Shader.type::NONE at index {} ", i);
             LOG_INTERNAL_ERROR(logText.c_str());
             return;
@@ -51,8 +52,8 @@ void Shader::Initialise(const std::span<const ShaderData>& data) {
             return;
         }
 
-        _data.at(i).Type = shader.Type;
-        strcpy_s(_data.at(i).FilePath.data(), ShaderData::MAX_FILE_PATH_SIZE, shader.FilePath.data());
+        _data.at(i) = shader;
+        ++_dataCount;
     }
 
     GraphicAPI::Get().GetShaderImpl().Initialise(_id.Value, data);
@@ -111,7 +112,7 @@ std::span<const ShaderData> Shader::GetData() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
-    return std::span<const ShaderData>(_data);
+    return {_data.data(), _dataCount};
 }
 
 unsigned int Shader::GetID() const {

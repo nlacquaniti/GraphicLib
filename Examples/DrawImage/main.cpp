@@ -139,6 +139,7 @@ void Application::Initialise() {
 
     _shouldUpdate = true;
 
+    // Box vertex buffer data;
     std::vector<float> boxVertices{
         -0.5f, -0.5f, -0.5f, 0.0f, 0.0f, //
         0.5f, -0.5f, -0.5f, 1.0f, 0.0f,  //
@@ -177,9 +178,9 @@ void Application::Initialise() {
         -0.5f, 0.5f, 0.5f, 0.0f, 0.0f,   //
         -0.5f, 0.5f, -0.5f, 0.0f, 1.0f   //
     };
-    std::vector<GraphicLib::VertexAttribute> boxVertexAttributes{{"Position", 3}, {"TexCoord", 2}};
-    GraphicLib::VertexBufferData boxVertexBufferData{std::move(boxVertices), std::move(boxVertexAttributes)};
+    const GraphicLib::VertexAttribute boxVertexAttributes[]{{"Position", 3}, {"TexCoord", 2}};
 
+    // Box textures.
     std::vector<GraphicLib::TextureData> boxTexturesData;
     GraphicLib::TextureData& boxTextureData = boxTexturesData.emplace_back();
     boxTextureData.Parameters = {
@@ -192,7 +193,8 @@ void Application::Initialise() {
     boxTextureData.Type = GraphicLib::ETextureType::TEXTURE_2D;
 
     _boxMesh.Initialise();
-    _boxMesh.Set(std::move(boxVertexBufferData), std::move(boxTexturesData));
+    _boxMesh.SetVertexBuffer(std::move(boxVertices), boxVertexAttributes);
+    _boxMesh.SetTextures(std::move(boxTexturesData));
 
     const GraphicLib::ShaderData boxShaderParams[]{
         {GetResourceFullPath2<GraphicLib::ShaderData::MAX_FILE_PATH_SIZE>("Resources/Texture.vertex"), GraphicLib::EShaderType::VERTEX},
@@ -204,6 +206,7 @@ void Application::Initialise() {
     _boxShader.SetUniformIntValue("Diffuse", 0);
     _boxShader.Unbind();
 
+    // Grid vertex buffer data.
     std::vector<float> gridVertices{
         1, 1, 0,   //
         -1, -1, 0, //
@@ -212,10 +215,10 @@ void Application::Initialise() {
         1, 1, 0,   //
         1, -1, 0,  //
     };
-    std::vector<GraphicLib::VertexAttribute> gridVertexAttributes{{"Position", 3}};
-    GraphicLib::VertexBufferData gridVertexBufferData{std::move(gridVertices), std::move(gridVertexAttributes)};
+    const GraphicLib::VertexAttribute gridVertexAttributes[]{{"Position", 3}};
+
     _gridMesh.Initialise();
-    _gridMesh.Set(std::move(gridVertexBufferData), {});
+    _gridMesh.SetVertexBuffer(std::move(gridVertices), gridVertexAttributes);
 
     const GraphicLib::ShaderData gridShaderParams[]{
         {GetResourceFullPath2<GraphicLib::ShaderData::MAX_FILE_PATH_SIZE>("Resources/Grid.vertex"), GraphicLib::EShaderType::VERTEX},

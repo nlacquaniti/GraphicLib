@@ -44,5 +44,6 @@ public:
 private:
     std::array<ShaderData, MAX_DATA_COUNT> _data;
     UniqueIdentifier _id;
+    std::size_t _dataCount{};
 };
 } // namespace GraphicLib

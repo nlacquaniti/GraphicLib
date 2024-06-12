@@ -12,13 +12,27 @@ void Mesh::Initialise() {
     _id.IsInitialised = true;
 }
 
-void Mesh::Set(VertexBufferData&& vertexBufferData, std::vector<TextureData>&& texturesData) {
+void Mesh::SetVertexBuffer(std::vector<float>&& vertexData, const std::span<const VertexAttribute>& vertexAttributes) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
+    _vertexArray.SetVertexBuffer(std::move(vertexData), vertexAttributes);
+}
 
-    _vertexArray.Set(std::move(vertexBufferData));
+void Mesh::SetIndexBuffer(std::vector<IndexBufferDataElement>&& indices) {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
+    _vertexArray.SetIndexBuffer(std::move(indices));
+}
+
+void Mesh::SetTextures(std::vector<TextureData>&& texturesData) {
+    if (!_id.IsInitialised) {
+        LOG_INTERNAL_ERROR("Uninitialised");
+        return;
+    }
 
     _textures.reserve(texturesData.size());
     for (auto& textureData : texturesData) {
@@ -34,7 +48,7 @@ void Mesh::Draw(const Shader& shader) {
         return;
     }
 
-    // shader.Bind();
+    shader.Bind();
     for (size_t i{}; i < _textures.size(); ++i) {
         Texture& texture = _textures[i];
         _textures[i].SetTextureSlot(static_cast<unsigned int>(i));
@@ -42,14 +56,12 @@ void Mesh::Draw(const Shader& shader) {
         texture.Bind();
     }
 
-    _vertexArray.Bind();
     _vertexArray.Draw();
 
     _vertexArray.Unbind();
     for (size_t i{}; i < _textures.size(); ++i) {
         _textures[i].Unbind();
     }
-    // shader.Unbind();
 }
 
 const VertexArray& Mesh::GetVertexArray() const {

@@ -1,6 +1,7 @@
 #pragma once
 
 #include "GraphicLib/DLL_API.h"
+#include "GraphicLib/IndexBuffer.h"
 #include "GraphicLib/Shader.h"
 #include "GraphicLib/Texture.h"
 #include "GraphicLib/Utilities/UniqueIdentifier.h"
@@ -18,7 +19,9 @@ public:
     Mesh& operator=(const Mesh& other) = delete;
     ~Mesh() noexcept = default;
     void Initialise();
-    void Set(VertexBufferData&& vertexBufferData, std::vector<TextureData>&& texturesData);
+    void SetVertexBuffer(std::vector<float>&& vertexData, const std::span<const VertexAttribute>& vertexAttributes);
+    void SetIndexBuffer(std::vector<IndexBufferDataElement>&& indices);
+    void SetTextures(std::vector<TextureData>&& texturesData);
     void Draw(const Shader& shader);
     [[nodiscard]] const VertexArray& GetVertexArray() const;
     [[nodiscard]] const std::vector<Texture>& GetTextures() const;

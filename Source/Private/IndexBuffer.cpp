@@ -42,27 +42,27 @@ void IndexBuffer::Unbind() const {
     GraphicAPI::Get().GetIndexBufferImpl().Unbind(_id.Value);
 }
 
-void IndexBuffer::Set(IndexBufferData&& data) {
+void IndexBuffer::Set(std::vector<IndexBufferDataElement>&& indices) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
 
-    if (data.Indicies.empty()) {
+    if (indices.empty()) {
         LOG_INTERNAL_ERROR("Indicies are empty");
         return;
     }
 
-    _data = std::move(data);
+    _indices = std::move(indices);
     Bind();
-    GraphicAPI::Get().GetIndexBufferImpl().Set(_id.Value, _data);
+    GraphicAPI::Get().GetIndexBufferImpl().Set(_id.Value, _indices);
     Unbind();
 }
 
-const IndexBufferData& IndexBuffer::GetData() const {
+const std::vector<IndexBufferDataElement>& IndexBuffer::GetIndices() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
-    return _data;
+    return _indices;
 }
 } // namespace GraphicLib

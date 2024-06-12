@@ -11,10 +11,6 @@ struct IndexBufferDataElement {
     unsigned int ThirdVertex{};
 };
 
-struct IndexBufferData {
-    std::vector<IndexBufferDataElement> Indicies;
-};
-
 class DLL_API IndexBuffer {
 public:
     IndexBuffer() noexcept = default;
@@ -26,11 +22,11 @@ public:
     void Initialise();
     void Bind() const;
     void Unbind() const;
-    void Set(IndexBufferData&& data);
-    [[nodiscard]] const IndexBufferData& GetData() const;
+    void Set(std::vector<IndexBufferDataElement>&& indices);
+    [[nodiscard]] const std::vector<IndexBufferDataElement>& GetIndices() const;
 
 private:
-    IndexBufferData _data;
+    std::vector<IndexBufferDataElement> _indices;
     UniqueIdentifier _id;
 };
 } // namespace GraphicLib

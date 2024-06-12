@@ -17,8 +17,8 @@ public:
     void Initialise();
     void Bind() const;
     void Unbind() const;
-    void Set(VertexBufferData&& vertexBufferData);
-    void Set(VertexBufferData&& vertexBufferData, IndexBufferData&& indexBufferData);
+    void SetVertexBuffer(std::vector<float>&& vertexData, const std::span<const VertexAttribute>& vertexAttributes);
+    void SetIndexBuffer(std::vector<IndexBufferDataElement>&& Indicies);
     void Draw();
     [[nodiscard]] const VertexBuffer& GetVertexBuffer() const;
     [[nodiscard]] const IndexBuffer& GetIndexBuffer() const;
