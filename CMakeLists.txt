@@ -20,10 +20,12 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Public/${PROJECT_NAME}/FrameBuffer.h
 	Source/Public/${PROJECT_NAME}/RenderBuffer.h
 	Source/Public/${PROJECT_NAME}/Mesh.h
+	Source/Public/${PROJECT_NAME}/Model3d.h
 	Source/Public/${PROJECT_NAME}/Utilities/TextureUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/RenderBufferUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/ShaderUtils.h
 	Source/Public/${PROJECT_NAME}/Utilities/UniqueIdentifier.h
+	Source/Public/${PROJECT_NAME}/Utilities/Model3dUtils.h
 
 	Source/Private/IExternalLogSystem.h
 	Source/Private/IExternalLogSystem.cpp
@@ -35,6 +37,7 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Private/FrameBuffer.cpp
 	Source/Private/RenderBuffer.cpp
 	Source/Private/Mesh.cpp
+	Source/Private/Model3d.cpp
 	Source/Private/Logger.cpp
 	Source/Private/InternalLogger.h
 	Source/Private/InternalLogger.cpp
@@ -43,6 +46,7 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Private/Utilities/RenderBufferUtils.cpp
 	Source/Private/Utilities/ShaderUtils.cpp
 	Source/Private/Utilities/UniqueIdentifier.cpp
+	Source/Private/Utilities/Model3dUtils.cpp
 
 	Source/Private/Vendors/stb/stb_image.h
 )
