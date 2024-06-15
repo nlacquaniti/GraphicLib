@@ -20,7 +20,7 @@ public:
     ~Mesh() noexcept = default;
     void Initialise();
     void SetVertexBuffer(std::vector<float>&& vertexData, const std::span<const VertexAttribute>& vertexAttributes);
-    void SetIndexBuffer(std::vector<IndexBufferDataElement>&& indices);
+    void SetIndexBuffer(std::vector<unsigned int>&& indices);
     void SetTextures(std::vector<TextureData>&& texturesData);
     void Draw(const Shader& shader);
     [[nodiscard]] const VertexArray& GetVertexArray() const;

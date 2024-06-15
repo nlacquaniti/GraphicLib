@@ -42,7 +42,7 @@ void IndexBuffer::Unbind() const {
     GraphicAPI::Get().GetIndexBufferImpl().Unbind(_id.Value);
 }
 
-void IndexBuffer::Set(std::vector<IndexBufferDataElement>&& indices) {
+void IndexBuffer::Set(std::vector<unsigned int>&& indices) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
@@ -59,7 +59,7 @@ void IndexBuffer::Set(std::vector<IndexBufferDataElement>&& indices) {
     Unbind();
 }
 
-const std::vector<IndexBufferDataElement>& IndexBuffer::GetIndices() const {
+const std::vector<unsigned int>& IndexBuffer::GetIndices() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }

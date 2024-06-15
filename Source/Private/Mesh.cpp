@@ -20,7 +20,7 @@ void Mesh::SetVertexBuffer(std::vector<float>&& vertexData, const std::span<cons
     _vertexArray.SetVertexBuffer(std::move(vertexData), vertexAttributes);
 }
 
-void Mesh::SetIndexBuffer(std::vector<IndexBufferDataElement>&& indices) {
+void Mesh::SetIndexBuffer(std::vector<unsigned int>&& indices) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;

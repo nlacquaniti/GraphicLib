@@ -5,12 +5,6 @@
 #include <vector>
 
 namespace GraphicLib {
-struct IndexBufferDataElement {
-    unsigned int FirstVertex{};
-    unsigned int SecondVertex{};
-    unsigned int ThirdVertex{};
-};
-
 class DLL_API IndexBuffer {
 public:
     IndexBuffer() noexcept = default;
@@ -22,11 +16,11 @@ public:
     void Initialise();
     void Bind() const;
     void Unbind() const;
-    void Set(std::vector<IndexBufferDataElement>&& indices);
-    [[nodiscard]] const std::vector<IndexBufferDataElement>& GetIndices() const;
+    void Set(std::vector<unsigned int>&& indices);
+    [[nodiscard]] const std::vector<unsigned int>& GetIndices() const;
 
 private:
-    std::vector<IndexBufferDataElement> _indices;
+    std::vector<unsigned int> _indices;
     UniqueIdentifier _id;
 };
 } // namespace GraphicLib

@@ -5,9 +5,6 @@
 
 namespace GraphicLib::OpenGLImpl {
 void VertexBufferImpl::Initialise(unsigned int& id) const {
-    // int maxVertexAttribs;
-    // glGetIntegerv(GL_MAX_VERTEX_ATTRIBS, &maxVertexAttribs);
-    // std::cout << "GL_MAX_VERTEX_ATTRIBS" << maxVertexAttribs << std::endl;
     glGenBuffers(1, &id);
 }
 

@@ -61,7 +61,7 @@ void VertexArray::SetVertexBuffer(std::vector<float>&& vertexData, const std::sp
     Unbind();
 }
 
-void VertexArray::SetIndexBuffer(std::vector<IndexBufferDataElement>&& indices) {
+void VertexArray::SetIndexBuffer(std::vector<unsigned int>&& indices) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
