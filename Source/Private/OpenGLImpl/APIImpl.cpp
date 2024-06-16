@@ -10,7 +10,7 @@ APIImpl* APIImpl::_instance{};
 
 const APIImpl& APIImpl::Get() {
     if (_instance == nullptr) {
-        gladLoadGL();
+        // gladLoadGL();
         InternalLogger::Get().AttachExternalLogSystem(std::make_unique<OpenGLLogSystem>());
         _instance = new APIImpl{};
     }
@@ -20,10 +20,6 @@ const APIImpl& APIImpl::Get() {
 
 const VertexArrayImpl& APIImpl::GetVertexArrayImpl() const {
     return _vertexArrayImpl;
-}
-
-const VertexBufferImpl& APIImpl::GetVertexBufferImpl() const {
-    return _vertexBufferImpl;
 }
 
 const IndexBufferImpl& APIImpl::GetIndexBufferImpl() const {

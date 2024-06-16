@@ -13,7 +13,6 @@ class APIImpl {
 public:
     static const APIImpl& Get();
     const VertexArrayImpl& GetVertexArrayImpl() const;
-    const VertexBufferImpl& GetVertexBufferImpl() const;
     const IndexBufferImpl& GetIndexBufferImpl() const;
     const TextureImpl& GetTextureImpl() const;
     const ShaderImpl& GetShaderImpl() const;
@@ -23,7 +22,6 @@ public:
 private:
     static APIImpl* _instance;
     VertexArrayImpl _vertexArrayImpl{};
-    VertexBufferImpl _vertexBufferImpl{};
     IndexBufferImpl _indexBufferImpl{};
     TextureImpl _textureImpl{};
     ShaderImpl _shaderImpl{};

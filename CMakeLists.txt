@@ -7,15 +7,18 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 option(GL_ENABLE_OPENGL "Use OpenGL has a graphic library" ON)
 option(GL_ENABLE_EXAMPLES "Build example projects" OFF)
+option(GL_ENABLE_TESTS "Build tests projects" OFF)
 option(GL_ENABLE_EXAMPLES_SYMLINK "Enable example projects files symlink" ON)
 
-add_library(${PROJECT_NAME} SHARED
+add_library(${PROJECT_NAME} STATIC 
 	Source/Public/${PROJECT_NAME}/DLL_API.h
+	Source/Public/${PROJECT_NAME}/LibInitialise.h
 	Source/Public/${PROJECT_NAME}/Logger.h
 	Source/Public/${PROJECT_NAME}/IndexBuffer.h
 	Source/Public/${PROJECT_NAME}/Shader.h
 	Source/Public/${PROJECT_NAME}/VertexArray.h
 	Source/Public/${PROJECT_NAME}/VertexBuffer.h
+	Source/Public/${PROJECT_NAME}/GL_VertexBuffer.h
 	Source/Public/${PROJECT_NAME}/Texture.h
 	Source/Public/${PROJECT_NAME}/FrameBuffer.h
 	Source/Public/${PROJECT_NAME}/RenderBuffer.h
@@ -27,12 +30,14 @@ add_library(${PROJECT_NAME} SHARED
 	Source/Public/${PROJECT_NAME}/Utilities/UniqueIdentifier.h
 	Source/Public/${PROJECT_NAME}/Utilities/Model3dUtils.h
 
+	Source/Private/LibInitialise.cpp
 	Source/Private/IExternalLogSystem.h
 	Source/Private/IExternalLogSystem.cpp
 	Source/Private/IndexBuffer.cpp
 	Source/Private/Shader.cpp
 	Source/Private/VertexArray.cpp
 	Source/Private/VertexBuffer.cpp
+	Source/Private/GL_VertexBuffer.cpp
 	Source/Private/Texture.cpp
 	Source/Private/FrameBuffer.cpp
 	Source/Private/RenderBuffer.cpp
@@ -140,4 +145,9 @@ target_link_libraries(
 
 if(GL_ENABLE_EXAMPLES)
 	add_subdirectory(Examples)
+endif()
+
+if(GL_ENABLE_TESTS) 
+	target_compile_definitions(${PROJECT_NAME} PRIVATE MOCK_OPENGL_IMPL)
+	add_subdirectory(Tests)
 endif()

@@ -1,40 +1,52 @@
 #include "OpenGLImpl/VertexBufferImpl.h"
-#include "GraphicLib/VertexBuffer.h"
 
+#ifndef MOCK_OPENGL_IMPL
 #include <glad/glad.h>
 
-namespace GraphicLib::OpenGLImpl {
-void VertexBufferImpl::Initialise(unsigned int& id) const {
-    glGenBuffers(1, &id);
+void GL_Internal_InitialiseVertexBuffer(GL_Internal_Id* id) {
+    glGenBuffers(1, id);
 }
 
-void VertexBufferImpl::Bind(unsigned int id) const {
+void GL_Internal_BindVertexBuffer(GL_Internal_Id id) {
     glBindBuffer(GL_ARRAY_BUFFER, id);
 }
 
-void VertexBufferImpl::Unbind(unsigned int /*unused*/) const {
+void GL_Internal_UnbindVertexBuffer() {
     glBindBuffer(GL_ARRAY_BUFFER, 0);
 }
 
-void VertexBufferImpl::Set(unsigned int /*unused*/, const std::vector<float>& vertexData, const std::span<const VertexAttribute>& vertexAttributes) const {
-    glBufferData(GL_ARRAY_BUFFER, static_cast<long long>(vertexData.size() * sizeof(float)), vertexData.data(), GL_STATIC_DRAW);
-    int numberOfAttributes{};
-    for (const VertexAttribute& vertexAttribute : vertexAttributes) {
-        numberOfAttributes += vertexAttribute.Count;
+void GL_Internal_SetVertexBuffer(const float* vertexData,
+    size_t vertexDataSize,
+    const int* vertexAttributes,
+    size_t vertexAttributesSize) {
+    glBufferData(GL_ARRAY_BUFFER,
+        static_cast<long long>(vertexDataSize * sizeof(float)),
+        vertexData,
+        GL_STATIC_DRAW);
+
+    int numberOfAttributes = 0;
+    for (size_t i = 0; i < vertexAttributesSize; ++i) {
+        numberOfAttributes += vertexAttributes[i];
     }
 
-    int attributesSum{};
-    for (unsigned int i{}; i < vertexAttributes.size(); ++i) {
-        const int attribute{vertexAttributes[i].Count};
-        constexpr unsigned long long sizeOfFloat{sizeof(float)};
-        glVertexAttribPointer(i, attribute, GL_FLOAT, GL_FALSE, numberOfAttributes * static_cast<int>(sizeOfFloat),
-            reinterpret_cast<void*>(static_cast<unsigned long long>(attributesSum) * sizeOfFloat));
+    int attributesSum = 0;
+    for (unsigned int i{}; i < vertexAttributesSize; ++i) {
+        const int attribute = vertexAttributes[i];
+
+        glVertexAttribPointer(i,
+            attribute,
+            GL_FLOAT,
+            GL_FALSE,
+            numberOfAttributes * static_cast<int>(sizeof(float)),
+            reinterpret_cast<void*>(
+                static_cast<size_t>(attributesSum) * sizeof(float)));
+
         glEnableVertexAttribArray(i);
         attributesSum += attribute;
     }
 }
 
-void VertexBufferImpl::Delete(unsigned int& id) const {
-    glDeleteBuffers(1, &id);
+void GL_Internal_DeleteVertexBuffer(unsigned int* id) {
+    glDeleteBuffers(1, id);
 }
-} // namespace GraphicLib::OpenGLImpl
+#endif
