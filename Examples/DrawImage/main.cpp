@@ -183,12 +183,10 @@ void Application::Initialise() {
     // Box textures.
     std::vector<GraphicLib::TextureData> boxTexturesData;
     GraphicLib::TextureData& boxTextureData = boxTexturesData.emplace_back();
-    boxTextureData.Parameters = {
-        {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT},
-        {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT},
-        {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-        {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-    };
+    boxTextureData.Parameters.at(0) = {GraphicLib::ETextureParamName::WRAP_S, GraphicLib::ETextureParamValue::WRAP_REPEAT};
+    boxTextureData.Parameters.at(1) = {GraphicLib::ETextureParamName::WRAP_T, GraphicLib::ETextureParamValue::WRAP_REPEAT};
+    boxTextureData.Parameters.at(2) = {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR};
+    boxTextureData.Parameters.at(3) = {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR};
     boxTextureData.FilePath = GetResourceFullPath("Resources/Diffuse.png");
     boxTextureData.Type = GraphicLib::ETextureType::TEXTURE_2D;
 

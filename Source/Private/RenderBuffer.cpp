@@ -2,19 +2,15 @@
 
 #include "InternalLogger.h"
 
-#ifdef OPENGL_IMPL
-#include "OpenGLImpl/APIImpl.h"
-using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
-#else
-#error "No GraphicAPI has been detected."
-#endif
+#include "OpenGLImpl/RenderBufferImpl.h"
+#include "OpenGLImpl/Utils/RenderBufferImplUtils.h"
 
 namespace GraphicLib {
 RenderBuffer::~RenderBuffer() noexcept {
     if (!_id.IsInitialised) {
         return;
     }
-    GraphicAPI::Get().GetRenderBufferImpl().Delete(_id.Value);
+    Internal::DeleteRenderBuffer(&_id.Value);
 }
 
 void RenderBuffer::Initialise() {
@@ -22,7 +18,7 @@ void RenderBuffer::Initialise() {
         LOG_INTERNAL_ERROR("Already initialised");
         return;
     }
-    GraphicAPI::Get().GetRenderBufferImpl().Initialise(_id.Value);
+    Internal::InitialiseRenderBuffer(&_id.Value);
     _id.IsInitialised = true;
 }
 
@@ -31,7 +27,7 @@ void RenderBuffer::Bind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetRenderBufferImpl().Bind(_id.Value);
+    Internal::BindRenderBuffer(_id.Value);
 }
 
 void RenderBuffer::Unbind() const {
@@ -39,7 +35,7 @@ void RenderBuffer::Unbind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetRenderBufferImpl().Unbind(_id.Value);
+    Internal::UnbindRenderBuffer();
 }
 
 void RenderBuffer::Set(const RenderBufferData& data) {
@@ -47,9 +43,16 @@ void RenderBuffer::Set(const RenderBufferData& data) {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
+
+    unsigned int outOpenGLRenderBufferFormat;
+    if (!Internal::ConvertRenderBufferFormatToInternalFormat(
+            data.Format, outOpenGLRenderBufferFormat)) {
+        return;
+    }
+
     _data = data;
     Bind();
-    GraphicAPI::Get().GetRenderBufferImpl().Set(_id.Value, data);
+    Internal::SetRenderBuffer(outOpenGLRenderBufferFormat, data.Width, data.Height);
 }
 
 unsigned int RenderBuffer::GetID() const {

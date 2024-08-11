@@ -1,7 +1,5 @@
 
 add_executable(GL_TESTS 
-    VertexBufferTests.h
-    VertexBufferTests.cpp
     main.cpp
 )
 

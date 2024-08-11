@@ -20,7 +20,8 @@ GraphicLib::FrameBuffer WindowImpl::_windowFrameBuffer{};
 
 bool WindowImpl::Create(const char* title) {
     if (title == nullptr) {
-        _invokeLogCallback("OpenGLImpl::WindowImpl::Create: Cannot create a window without a title");
+        _invokeLogCallback(
+            "OpenGLImpl::WindowImpl::Create: Cannot create a window without a title");
         return false;
     }
 
@@ -56,7 +57,8 @@ bool WindowImpl::Create(const char* title) {
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableKeyboard; // Enable Keyboard Controls
     io.ConfigFlags |= ImGuiConfigFlags_NavEnableGamepad;  // Enable Gamepad Controls
     io.ConfigFlags |= ImGuiConfigFlags_DockingEnable;     // Enable Docking
-    io.ConfigFlags |= ImGuiConfigFlags_ViewportsEnable;   // Enable Multi-Viewport / Platform Windows
+    io.ConfigFlags |=
+        ImGuiConfigFlags_ViewportsEnable; // Enable Multi-Viewport / Platform Windows
     io.FontGlobalScale = 1.5f;
     io.ConfigViewportsNoAutoMerge = true;
     io.ConfigViewportsNoTaskBarIcon = true;
@@ -64,7 +66,8 @@ bool WindowImpl::Create(const char* title) {
     // Setup Dear ImGui style
     ImGui::StyleColorsDark();
 
-    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can look identical to regular ones.
+    // When viewports are enabled we tweak WindowRounding/WindowBg so platform windows can
+    // look identical to regular ones.
     ImGuiStyle& style = ImGui::GetStyle();
     if (io.ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         style.WindowRounding = 0.0f;
@@ -131,8 +134,10 @@ void WindowImpl::Update() {
     ImGui_ImplOpenGL3_RenderDrawData(ImGui::GetDrawData());
 
     // Update and Update additional Platform Windows
-    // (Platform functions may change the current OpenGL context, so we save/restore it to make it easier to paste this code elsewhere.
-    //  For this specific demo app we could also call glfwMakeContextCurrent(window) directly)
+    // (Platform functions may change the current OpenGL context, so we save/restore it to
+    // make it easier to paste this code elsewhere.
+    //  For this specific demo app we could also call glfwMakeContextCurrent(window)
+    //  directly)
     if (ImGui::GetIO().ConfigFlags & ImGuiConfigFlags_ViewportsEnable) {
         GLFWwindow* backup_current_context = glfwGetCurrentContext();
         ImGui::UpdatePlatformWindows();
@@ -203,10 +208,15 @@ void WindowImpl::_setFrameBufferConfiguration() {
 
     // FrameBuffer texture.
     GraphicLib::TextureData frameBufferTextureData{};
-    frameBufferTextureData.Parameters = {
-        {GraphicLib::ETextureParamName::MIN_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-        {GraphicLib::ETextureParamName::MAG_FILTER, GraphicLib::ETextureParamValue::FILTER_LIEAR},
-    };
+    frameBufferTextureData.Parameters.at(0) = {GraphicLib::ETextureParamName::MIN_FILTER,
+        GraphicLib::ETextureParamValue::FILTER_LIEAR};
+    frameBufferTextureData.Parameters.at(1) = {GraphicLib::ETextureParamName::MAG_FILTER,
+        GraphicLib::ETextureParamValue::FILTER_LIEAR};
+    frameBufferTextureData.Parameters.at(2) = {GraphicLib::ETextureParamName::WRAP_S,
+        GraphicLib::ETextureParamValue::WRAP_CLAMP_TO_EDGE};
+    frameBufferTextureData.Parameters.at(3) = {GraphicLib::ETextureParamName::WRAP_T,
+        GraphicLib::ETextureParamValue::WRAP_CLAMP_TO_EDGE};
+
     frameBufferTextureData.Name = "FramebufferTexture";
     frameBufferTextureData.Width = windowWidth;
     frameBufferTextureData.Height = windowHeight;
@@ -219,5 +229,6 @@ void WindowImpl::_setFrameBufferConfiguration() {
 
     // Frame buffer render buffer creation.
     _windowFrameBuffer.GetRenderBuffer().Bind();
-    _windowFrameBuffer.GetRenderBuffer().Set({GraphicLib::ERenderBufferFormat::DEPTH24, windowWidth, windowHeight});
+    _windowFrameBuffer.GetRenderBuffer().Set(
+        {GraphicLib::ERenderBufferFormat::DEPTH24, windowWidth, windowHeight});
 }

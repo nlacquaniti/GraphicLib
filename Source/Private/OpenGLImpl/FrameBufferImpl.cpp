@@ -1,52 +1,37 @@
+#ifndef MOCK_OPENGL_IMPL
 #include "OpenGLImpl/FrameBufferImpl.h"
 
-#include "GraphicLib/RenderBuffer.h"
-#include "GraphicLib/Texture.h"
-#include "InternalLogger.h"
-#include "Utils/RenderBufferImplUtils.h"
-#include "Utils/TextureImplUtils.h"
 #include <glad/glad.h>
 
-namespace GraphicLib::OpenGLImpl {
-void FrameBufferImpl::Initialise(unsigned int& id) const {
-    glGenFramebuffers(1, &id);
+namespace GraphicLib::Internal {
+void InitialiseFrameBuffer(unsigned int* id) {
+    glGenFramebuffers(1, id);
 }
 
-void FrameBufferImpl::Bind(unsigned int id) const {
+void BindFrameBuffer(unsigned int id) {
     glBindFramebuffer(GL_FRAMEBUFFER, id);
 }
 
-void FrameBufferImpl::Unbind(unsigned int /*unused*/) const {
+void UnbindFrameBuffer() {
     glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void FrameBufferImpl::Set(unsigned int /*unused*/, const Texture& frameBufferTexture, const RenderBuffer& renderBuffer) const {
-    // Set FrameBuffer Texture.
-    unsigned int frameBufferAttachment{};
-    if (!TextureImplUtils::ConvertTextureFormatToFrameBufferAttachment(frameBufferTexture.GetData().Format, frameBufferAttachment)) {
-        return;
-    }
+bool SetFrameBuffer(unsigned int textureId,
+    unsigned int frameBufferAttachement,
+    unsigned int textureType,
+    unsigned int renderBufferId,
+    unsigned int renderBufferAttachment) {
+    glFramebufferTexture2D(
+        GL_FRAMEBUFFER, frameBufferAttachement, textureType, textureId, 0);
 
-    unsigned int textureTarget{};
-    if (!TextureImplUtils::ConvertTextureType(frameBufferTexture.GetData().Type, textureTarget)) {
-        return;
-    }
+    glFramebufferRenderbuffer(
+        GL_FRAMEBUFFER, renderBufferAttachment, GL_RENDERBUFFER, renderBufferId);
 
-    glFramebufferTexture2D(GL_FRAMEBUFFER, frameBufferAttachment, textureTarget, frameBufferTexture.GetID(), 0);
-
-    // Set FrameBuffer RenderBuffer.
-    unsigned int renderBufferAttachment{};
-    if (!RenderBufferImplUtils::ConvertRenderBufferFormatToFrameBufferAttachment(renderBuffer.GetData().Format, renderBufferAttachment)) {
-        return;
-    }
-    glFramebufferRenderbuffer(GL_FRAMEBUFFER, renderBufferAttachment, GL_RENDERBUFFER, renderBuffer.GetID());
-
-    if (glCheckFramebufferStatus(GL_FRAMEBUFFER) != GL_FRAMEBUFFER_COMPLETE) {
-        LOG_INTERNAL_ERROR("FrameBuffer is not completed");
-    }
+    return (glCheckFramebufferStatus(GL_FRAMEBUFFER) == GL_FRAMEBUFFER_COMPLETE);
 }
 
-void FrameBufferImpl::Delete(unsigned int& id) const {
-    glDeleteFramebuffers(1, &id);
+void DeleteFrameBuffer(unsigned int* id) {
+    glDeleteFramebuffers(1, id);
 }
-} // namespace GraphicLib::OpenGLImpl
+} // namespace GraphicLib::Internal
+#endif

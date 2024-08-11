@@ -1,18 +1,46 @@
 #pragma once
 
-#include "GraphicLib/Texture.h"
-
-namespace GraphicLib::OpenGLImpl {
-class TextureImpl {
-public:
-    void Initialise(unsigned int& id) const;
-    void Bind(unsigned int id, ETextureType type) const;
-    void Unbind(unsigned int id, ETextureType type) const;
-    void SetTextureSlot(unsigned int id, ETextureType type, unsigned int slot) const;
-    void Set(unsigned int id, const TextureData& textureData) const;
-    void Delete(unsigned int& id, ETextureType type) const;
-
-private:
-    static unsigned int _maxTextureSlots;
+namespace GraphicLib::Internal {
+struct TextureParameter {
+    unsigned int Name;
+    int Value;
 };
-} // namespace GraphicLib::OpenGLImpl
+
+struct TextureData {
+    static constexpr size_t MAX_PARAMETERS_COUNT = 4;
+    Internal::TextureParameter Parameters[MAX_PARAMETERS_COUNT];
+    const void* PixelData;
+    unsigned int Type;
+    unsigned int TextureFormat;
+    unsigned int DataType;
+    int Format;
+    int Width;
+    int Height;
+};
+
+#ifndef MOCK_OPENGL_IMPL
+void InitialiseTexture(unsigned int* id);
+void BindTexture(unsigned int id, unsigned int type);
+void UnbindTexture(unsigned int id, unsigned int type);
+void SetTextureSlot(unsigned int slot);
+void SetTexture(const Internal::TextureData& textureData);
+int GetMaxTextureSlots();
+void DeleteTexture(unsigned int* id);
+#else
+inline void InitialiseTexture(unsigned int* id) {
+}
+inline void BindTexture(unsigned int id, unsigned int type) {
+}
+inline void UnbindTexture(unsigned int id, unsigned int type) {
+}
+inline void SetTextureSlot(unsigned int slot) {
+}
+inline void SetTexture(const Internal::TextureData& textureData) {
+}
+inline int GetMaxTextureSlots() {
+    return 0;
+}
+void DeleteTexture(unsigned int* id) {
+}
+#endif
+} // namespace GraphicLib::Internal

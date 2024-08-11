@@ -1,14 +1,17 @@
 #pragma once
 
-#include <vector>
-
-namespace GraphicLib::OpenGLImpl {
-class IndexBufferImpl {
-public:
-    void Initialise(unsigned int& id) const;
-    void Bind(unsigned int id) const;
-    void Unbind(unsigned int id) const;
-    void Set(unsigned int id, const std::vector<unsigned int>& indices) const;
-    void Delete(unsigned int& id) const;
-};
-} // namespace GraphicLib::OpenGLImpl
+namespace GraphicLib::Internal {
+#ifndef MOCK_OPENGL_IMPL
+void InitialiseIndexBuffer(unsigned int* id);
+void BindIndexBuffer(unsigned int id);
+void UnbindIndexBuffer();
+void SetIndexBuffer(const unsigned int* indices, size_t indicesCount);
+void DeleteIndexBuffer(unsigned int* id);
+#else
+inline void InitialiseIndexBuffer(unsigned int*) {};
+inline void BindIndexBuffer(unsigned int) {};
+inline void UnbindIndexBuffer() {};
+inline void SetIndexBuffer(const unsigned int*, size_t) {};
+inline void DeleteIndexBuffer(unsigned int*) {};
+#endif
+}

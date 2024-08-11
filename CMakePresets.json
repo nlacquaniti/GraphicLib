@@ -1,0 +1,133 @@
+{
+    "version": 3,
+    "cmakeMinimumRequired": {
+      "major": 3,
+      "minor": 19,
+      "patch": 0
+    },
+    "configurePresets": [
+      {
+        "name": "ninja-debug",
+        "hidden": false,
+        "generator": "Ninja",
+        "binaryDir": "build/ninja-debug",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "Debug",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        }
+      },
+      {
+        "name": "ninja-release",
+        "hidden": false,
+        "generator": "Ninja",
+        "binaryDir": "build/ninja-release",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        }
+      },
+      {
+        "name": "ninja-relwithdebinfo",
+        "hidden": false,
+        "generator": "Ninja",
+        "binaryDir": "build/ninja-relwithdebinfo",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        }
+      },
+      {
+        "name": "ninja-minsizerel",
+        "hidden": false,
+        "generator": "Ninja",
+        "binaryDir": "build/ninja-minsizerel",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "MinSizeRel",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        }
+      },
+      {
+        "name": "vs-debug",
+        "hidden": false,
+        "generator": "Visual Studio 17 2022",
+        "binaryDir": "build/vs-debug",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "Debug",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        }
+      },
+      {
+        "name": "vs-release",
+        "hidden": false,
+        "generator": "Visual Studio 17 2022",  
+        "binaryDir": "build/vs-release",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "Release",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        }
+      },
+      {
+        "name": "vs-relwithdebinfo",
+        "hidden": false,
+        "generator": "Visual Studio 17 2022",  
+        "binaryDir": "build/vs-relwithdebinfo",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "RelWithDebInfo",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        }
+      },
+      {
+        "name": "vs-minsizerel",
+        "hidden": false,
+        "generator": "Visual Studio 17 2022",  
+        "binaryDir": "build/vs-minsizerel",
+        "cacheVariables": {
+          "CMAKE_BUILD_TYPE": "MinSizeRel",
+          "CMAKE_EXPORT_COMPILE_COMMANDS": "YES"
+        }
+      }
+    ],
+    "buildPresets": [
+      {
+        "name": "ninja-debug",
+        "hidden": false,
+        "configurePreset": "ninja-debug"
+
+      },
+      {
+        "name": "ninja-release",
+        "hidden": false,
+        "configurePreset": "ninja-release"
+      },
+      {
+        "name": "ninja-relwithdebinfo",
+        "hidden": false,
+        "configurePreset": "ninja-relwithdebinfo"
+      },
+      {
+        "name": "ninja-minsizerel",
+        "hidden": false,
+        "configurePreset": "ninja-minsizerel"
+      },
+      {
+        "name": "vs-debug",
+        "hidden": false,
+        "configurePreset": "vs-debug"
+      },
+      {
+        "name": "vs-release",
+        "hidden": false,
+        "configurePreset": "vs-release"
+      },
+      {
+        "name": "vs-relwithdebinfo",
+        "hidden": false,
+        "configurePreset": "vs-relwithdebinfo"
+      },
+      {
+        "name": "vs-minsizerel",
+        "hidden": false,
+        "configurePreset": "vs-minsizerel"
+      }
+    ]
+  }

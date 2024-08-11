@@ -1,41 +1,40 @@
 #include "GraphicLib/Texture.h"
 
 #include "InternalLogger.h"
+#include "OpenGLImpl/TextureImpl.h"
+#include "OpenGLImpl/Utils/TextureImplUtils.h"
 #include "StbImage.h"
 #include <filesystem>
 #include <format>
 #include <string>
-
-
-#ifdef OPENGL_IMPL
-#include "OpenGLImpl/APIImpl.h"
-using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
-#else
-#error "No GraphicAPI has been detected."
-#endif
 
 namespace GraphicLib {
 namespace {
 std::string extractTextureName(const std::string& texturePath) {
     const size_t nameEndPos = texturePath.rfind('.');
     if (nameEndPos == std::string::npos) {
-        const std::string& logText = std::format("Can't extract texture name for file \"{}\"", texturePath);
+        const std::string& logText =
+            std::format("Can't extract texture name for file \"{}\"", texturePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return {};
     }
+
     size_t nameStartPos = texturePath.rfind('/');
     if (nameStartPos == std::string::npos) {
         nameStartPos = 0;
     } else {
         ++nameStartPos;
     }
+
     size_t nameSize = nameEndPos - nameStartPos;
     std::string textureName = texturePath.substr(nameStartPos, nameSize);
     if (textureName.empty()) {
-        const std::string& logText = std::format("Texture name is empty for file \"{}\"", texturePath);
+        const std::string& logText =
+            std::format("Texture name is empty for file \"{}\"", texturePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return {};
     }
+
     return textureName;
 }
 } // namespace
@@ -44,10 +43,11 @@ Texture::~Texture() noexcept {
     if (!_id.IsInitialised) {
         return;
     }
+
     stbi_image_free(_data.PixelData);
     _data.PixelData = nullptr;
     Bind();
-    GraphicAPI::Get().GetTextureImpl().Delete(_id.Value, _data.Type);
+    Internal::DeleteTexture(&_id.Value);
 }
 
 void Texture::Initialise() {
@@ -62,7 +62,7 @@ void Texture::Initialise() {
         stbi_set_flip_vertically_on_load(1);
     }
 
-    GraphicAPI::Get().GetTextureImpl().Initialise(_id.Value);
+    Internal::InitialiseTexture(&_id.Value);
     _id.IsInitialised = true;
 }
 
@@ -71,7 +71,13 @@ void Texture::Bind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetTextureImpl().Bind(_id.Value, _data.Type);
+
+    unsigned int outType;
+    if (!Internal::ConvertTextureType(_data.Type, outType)) {
+        return;
+    }
+
+    Internal::BindTexture(_id.Value, outType);
 }
 
 void Texture::Unbind() const {
@@ -79,7 +85,13 @@ void Texture::Unbind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetTextureImpl().Unbind(_id.Value, _data.Type);
+
+    unsigned int outType;
+    if (!Internal::ConvertTextureType(_data.Type, outType)) {
+        return;
+    }
+
+    Internal::UnbindTexture(_id.Value, outType);
 }
 
 void Texture::SetTextureSlot(unsigned int slot) const {
@@ -87,10 +99,24 @@ void Texture::SetTextureSlot(unsigned int slot) const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetTextureImpl().SetTextureSlot(_id.Value, _data.Type, slot);
+
+    const auto maxTextureSlots =
+        static_cast<unsigned int>(Internal::GetMaxTextureSlots());
+    if (slot > maxTextureSlots) {
+        const std::string& logText = std::format(
+            "Provided texture slot {} exceeded the max number of texture slots {}", slot,
+            maxTextureSlots);
+        LOG_INTERNAL_ERROR(logText.c_str());
+        return;
+    }
+
+    Internal::SetTextureSlot(slot);
 }
 
 void Texture::Set(TextureData&& data) {
+    static_assert(TextureData::TEXTURE_PARAMETER_MAX_COUNT ==
+                  Internal::TextureData::MAX_PARAMETERS_COUNT);
+
     if (!data.FilePath.empty()) {
         _setFromFile(std::move(data));
     } else {
@@ -129,46 +155,54 @@ void Texture::_setFromFile(TextureData&& data) {
     }
 
     if (!std::filesystem::exists(std::filesystem::path{data.FilePath})) {
-        const std::string& logText = std::format("File \"{}\" doesn't exist", data.FilePath);
+        const std::string& logText =
+            std::format("File \"{}\" doesn't exist", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
-    std::string name = extractTextureName(data.FilePath);
+    const std::string name = extractTextureName(data.FilePath);
     if (name.empty()) {
-        const std::string& logText = std::format("File \"{}\" resulted in an empty name", data.FilePath);
+        const std::string& logText =
+            std::format("File \"{}\" resulted in an empty name", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     int width, height, channel;
-    unsigned char* pixelData = stbi_load(data.FilePath.c_str(), &width, &height, &channel, 0);
+    unsigned char* pixelData =
+        stbi_load(data.FilePath.c_str(), &width, &height, &channel, 0);
     if (stbi_failure_reason() != nullptr) {
-        const std::string& logText = std::format(R"(stbi_load failed with reason "{}")", stbi_failure_reason());
+        const std::string& logText =
+            std::format(R"(stbi_load failed with reason "{}")", stbi_failure_reason());
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (pixelData == nullptr) {
-        const std::string& logText = std::format(R"(Can't read pixel data for "{}")", data.FilePath);
+        const std::string& logText =
+            std::format(R"(Can't read pixel data for "{}")", data.FilePath);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (width == 0) {
-        const std::string& logText = std::format(R"(File "{}" with name "{}" couldn't retrive width)", data.FilePath, name);
+        const std::string& logText = std::format(
+            R"(File "{}" with name "{}" couldn't retrive width)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (height == 0) {
-        const std::string& logText = std::format(R"(File "{}" with name "{}" couldn't retrive height)", data.FilePath, name);
+        const std::string& logText = std::format(
+            R"(File "{}" with name "{}" couldn't retrive height)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
 
     if (channel == 0) {
-        const std::string& logText = std::format(R"(File "{}" with name "{}" couldn't retrive channel)", data.FilePath, name);
+        const std::string& logText = std::format(
+            R"(File "{}" with name "{}" couldn't retrive channel)", data.FilePath, name);
         LOG_INTERNAL_ERROR(logText.c_str());
         return;
     }
@@ -184,8 +218,13 @@ void Texture::_setFromFile(TextureData&& data) {
     _data.Format = ETextureFormat::RGBA32F;
     _data.DataType = ETextureDataType::UNSIGNED_BYTE;
 
+    Internal::TextureData internalTextureData;
+    if (!Internal::ConvertTextureData(_data, internalTextureData)) {
+        return;
+    }
+
     Bind();
-    GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data);
+    Internal::SetTexture(internalTextureData);
     Unbind();
 }
 
@@ -246,8 +285,13 @@ void Texture::_setRaw(TextureData&& data) {
     _data.Format = data.Format;
     _data.DataType = data.DataType;
 
+    Internal::TextureData internalTextureData;
+    if (!Internal::ConvertTextureData(_data, internalTextureData)) {
+        return;
+    }
+
     Bind();
-    GraphicAPI::Get().GetTextureImpl().Set(_id.Value, _data);
+    Internal::SetTexture(internalTextureData);
     Unbind();
 }
 }; // namespace GraphicLib

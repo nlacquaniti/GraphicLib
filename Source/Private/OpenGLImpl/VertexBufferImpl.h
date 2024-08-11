@@ -1,21 +1,25 @@
 #pragma once
 
-typedef unsigned int GL_Internal_Id;
-
+namespace GraphicLib::Internal {
 #ifndef MOCK_OPENGL_IMPL
-void GL_Internal_InitialiseVertexBuffer(GL_Internal_Id* id);
-void GL_Internal_BindVertexBuffer(GL_Internal_Id id);
-void GL_Internal_UnbindVertexBuffer();
-void GL_Internal_SetVertexBuffer(const float* vertexData,
+void InitialiseVertexBuffer(unsigned int* id);
+void BindVertexBuffer(unsigned int id);
+void UnbindVertexBuffer();
+void SetVertexBuffer(const float* vertexData,
     size_t vertexDataSize,
     const int* vertexAttributes,
     size_t vertexAttributesSize);
-void GL_Internal_DeleteVertexBuffer(GL_Internal_Id* id);
+void DeleteVertexBuffer(unsigned int* id);
 #else
-inline void GL_Internal_InitialiseVertexBuffer(GL_Internal_Id*) {};
-inline void GL_Internal_BindVertexBuffer(GL_Internal_Id){};
-inline void GL_Internal_UnbindVertexBuffer() {};
-inline void
-GL_Internal_SetVertexBuffer(const float*, size_t, const int*, size_t) {};
-inline void GL_Internal_DeleteVertexBuffer(GL_Internal_Id*) {};
+inline void InitialiseVertexBuffer(unsigned int*) {
+}
+inline void BindVertexBuffer(unsigned int) {
+}
+inline void UnbindVertexBuffer() {
+}
+inline void SetVertexBuffer(const float*, size_t, const int*, size_t) {
+}
+inline void DeleteVertexBuffer(unsigned int*) {
+}
 #endif
+} // namespace GraphicLib::Internal

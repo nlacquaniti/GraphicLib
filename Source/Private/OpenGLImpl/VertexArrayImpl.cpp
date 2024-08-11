@@ -1,29 +1,31 @@
+#ifndef MOCK_OPENGL_IMPL
 #include "OpenGLImpl/VertexArrayImpl.h"
 
 #include <glad/glad.h>
 
-namespace GraphicLib::OpenGLImpl {
-void VertexArrayImpl::Initialise(unsigned int& id) const {
-    glGenVertexArrays(1, &id);
+namespace GraphicLib::Internal {
+void InitialiseVertexArray(unsigned int* id) {
+    glGenVertexArrays(1, id);
 }
 
-void VertexArrayImpl::Bind(unsigned int id) const {
+void BindVertexArray(unsigned int id) {
     glBindVertexArray(id);
 }
 
-void VertexArrayImpl::Unbind(unsigned int) const {
+void UnbindVertexArray() {
     glBindVertexArray(0);
 }
 
-void VertexArrayImpl::DrawTriangles(unsigned int, int trianglesCount) const {
+void DrawTrianglesVertexArray(int trianglesCount) {
     glDrawElements(GL_TRIANGLES, trianglesCount, GL_UNSIGNED_INT, nullptr);
 }
 
-void VertexArrayImpl::DrawVertices(unsigned int, int verticesCount) const {
+void DrawVerticesVertexArray(int verticesCount) {
     glDrawArrays(GL_TRIANGLES, 0, verticesCount);
 }
 
-void VertexArrayImpl::Delete(unsigned int& id) const {
-    glDeleteVertexArrays(1, &id);
+void DeleteVertexArray(unsigned int* id) {
+    glDeleteVertexArrays(1, id);
 }
-} // namespace GraphicLib::OpenGLImpl
+} // namespace GraphicLib::Internal
+#endif

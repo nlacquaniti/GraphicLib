@@ -3,7 +3,7 @@
 #include "GraphicLib/DLL_API.h"
 #include "GraphicLib/Utilities/UniqueIdentifier.h"
 #include <string>
-#include <vector>
+#include <array>
 
 namespace GraphicLib {
 enum class ETextureType : unsigned char {
@@ -79,7 +79,8 @@ struct TextureParameter {
 };
 
 struct TextureData {
-    std::vector<TextureParameter> Parameters;
+    static constexpr std::size_t TEXTURE_PARAMETER_MAX_COUNT = 4;
+    std::array<TextureParameter, TEXTURE_PARAMETER_MAX_COUNT> Parameters;
     std::string FilePath;
     std::string Name;
     unsigned char* PixelData{};

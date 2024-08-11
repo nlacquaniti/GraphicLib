@@ -18,7 +18,6 @@ add_library(${PROJECT_NAME} STATIC
 	Source/Public/${PROJECT_NAME}/Shader.h
 	Source/Public/${PROJECT_NAME}/VertexArray.h
 	Source/Public/${PROJECT_NAME}/VertexBuffer.h
-	Source/Public/${PROJECT_NAME}/GL_VertexBuffer.h
 	Source/Public/${PROJECT_NAME}/Texture.h
 	Source/Public/${PROJECT_NAME}/FrameBuffer.h
 	Source/Public/${PROJECT_NAME}/RenderBuffer.h
@@ -37,7 +36,6 @@ add_library(${PROJECT_NAME} STATIC
 	Source/Private/Shader.cpp
 	Source/Private/VertexArray.cpp
 	Source/Private/VertexBuffer.cpp
-	Source/Private/GL_VertexBuffer.cpp
 	Source/Private/Texture.cpp
 	Source/Private/FrameBuffer.cpp
 	Source/Private/RenderBuffer.cpp
@@ -58,7 +56,6 @@ add_library(${PROJECT_NAME} STATIC
 
 if(GL_ENABLE_OPENGL)
 	target_sources(${PROJECT_NAME} PRIVATE 
-		Source/Private/OpenGLImpl/APIImpl.h
 		Source/Private/OpenGLImpl/ShaderImpl.h
 		Source/Private/OpenGLImpl/VertexArrayImpl.h
 		Source/Private/OpenGLImpl/VertexBufferImpl.h
@@ -71,7 +68,6 @@ if(GL_ENABLE_OPENGL)
 		Source/Private/OpenGLImpl/Utils/RenderBufferImplUtils.h
 		Source/Private/OpenGLImpl/Utils/ShaderImplUtils.h
 	
-		Source/Private/OpenGLImpl/APIImpl.cpp
 		Source/Private/OpenGLImpl/ShaderImpl.cpp
 		Source/Private/OpenGLImpl/VertexArrayImpl.cpp
 		Source/Private/OpenGLImpl/VertexBufferImpl.cpp

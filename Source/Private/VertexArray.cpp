@@ -4,12 +4,7 @@
 #include "GraphicLib/VertexBuffer.h"
 #include "InternalLogger.h"
 
-#ifdef OPENGL_IMPL
-#include "OpenGLImpl/APIImpl.h"
-using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
-#else
-#error "No GraphicAPI has been detected."
-#endif
+#include "OpenGLImpl/VertexArrayImpl.h"
 
 #include <limits>
 
@@ -18,7 +13,7 @@ VertexArray::~VertexArray() noexcept {
     if (!_id.IsInitialised) {
         return;
     }
-    GraphicAPI::Get().GetVertexArrayImpl().Delete(_id.Value);
+    Internal::DeleteVertexArray(&_id.Value);
 }
 
 void VertexArray::Initialise() {
@@ -26,7 +21,7 @@ void VertexArray::Initialise() {
         LOG_INTERNAL_ERROR("Already initialised");
         return;
     }
-    GraphicAPI::Get().GetVertexArrayImpl().Initialise(_id.Value);
+    Internal::InitialiseVertexArray(&_id.Value);
     _vertexBuffer.Initialise();
     _indexBuffer.Initialise();
     _id.IsInitialised = true;
@@ -37,7 +32,7 @@ void VertexArray::Bind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetVertexArrayImpl().Bind(_id.Value);
+    Internal::BindVertexArray(_id.Value);
     _vertexBuffer.Bind();
     _indexBuffer.Bind();
 }
@@ -47,12 +42,13 @@ void VertexArray::Unbind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetVertexArrayImpl().Unbind(_id.Value);
+    Internal::UnbindVertexArray();
     _vertexBuffer.Unbind();
     _indexBuffer.Unbind();
 }
 
-void VertexArray::SetVertexBuffer(std::vector<float>&& vertexData, const std::span<const VertexAttribute>& vertexAttributes) {
+void VertexArray::SetVertexBuffer(std::vector<float>&& vertexData,
+    const std::span<const VertexAttribute>& vertexAttributes) {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
@@ -84,22 +80,25 @@ void VertexArray::Draw() {
         }
 
         Bind();
-        GraphicAPI::Get().GetVertexArrayImpl().DrawTriangles(_id.Value, static_cast<int>(trianglesCount));
+        Internal::DrawTrianglesVertexArray(static_cast<int>(trianglesCount));
         Unbind();
-    } else if (!_vertexBuffer.GetVertexData().empty() && !_vertexBuffer.GetVertexAttributes().empty()) {
+    } else if (!_vertexBuffer.GetVertexData().empty() &&
+               !_vertexBuffer.GetVertexAttributes().empty()) {
         unsigned long long attributesCount{};
-        for (const VertexAttribute& vertexAttribute : _vertexBuffer.GetVertexAttributes()) {
+        for (const VertexAttribute& vertexAttribute :
+            _vertexBuffer.GetVertexAttributes()) {
             attributesCount += static_cast<unsigned long long>(vertexAttribute.Count);
         }
 
-        const std::size_t verticesCount = _vertexBuffer.GetVertexData().size() / attributesCount;
+        const std::size_t verticesCount =
+            _vertexBuffer.GetVertexData().size() / attributesCount;
         if (static_cast<long long>(verticesCount) > std::numeric_limits<int>::max()) {
             LOG_INTERNAL_ERROR("Vertices count exceeded the max number");
             return;
         }
 
         Bind();
-        GraphicAPI::Get().GetVertexArrayImpl().DrawVertices(_id.Value, static_cast<int>(verticesCount));
+        Internal::DrawVerticesVertexArray(static_cast<int>(verticesCount));
         Unbind();
     } else {
         LOG_INTERNAL_ERROR("Draw failed, both IndexBuffer and VertexBuffer are empty");

@@ -58,7 +58,7 @@ if(GL_ENABLE_OPENGL)
 	target_compile_definitions(DrawImageExample PRIVATE OPENGL_IMPL)
 endif()
 
-target_compile_definitions(DrawImageExample PRIVATE EXEC_PATH="${CMAKE_CURRENT_BINARY_DIR}/")
+target_compile_definitions(DrawImageExample PRIVATE EXEC_PATH="$<TARGET_FILE_DIR:DrawImageExample>/")
 
 add_dependencies(DrawImageExample ${PROJECT_NAME})
 

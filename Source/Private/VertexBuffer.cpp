@@ -11,7 +11,7 @@ VertexBuffer::~VertexBuffer() noexcept {
     if (!_id.IsInitialised) {
         return;
     }
-    GL_Internal_DeleteVertexBuffer(&_id.Value);
+    Internal::DeleteVertexBuffer(&_id.Value);
 }
 
 void VertexBuffer::Initialise() {
@@ -19,7 +19,7 @@ void VertexBuffer::Initialise() {
         LOG_INTERNAL_ERROR("Already initialised");
         return;
     }
-    GL_Internal_InitialiseVertexBuffer(&_id.Value);
+    Internal::InitialiseVertexBuffer(&_id.Value);
     _id.IsInitialised = true;
 }
 
@@ -28,7 +28,7 @@ void VertexBuffer::Bind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GL_Internal_BindVertexBuffer(_id.Value);
+    Internal::BindVertexBuffer(_id.Value);
 }
 
 void VertexBuffer::Unbind() const {
@@ -36,7 +36,7 @@ void VertexBuffer::Unbind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GL_Internal_UnbindVertexBuffer();
+    Internal::UnbindVertexBuffer();
 }
 
 void VertexBuffer::Set(std::vector<float>&& vertexData,
@@ -89,7 +89,7 @@ void VertexBuffer::Set(std::vector<float>&& vertexData,
     }
 
     Bind();
-    GL_Internal_SetVertexBuffer(_vertexData.data(),
+    Internal::SetVertexBuffer(_vertexData.data(),
         _vertexData.size(),
         openGLVertexAttributes,
         vertexAttributes.size());

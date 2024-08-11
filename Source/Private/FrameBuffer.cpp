@@ -1,20 +1,19 @@
 #include "GraphicLib/FrameBuffer.h"
 
+#include "GraphicLib/RenderBuffer.h"
 #include "InternalLogger.h"
 
-#ifdef OPENGL_IMPL
-#include "OpenGLImpl/APIImpl.h"
-using GraphicAPI = GraphicLib::OpenGLImpl::APIImpl;
-#else
-#error "No GraphicAPI has been detected."
-#endif
+#include "OpenGLImpl/FrameBufferImpl.h"
+#include "OpenGLImpl/Utils/RenderBufferImplUtils.h"
+#include "OpenGLImpl/Utils/TextureImplUtils.h"
 
 namespace GraphicLib {
 FrameBuffer::~FrameBuffer() noexcept {
     if (!_id.IsInitialised) {
         return;
     }
-    GraphicAPI::Get().GetFrameBufferImpl().Delete(_id.Value);
+
+    Internal::DeleteFrameBuffer(&_id.Value);
 }
 
 void FrameBuffer::Initialise() {
@@ -22,7 +21,8 @@ void FrameBuffer::Initialise() {
         LOG_INTERNAL_ERROR("Already initialised");
         return;
     }
-    GraphicAPI::Get().GetFrameBufferImpl().Initialise(_id.Value);
+
+    Internal::InitialiseFrameBuffer(&_id.Value);
     _id.IsInitialised = true;
 }
 
@@ -31,7 +31,8 @@ void FrameBuffer::Bind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetFrameBufferImpl().Bind(_id.Value);
+
+    Internal::BindFrameBuffer(_id.Value);
 }
 
 void FrameBuffer::Unbind() const {
@@ -39,7 +40,8 @@ void FrameBuffer::Unbind() const {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetFrameBufferImpl().Unbind(_id.Value);
+
+    Internal::UnbindFrameBuffer();
 }
 
 void FrameBuffer::Set() {
@@ -47,13 +49,35 @@ void FrameBuffer::Set() {
         LOG_INTERNAL_ERROR("Uninitialised");
         return;
     }
-    GraphicAPI::Get().GetFrameBufferImpl().Set(_id.Value, _texture, _renderBuffer);
+
+    unsigned int frameBufferAttachment{};
+    if (!Internal::ConvertTextureFormatToFrameBufferAttachment(
+            _texture.GetData().Format, frameBufferAttachment)) {
+        return;
+    }
+
+    unsigned int internalTextureType;
+    if (!Internal::ConvertTextureType(_texture.GetData().Type, internalTextureType)) {
+        return;
+    }
+
+    unsigned int renderBufferAttachment{};
+    if (!Internal::ConvertRenderBufferFormatToFrameBufferAttachment(
+            _renderBuffer.GetData().Format, renderBufferAttachment)) {
+        return;
+    }
+
+    if (!Internal::SetFrameBuffer(_texture.GetID(), frameBufferAttachment,
+            internalTextureType, _renderBuffer.GetID(), renderBufferAttachment)) {
+        LOG_INTERNAL_ERROR("Internal::SetFrameBuffer failed.");
+    }
 }
 
 const Texture& FrameBuffer::GetTexture() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
+
     return _texture;
 }
 
@@ -61,6 +85,7 @@ Texture& FrameBuffer::GetTexture() {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
+
     return _texture;
 }
 
@@ -68,6 +93,7 @@ const RenderBuffer& FrameBuffer::GetRenderBuffer() const {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
+
     return _renderBuffer;
 }
 
@@ -75,6 +101,7 @@ RenderBuffer& FrameBuffer::GetRenderBuffer() {
     if (!_id.IsInitialised) {
         LOG_INTERNAL_ERROR("Uninitialised");
     }
+
     return _renderBuffer;
 }
 } // namespace GraphicLib
